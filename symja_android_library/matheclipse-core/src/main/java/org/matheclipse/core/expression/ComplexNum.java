@@ -12,6 +12,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.form.DoubleToMMA;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IComplex;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -103,9 +104,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
    * @return
    */
   private static ComplexNum newInstance(final Complex value) {
-    ComplexNum d = new ComplexNum(0.0, 0.0);
-    d.fComplex = value;
-    return d;
+    return new ComplexNum(value);
   }
 
   public static ComplexNum valueOf(final Complex c) {
@@ -156,6 +155,10 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
   private ComplexNum(final double r, final double i) {
     fComplex = new Complex(r, i);
+  }
+
+  private ComplexNum(Complex complex) {
+    fComplex = complex;
   }
 
   /** {@inheritDoc} */
@@ -224,7 +227,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     try {
       return F.complex(
           NumberUtil.toLong(Math.ceil(fComplex.getReal())),
-        NumberUtil.toLong(Math.ceil(fComplex.getImaginary())));
+          NumberUtil.toLong(Math.ceil(fComplex.getImaginary())));
     } catch (ArithmeticException ae) {
       ArgumentTypeException.throwArg(this, F.Ceiling(this));
     }
@@ -357,6 +360,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     return FEConfig.MACHINE_PRECISION;
   }
 
+  @Override
   public IComplexNum divide(final IComplexNum that) {
     if (that instanceof ApcomplexNum) {
       return ApcomplexNum.valueOf(fComplex, ((ApcomplexNum) that).precision())
@@ -428,6 +432,48 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
   /** {@inheritDoc} */
   @Override
+  public String fullFormString() {
+    double re = fComplex.getReal();
+    double im = fComplex.getImaginary();
+    StringBuilder buf = new StringBuilder("Complex");
+    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+      buf.append('(');
+    } else {
+      buf.append('[');
+    }
+
+    String str = Double.toString(re);
+    if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      int indx = str.indexOf("E");
+      if (indx > 0) {
+        str = str.replace("E", "`*^");
+      } else {
+        str = str + "`";
+      }
+    }
+    buf.append(str);
+    buf.append(',');
+    str = Double.toString(im);
+    if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      int indx = str.indexOf("E");
+      //    `*^
+      if (indx > 0) {
+        str = str.replace("E", "`*^");
+      } else {
+        str = str + "`";
+      }
+    }
+    buf.append(str);
+    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+      buf.append(')');
+    } else {
+      buf.append(']');
+    }
+    return buf.toString();
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public IComplex integerPart() {
     // isNegative() ? ceilFraction() : floorFraction();
     double re = fComplex.getReal();
@@ -452,10 +498,10 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     try {
       return F.complex(
           NumberUtil.toLong(Math.floor(fComplex.getReal())),
-        NumberUtil.toLong(Math.floor(fComplex.getImaginary())));
+          NumberUtil.toLong(Math.floor(fComplex.getImaginary())));
     } catch (ArithmeticException ae) {
       ArgumentTypeException.throwArg(this, F.Floor(this));
-  }
+    }
 
     return null;
   }
@@ -475,7 +521,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     return fComplex.getImaginary();
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public double getImaginaryPart() {
     double temp = fComplex.getImaginary();
@@ -491,6 +537,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     return F.num(getRealPart());
   }
 
+  @Override
   public IExpr sqrt() {
     return valueOf(fComplex.sqrt());
   }
@@ -501,7 +548,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
   }
 
   @Override
-  public INumber round() throws ArithmeticException {
+  public INumber roundExpr() throws ArithmeticException {
     return F
         .complex(F.ZZ(DoubleMath.roundToBigInteger(fComplex.getReal(), RoundingMode.HALF_EVEN)), //
             F.ZZ(DoubleMath.roundToBigInteger(fComplex.getImaginary(), RoundingMode.HALF_EVEN)));
@@ -565,12 +612,12 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     return equals(I);
   }
 
-  /** @return */
+  /** @return  */
   public boolean isInfinite() {
     return fComplex.isInfinite();
   }
 
-  /** @return */
+  /** @return  */
   public boolean isNaN() {
     return fComplex.isNaN();
   }
@@ -642,7 +689,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     return newInstance(fComplex.negate());
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public INumber opposite() {
     return newInstance(fComplex.negate());
@@ -680,12 +727,12 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
     if (Complex.equals(fComplex, Complex.ZERO, Config.DOUBLE_TOLERANCE)) {
       ISignedNumber sn = val.re();
       if (sn.isNegative()) {
-        IOFunctions.printMessage(F.Power, "infy", F.List(F.Power(F.C0, sn)), EvalEngine.get());
+        IOFunctions.printMessage(S.Power, "infy", F.List(F.Power(F.C0, sn)), EvalEngine.get());
         // EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
         return INF;
       }
       if (sn.isZero()) {
-        IOFunctions.printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+        IOFunctions.printMessage(S.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
         // EvalEngine.get().printMessage("Infinite expression 0^0.");
         return NaN;
       }
@@ -714,6 +761,7 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
    * @throws NullArgumentException if {@code subtrahend} is {@code null}.
    */
 
+  @Override
   public IComplexNum subtract(final IComplexNum subtrahend) {
     if (subtrahend instanceof ApcomplexNum) {
       return ApcomplexNum.valueOf(fComplex, ((ApcomplexNum) subtrahend).precision())
@@ -749,22 +797,37 @@ public class ComplexNum extends IComplexNumImpl implements IComplexNum {
 
   @Override
   public IAST toPolarCoordinates() {
-    return F.pair(abs(), complexArg());
+    return F.list(abs(), complexArg());
   }
 
   @Override
   public String toString() {
-    // try {
-    // StringBuilder sb = new StringBuilder();
-    // OutputFormFactory.get().convertDoubleComplex(sb, this, Integer.MIN_VALUE,
-    // OutputFormFactory.NO_PLUS_CALL);
-    // return sb.toString();
-    // } catch (Exception e1) {
-    // fall back to simple output format
-    return fComplex.toString();
-    // }
-  }
+    if (FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      return fComplex.toString();
+    }
+    StringBuilder buf = new StringBuilder();
+    buf.append("(");
+    double realPart = fComplex.getReal();
+    double imaginaryPart = fComplex.getImaginary();
+    if (realPart != 0.0 || imaginaryPart == 0.0) {
+      DoubleToMMA.doubleToMMA(buf, realPart, 5, 7);
+    }
 
+    if (imaginaryPart != 0.0) {
+      if (imaginaryPart < 0.0) {
+        buf.append("-I*");
+        imaginaryPart *= (-1);
+      } else {
+        if (realPart != 0.0) {
+          buf.append("+");
+        }
+        buf.append("I*");
+      }
+      DoubleToMMA.doubleToMMA(buf, imaginaryPart, 5, 7);
+    }
+    buf.append(")");
+    return buf.toString();
+  }
 
   /**
    * Return the quotient and remainder as an array <code>[quotient, remainder]</code> of the

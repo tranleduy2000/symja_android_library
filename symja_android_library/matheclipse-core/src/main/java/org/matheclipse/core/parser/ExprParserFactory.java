@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.parser.client.FEConfig;
+import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.ast.IParserFactory;
 import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
@@ -38,6 +41,7 @@ public class ExprParserFactory implements IParserFactory {
   public static CharMatcher OPERATOR_MATCHER = null;
 
   /** The set of characters, which could form an operator */
+  @Override
   public boolean isOperatorChar(char ch) {
     return OPERATOR_MATCHER.matches(ch);
   }
@@ -48,9 +52,10 @@ public class ExprParserFactory implements IParserFactory {
       super(oper, functionName, precedence);
     }
 
+    @Override
     public IExpr createFunction(final IParserFactory factory, final IExpr argument) {
       if (fOperatorString.equals("?")) {
-        return F.Information(argument, F.Rule(F.LongForm, F.False));
+        return F.Information(argument, F.Rule(S.LongForm, S.False));
       }
       // ?? operator:
       return F.Information(argument);
@@ -96,13 +101,47 @@ public class ExprParserFactory implements IParserFactory {
       if (rhs.isAST()) {
         IAST r = (IAST) rhs;
 
-        if (r.isAST(F.Set, 3)) {
+        if (r.isAST(S.Set, 3)) {
           return F.TagSet(lhs, r.arg1(), r.arg2());
-        } else if (r.isAST(F.SetDelayed, 3)) {
+        } else if (r.isAST(S.SetDelayed, 3)) {
           return F.TagSetDelayed(lhs, r.arg1(), r.arg2());
         }
       }
-      return F.binaryAST2(F.TagSet, lhs, rhs);
+      return F.binaryAST2(S.TagSet, lhs, rhs);
+    }
+  }
+
+  private static class TildeOperator extends InfixExprOperator {
+
+    public TildeOperator(
+        final String oper, final String functionName, final int precedence, final int grouping) {
+      super(oper, functionName, precedence, grouping);
+    }
+
+    @Override
+    public IASTAppendable createFunction(
+        final IParserFactory factory, ExprParser parser, final IExpr lhs, final IExpr rhs) {
+      IASTAppendable result = F.ast(F.NIL);
+      result.append(lhs);
+      result.append(rhs);
+      return result;
+    }
+
+    @Override
+    public IAST endFunction(
+        final IParserFactory factory, final IAST function, final Scanner scanner) {
+      final int size = function.size();
+      if (size < 4 || (size & 0x01) != 0x00) {
+        scanner.throwSyntaxError("Operator ~ requires even number of arguments");
+      }
+
+      IAST result = F.binaryAST2(function.arg2(), function.arg1(), function.arg3());
+      for (int i = 4; i < size; i += 2) {
+        IAST temp = F.binaryAST2(function.get(i), result, function.get(i + 1));
+        result = temp;
+      }
+
+      return result;
     }
   }
 
@@ -121,10 +160,10 @@ public class ExprParserFactory implements IParserFactory {
       if (rhs.isInteger() && !rhs.isZero()) {
         if (lhs.isInteger()) {
           if (!parser.isHoldOrHoldFormOrDefer()) {
-            return (IASTMutable) F.Rational((IInteger) lhs, (IInteger) rhs);
+            return (IASTMutable) F.Rational(lhs, rhs);
           }
         }
-        return (IASTMutable) F.Times(F.fraction(F.C1, (IInteger) rhs), lhs);
+        return F.Times(F.fraction(F.C1, (IInteger) rhs), lhs);
       }
 
       if (lhs.equals(F.C1)) {
@@ -233,7 +272,17 @@ public class ExprParserFactory implements IParserFactory {
       "Repeated",
       "ReplaceAll", "TagSet", "Composition", "StringExpression", "TwoWayRule", "TwoWayRule",
       "DirectedEdge",
-      "UndirectedEdge", "CenterDot", "CircleDot"};
+    "UndirectedEdge",
+    "CenterDot",
+    "CircleDot",
+    "CircleTimes",
+    "Element",
+    "Intersection",
+    "NotEqual",
+    "Wedge",
+    "TensorProduct",
+    "§TILDE§"
+  };
 
   static final String[] OPERATOR_STRINGS = {"::", "<<", "?", "??", "?", "//@", "*=", "+", "^=", ";",
       "@", "/@", "=.",
@@ -247,7 +296,14 @@ public class ExprParserFactory implements IParserFactory {
       "\uF3D5", // DirectedEdge
       "\uF3D4", // UndirectedEdge
       "\u00B7", // CenterDot
-      "\u2299" // CircleDot
+    "\u2299", // CircleDot
+    "\u2297", // CircleTimes
+    "\u2208", // Element
+    "\u22C2", // Intersection
+    "\u2260", // NotEqual,
+    "\u22C0", // Wedge
+    "\uF3DA", // TensorProduct
+    "~"
   };
 
   private static Operator[] OPERATORS;
@@ -256,14 +312,10 @@ public class ExprParserFactory implements IParserFactory {
 
   public static final ExprParserFactory RELAXED_STYLE_FACTORY = new ExprParserFactory();
 
-  /**
-   *
-   */
+  /** */
   private static Trie<String, Operator> fOperatorMap;
 
-  /**
-   *
-   */
+  /** */
   private static Trie<String, ArrayList<Operator>> fOperatorTokenStartSet;
 
   /**
@@ -374,10 +426,22 @@ public class ExprParserFactory implements IParserFactory {
                 "UndirectedEdge",
                 Precedence.UNDIRECTEDEDGE,
               InfixOperator.RIGHT_ASSOCIATIVE), //
-          new InfixExprOperator("\u00B7", "CenterDot", Precedence.CENTERDOT,
-              InfixExprOperator.NONE), //
-          new InfixExprOperator("\u2299", "CircleDot", Precedence.CIRCLEDOT, InfixExprOperator.NONE)
-          //
+            new InfixExprOperator(
+                "\u00B7", "CenterDot", Precedence.CENTERDOT, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\u2299", "CircleDot", Precedence.CIRCLEDOT, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\u2297", "CircleTimes", Precedence.CIRCLETIMES, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\u2208", "Element", Precedence.ELEMENT, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\u22C2", "Intersection", Precedence.INTERSECTION, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\u2260", "Unequal", Precedence.UNEQUAL, InfixExprOperator.NONE), //
+            new InfixExprOperator("\u22C0", "Wedge", Precedence.WEDGE, InfixExprOperator.NONE), //
+            new InfixExprOperator(
+                "\uF3DA", "TensorProduct", Precedence.TENSORPRODUCT, InfixExprOperator.NONE),
+            new TildeOperator("~", "§TILDE§", Precedence.TILDE_OPERATOR, InfixOperator.NONE)
       };
 
       StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
@@ -457,17 +521,13 @@ public class ExprParserFactory implements IParserFactory {
     return fOperatorMap;
   }
 
-  /**
-   *
-   */
+  /** */
   @Override
   public Map<String, ArrayList<Operator>> getOperator2ListMap() {
     return fOperatorTokenStartSet;
   }
 
-  /**
-   *
-   */
+  /** */
   @Override
   public List<Operator> getOperatorList(final String key) {
     return fOperatorTokenStartSet.get(key);

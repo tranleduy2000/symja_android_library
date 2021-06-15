@@ -8,9 +8,9 @@ import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
 /**
- * Replace all occurrences of expressions where the given <code>function.apply()</code> method returns a non
- * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
- * occurred.
+ * Replace all occurrences of expressions where the given <code>function.apply()</code> method
+ * returns a non <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>
+ * F.NIL</code> if no substitution occurred.
  */
 public class VisitorPredicateReplaceAll extends VisitorReplaceAll {
 	final Predicate<IExpr> fPredicate;

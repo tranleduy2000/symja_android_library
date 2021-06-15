@@ -17,7 +17,7 @@
 package org.hipparchus.analysis;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 
 /**
  * An interface representing a univariate real function for any field type.
@@ -39,7 +39,7 @@ public interface FieldUnivariateFunction {
      * @param field field for the argument and value
      * @return converted function
      */
-    <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field);
+    <T extends CalculusFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field);
 
     /**
      * Compute the value of the function.
@@ -54,6 +54,6 @@ public interface FieldUnivariateFunction {
      *                                  usually the consequence of checking the actual parameters passed to
      *                                  the method.
      */
-    <T extends RealFieldElement<T>> T value(T x);
+    <T extends CalculusFieldElement<T>> T value(T x);
 
 }

@@ -3,9 +3,7 @@ package org.matheclipse.io.system;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
-/**
- * Test F.symjify()
- */
+/** Test F.symjify() */
 public class SymjifyTestCase extends AbstractTestCase {
 	public SymjifyTestCase(String name) {
 		super(name);
@@ -25,15 +23,18 @@ public class SymjifyTestCase extends AbstractTestCase {
 
 	public void test003() {
 		IExpr expr = F.symjify(new double[] {1.0,2.1,3.5});
-		assertEquals(expr.fullFormString(), "List(1.0, 2.1, 3.5)");
+    assertEquals(expr.fullFormString(), "List(1.0`, 2.1`, 3.5`)");
 		assertEquals(expr.toString(), "{1.0,2.1,3.5}");
 	} 
 	
 	public void test004() {
 		IExpr expr = F.symjify(new double[][] {{1.0,2.1,3.5},{1.1,2.2,3.6}});
-		assertEquals(expr.fullFormString(), "$realmatrix(List(1.0, 2.1, 3.5), List(1.1, 2.2, 3.6))");
-		assertEquals(expr.toString(), "\n{{1.0,2.1,3.5},\n" + 
-				" {1.1,2.2,3.6}}");
+    assertEquals(
+        expr.fullFormString(), //
+        "$realmatrix(List(1.0`, 2.1`, 3.5`), List(1.1`, 2.2`, 3.6`))");
+    assertEquals(
+        expr.toString(), //
+        "\n{{1.0,2.1,3.5},\n" + " {1.1,2.2,3.6}}");
 	} 
 	
 	public void test005() {

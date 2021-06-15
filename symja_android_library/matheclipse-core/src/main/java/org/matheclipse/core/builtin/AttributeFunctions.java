@@ -8,6 +8,7 @@ import org.matheclipse.core.eval.exception.FailedException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -27,11 +28,11 @@ public class AttributeFunctions {
   private static class Initializer {
 
     private static void init() {
-      F.Attributes.setEvaluator(new Attributes());
-      F.ClearAttributes.setEvaluator(new ClearAttributes());
-      F.SetAttributes.setEvaluator(new SetAttributes());
-      F.Protect.setEvaluator(new Protect());
-      F.Unprotect.setEvaluator(new Unprotect());
+      S.Attributes.setEvaluator(new Attributes());
+      S.ClearAttributes.setEvaluator(new ClearAttributes());
+      S.SetAttributes.setEvaluator(new SetAttributes());
+      S.Protect.setEvaluator(new Protect());
+      S.Unprotect.setEvaluator(new Unprotect());
     }
   }
 
@@ -52,45 +53,40 @@ public class AttributeFunctions {
    * {Flat,Listable,OneIdentity,Orderless,NumericFunction}
    * </pre>
    */
-  private static final class Attributes extends AbstractCoreFunctionEvaluator
-      implements ISetEvaluator {
+  private static final class Attributes extends AbstractFunctionEvaluator implements ISetEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       if (ast.isAST1()) {
         IExpr arg1 = ast.arg1();
-        if (arg1.isList()) {
-          IAST list = (IAST) arg1;
-          if (list.exists(new Predicate<IExpr>() {
-						@Override
-						public boolean test(IExpr x) {
-							return !x.isSymbol();
-						}
-					})) {
-            return F.NIL;
-          }
-          final IASTAppendable result = F.ListAlloc(list.size());
-          for (int i = 1; i < list.size(); i++) {
-            IExpr temp = attributesList(list.get(i), ast, engine);
-            if (!temp.isPresent()) {
-              return F.NIL;
-            }
-            result.append(temp);
-          }
-          return result;
-        }
+        //        if (arg1.isList()) {
+        //          IAST list = (IAST) arg1;
+        //          if (list.exists(x -> !x.isSymbol())) {
+        //            return F.NIL;
+        //          }
+        //          final IASTAppendable result = F.ListAlloc(list.size());
+        //          for (int i = 1; i < list.size(); i++) {
+        //            IExpr temp = attributesList(list.get(i), ast, engine);
+        //            if (!temp.isPresent()) {
+        //              return F.NIL;
+        //            }
+        //            result.append(temp);
+        //          }
+        //          return result;
+        //        }
         return attributesList(arg1, ast, engine);
       }
 
       return F.NIL;
     }
 
+    @Override
     public IExpr evaluateSet(
         final IExpr leftHandSide,
         IExpr rightHandSide,
         IBuiltInSymbol builtinSymbol,
         EvalEngine engine) {
-      if (leftHandSide.isAST(F.Attributes, 2)) {
+      if (leftHandSide.isAST(S.Attributes, 2)) {
         if (!leftHandSide.first().isSymbol()) {
           IOFunctions.printMessage(builtinSymbol, "setps", F.List(leftHandSide.first()), engine);
           return rightHandSide;
@@ -101,6 +97,15 @@ public class AttributeFunctions {
         }
       }
       return F.NIL;
+    }
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_1_1;
+    }
+
+    @Override
+    public void setUp(final ISymbol newSymbol) {
+      newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.LISTABLE);
     }
   }
 
@@ -188,7 +193,7 @@ public class AttributeFunctions {
         }
       }
       if (sym.isProtected()) {
-        IOFunctions.printMessage(F.ClearAttributes, "write", F.List(sym), EvalEngine.get());
+        IOFunctions.printMessage(S.ClearAttributes, "write", F.List(sym), EvalEngine.get());
         throw new FailedException();
       }
       if (attributes.isSymbol()) {
@@ -404,9 +409,9 @@ public class AttributeFunctions {
         IAST listOfSymbols, IExpr attributes, IAST ast, EvalEngine engine) {
       attributes = engine.evaluate(attributes);
       for (int i = 1; i < listOfSymbols.size(); i++) {
-        if (listOfSymbols.get(i).isSymbol()) {
-          IExpr temp = addAttributes(listOfSymbols.get(i), attributes, ast, engine);
-          if (!temp.isPresent()) {
+        final IExpr arg = listOfSymbols.get(i);
+        if (arg.isSymbol()) {
+          if (!addAttributes(arg, attributes, ast, engine).isPresent()) {
             return F.NIL;
           }
         }
@@ -417,7 +422,7 @@ public class AttributeFunctions {
     /**
      * Add the attribute to the symbols existing attributes bit-set.
      *
-     * @param sym
+     * @param expr
      * @param attributes
      * @param engine
      * @return {@link F#NIL} if <code>expr</code> is not a symbol
@@ -443,7 +448,7 @@ public class AttributeFunctions {
         final IAST lst = (IAST) attributes;
         // lst.forEach(x -> addAttributes(sym, (ISymbol) x));
         for (int i = 1; i < lst.size(); i++) {
-          ISymbol attribute = (ISymbol) lst.get(i);
+          final ISymbol attribute = (ISymbol) lst.get(i);
           addAttributes(sym, attribute);
           }
       }
@@ -458,7 +463,7 @@ public class AttributeFunctions {
      */
     private static void addAttributes(final ISymbol sym, ISymbol attribute) {
       if (sym.isProtected()) {
-        IOFunctions.printMessage(F.SetAttributes, "write", F.List(sym), EvalEngine.get());
+        IOFunctions.printMessage(S.SetAttributes, "write", F.List(sym), EvalEngine.get());
         throw new FailedException();
       }
       int functionID = attribute.ordinal();
@@ -552,67 +557,67 @@ public class AttributeFunctions {
    * @param symbol
    * @return
    */
-  public static IAST attributesList(final ISymbol symbol) {
-    IASTAppendable result = F.ListAlloc(4);
+  public static IAST attributesList(ISymbol symbol) {
     int attributes = symbol.getAttributes();
+    IASTAppendable result = F.ListAlloc(Integer.bitCount(attributes));
 
     if ((attributes & ISymbol.CONSTANT) != ISymbol.NOATTRIBUTE) {
-      result.append(F.Constant);
+      result.append(S.Constant);
     }
 
     if ((attributes & ISymbol.FLAT) != ISymbol.NOATTRIBUTE) {
-      result.append(F.Flat);
+      result.append(S.Flat);
     }
 
     if ((attributes & ISymbol.HOLDALLCOMPLETE) == ISymbol.HOLDALLCOMPLETE) {
-      result.append(F.HoldAllComplete);
+      result.append(S.HoldAllComplete);
     } else if ((attributes & ISymbol.HOLDCOMPLETE) == ISymbol.HOLDCOMPLETE) {
-      result.append(F.HoldComplete);
+      result.append(S.HoldComplete);
     } else if ((attributes & ISymbol.HOLDALL) == ISymbol.HOLDALL) {
-      result.append(F.HoldAll);
+      result.append(S.HoldAll);
     } else {
       if ((attributes & ISymbol.HOLDFIRST) != ISymbol.NOATTRIBUTE) {
-        result.append(F.HoldFirst);
+        result.append(S.HoldFirst);
       }
 
       if ((attributes & ISymbol.HOLDREST) != ISymbol.NOATTRIBUTE) {
-        result.append(F.HoldRest);
+        result.append(S.HoldRest);
       }
     }
     if ((attributes & ISymbol.LISTABLE) != ISymbol.NOATTRIBUTE) {
-      result.append(F.Listable);
+      result.append(S.Listable);
     }
 
     if ((attributes & ISymbol.NHOLDALL) == ISymbol.NHOLDALL) {
-      result.append(F.NHoldAll);
+      result.append(S.NHoldAll);
     } else {
       if ((attributes & ISymbol.NHOLDFIRST) != ISymbol.NOATTRIBUTE) {
-        result.append(F.NHoldFirst);
+        result.append(S.NHoldFirst);
       }
 
       if ((attributes & ISymbol.NHOLDREST) != ISymbol.NOATTRIBUTE) {
-        result.append(F.NHoldRest);
+        result.append(S.NHoldRest);
       }
     }
 
     if ((attributes & ISymbol.NUMERICFUNCTION) != ISymbol.NOATTRIBUTE) {
-      result.append(F.NumericFunction);
+      result.append(S.NumericFunction);
     }
     if ((attributes & ISymbol.ONEIDENTITY) != ISymbol.NOATTRIBUTE) {
-      result.append(F.OneIdentity);
+      result.append(S.OneIdentity);
     }
 
     if ((attributes & ISymbol.ORDERLESS) != ISymbol.NOATTRIBUTE) {
-      result.append(F.Orderless);
+      result.append(S.Orderless);
     }
 
     if ((attributes & ISymbol.PROTECTED) != ISymbol.NOATTRIBUTE) {
-      result.append(F.Protected);
+      result.append(S.Protected);
     }
 
     if ((attributes & ISymbol.SEQUENCEHOLD) == ISymbol.SEQUENCEHOLD
         && ((attributes & ISymbol.HOLDALLCOMPLETE) != ISymbol.HOLDALLCOMPLETE)) {
-      result.append(F.SequenceHold);
+      result.append(S.SequenceHold);
     }
     return result;
   }

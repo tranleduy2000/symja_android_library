@@ -15,6 +15,7 @@
  */
 package org.matheclipse.parser.client.operator;
 
+import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FunctionNode;
 import org.matheclipse.parser.client.ast.INodeParserFactory;
@@ -22,11 +23,11 @@ import org.matheclipse.parser.client.ast.INodeParserFactory;
 public class InfixOperator extends Operator {
 	private int fGrouping;
 
-	public final static int NONE = 0;
+  public static final int NONE = 0;
 
-	public final static int RIGHT_ASSOCIATIVE = 1;
+  public static final int RIGHT_ASSOCIATIVE = 1;
 
-	public final static int LEFT_ASSOCIATIVE = 2;
+  public static final int LEFT_ASSOCIATIVE = 2;
 
 	public InfixOperator(final String oper, final String functionName, final int precedence, final int grouping) {
 		super(oper, functionName, precedence);
@@ -49,4 +50,16 @@ public class InfixOperator extends Operator {
 		}
 		return factory.createFunction(factory.createSymbol(getFunctionName()), lhs, rhs);
 	}
+  /**
+   * At the end of parsing infix operators with multiple arguments this method will be called.
+   *
+   * @param factory
+   * @param function
+   * @param scanner can throw SyntaxError exceptions if necessary
+   * @return
+   */
+  public FunctionNode endFunction(
+      final INodeParserFactory factory, final FunctionNode function, final Scanner scanner) {
+    return function;
+  }
 }

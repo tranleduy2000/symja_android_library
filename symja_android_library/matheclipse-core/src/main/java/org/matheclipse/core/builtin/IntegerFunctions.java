@@ -1,24 +1,26 @@
 package org.matheclipse.core.builtin;
 
-import com.duy.annotations.Nonnull;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 
+import org.apfloat.Apfloat;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.ValidateException;
-import org.matheclipse.core.eval.interfaces.AbstractArg2;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.INumeric;
+import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.ComplexSym;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.IntervalSym;
+import org.matheclipse.core.expression.Num;
 import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.StringX;
 import org.matheclipse.core.interfaces.IAST;
@@ -69,9 +71,32 @@ public class IntegerFunctions {
       F.PowerMod.setEvaluator(new PowerMod());
       F.Quotient.setEvaluator(new Quotient());
       F.QuotientRemainder.setEvaluator(new QuotientRemainder());
+      F.RealDigits.setEvaluator(new RealDigits());
       F.Round.setEvaluator(new Round());
       F.UnitStep.setEvaluator(new UnitStep());
     }
+  }
+
+  private static IAST integerDigits(IInteger n, IInteger base, int padLeftZeros) {
+    IASTAppendable list = F.ListAlloc(16);
+    if (n.isZero()) {
+      list.append(F.C0);
+    } else {
+      while (n.isPositive()) {
+        IInteger mod = n.mod(base);
+        list.append(mod);
+        n = n.subtract(mod).div(base);
+      }
+    }
+    int padSizeZeros = padLeftZeros - list.argSize();
+    if (padSizeZeros < 0) {
+      padSizeZeros = 0;
+    }
+    IASTAppendable result = F.ListAlloc(list.argSize() + padSizeZeros);
+    for (int i = 0; i < padSizeZeros; i++) {
+      result.append(F.C0);
+    }
+    return list.reverse(result);
   }
 
   /**
@@ -117,6 +142,7 @@ public class IntegerFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -214,7 +240,7 @@ public class IntegerFunctions {
         if (ast.isAST2()) {
           return F.Times(F.Ceiling(F.Divide(ast.arg1(), ast.arg2())), ast.arg2());
         }
-        final IExpr arg1 = engine.evaluateNull(ast.arg1());
+        final IExpr arg1 = engine.evaluateNIL(ast.arg1());
         if (arg1.isPresent()) {
           return evalCeiling(arg1).orElseGet(new Supplier<IExpr>() {
             @Override
@@ -287,20 +313,23 @@ public class IntegerFunctions {
       IExpr result = F.NIL;
       int radix = 10;
       if (ast.isAST1()) {
-        result = F.IntegerDigits.of(engine, ast.arg1());
+        result = S.IntegerDigits.of(engine, ast.arg1());
       } else if (ast.size() >= 3) {
+        if (ast.isAST3() && ast.arg3().isList()) {
+          return ((IAST) ast.arg3()).mapThread(ast, 3);
+        }
         radix = ast.arg2().toIntDefault();
         if (radix <= 0) {
           return F.NIL;
         }
-        result = F.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
+        result = S.IntegerDigits.of(engine, ast.arg1(), ast.arg2());
       }
       if (result.isList()) {
         IAST list = (IAST) result;
 
         Object2IntOpenHashMap<IExpr> map = new Object2IntOpenHashMap<IExpr>();
         for (int i = 1; i < list.size(); i++) {
-          map.addTo((IExpr) list.get(i), 1);
+          map.addTo(list.get(i), 1);
         }
         if (ast.isAST3()) {
           int index = ast.arg3().toIntDefault();
@@ -328,20 +357,17 @@ public class IntegerFunctions {
             return F.NIL;
           }
         }
-        return F.ast(arr, F.List);
+        return F.ast(arr, S.List);
 
       }
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_3;
     }
 
-    @Override
-    public void setUp(ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.LISTABLE);
-    }
   }
 
   /**
@@ -352,9 +378,9 @@ public class IntegerFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns a list of integer digits for <code>n</code> under <code>base</code>.
-   * </p>
+   *
+   * <p>returns a list of integer digits for <code>n</code> under <code>base</code>.
+   *
    * </blockquote>
    *
    * <pre>
@@ -408,26 +434,8 @@ public class IntegerFunctions {
       }
       IExpr arg1 = ast.arg1();
       if (arg1.isInteger()) {
-        IASTAppendable list = F.ListAlloc(16);
         IInteger n = ((IInteger) arg1).abs();
-        if (n.isZero()) {
-          list.append(F.C0);
-        } else {
-          while (n.isPositive()) {
-            IInteger mod = n.mod(base);
-            list.append(mod);
-            n = n.subtract(mod).div(base);
-          }
-        }
-        int padSizeZeros = padLeftZeros - list.argSize();
-        if (padSizeZeros < 0) {
-          padSizeZeros = 0;
-        }
-        IASTAppendable result = F.ListAlloc(list.argSize() + padSizeZeros);
-        for (int i = 0; i < padSizeZeros; i++) {
-          result.append(F.C0);
-        }
-        return list.reverse(result);
+        return integerDigits(n, base, padLeftZeros);
       }
       return F.NIL;
     }
@@ -602,7 +610,7 @@ public class IntegerFunctions {
         if (ast.isAST2()) {
           return F.Times(F.Floor(F.Divide(ast.arg1(), ast.arg2())), ast.arg2());
         }
-        final IExpr arg1 = engine.evaluateNull(ast.arg1());
+        final IExpr arg1 = engine.evaluateNIL(ast.arg1());
         if (arg1.isPresent()) {
           return evalFloor(arg1).orElseGet(new Supplier<IExpr>() {
             @Override
@@ -748,6 +756,7 @@ public class IntegerFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -787,9 +796,7 @@ public class IntegerFunctions {
           char ch = str.charAt(i);
           if (ch >= '0' && ch <= '9') {
             digit = Character.digit(ch, radix);
-          } else if (ch >= 'A' && ch <= 'Z') {
-            digit = Character.digit(ch, 36);
-          } else if (ch >= 'a' && ch <= 'z') {
+          } else if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
             digit = Character.digit(ch, 36);
           } else {
             return F.NIL;
@@ -797,7 +804,7 @@ public class IntegerFunctions {
           if (digit == Integer.MIN_VALUE) {
             return F.NIL;
           }
-          digitsList.append(F.ZZ(digit));
+          digitsList.append(digit);
         }
         return fromDigits(digitsList, base);
 
@@ -866,9 +873,8 @@ public class IntegerFunctions {
    * &gt;&gt; IntegerLength(8, 2)
    * 4
    * </pre>
-   * <p>
-   * Check that <code>IntegerLength</code> is correct for the first 100 powers of 10:
-   * </p>
+   *
+   * <p>Check that <code>IntegerLength</code> is correct for the first 100 powers of 10:
    *
    * <pre>
    * &gt;&gt; IntegerLength /@ (10 ^ Range(100)) == Range(2, 101)
@@ -943,6 +949,7 @@ public class IntegerFunctions {
    * <p>for real <code>expr</code> return the integer part of <code>expr</code>.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -970,8 +977,11 @@ public class IntegerFunctions {
         if (arg1.isIntegerResult()) {
           return arg1;
         }
-        if (arg1.isInfinity() || arg1.isNegativeInfinity() || arg1.isDirectedInfinity(F.CI)
-            || arg1.isDirectedInfinity(F.CNI) || arg1.isAST(F.IntegerPart, 2)) {
+        if (arg1.isInfinity()
+            || arg1.isNegativeInfinity()
+            || arg1.isDirectedInfinity(F.CI)
+            || arg1.isDirectedInfinity(F.CNI)
+            || arg1.isAST(S.IntegerPart, 2)) {
           return arg1;
         }
         IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
@@ -979,7 +989,7 @@ public class IntegerFunctions {
           return Negate(IntegerPart(negExpr));
         }
         if (arg1.isInterval()) {
-          return IntervalSym.mapSymbol(F.IntegerPart, (IAST) arg1);
+          return IntervalSym.mapSymbol(S.IntegerPart, (IAST) arg1);
         }
 
         ISignedNumber signedNumber = arg1.evalReal();
@@ -1000,6 +1010,7 @@ public class IntegerFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -1048,13 +1059,14 @@ public class IntegerFunctions {
      * See: <a href="http://en.wikipedia.org/wiki/Modular_arithmetic">Wikipedia - Modular
      * arithmetic</a>
      */
-    public IExpr evaluate(final IAST ast, @Nonnull EvalEngine engine) {
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
       IExpr m = ast.arg1();
       IExpr n = ast.arg2();
       if (n.isZero()) {
         // Indeterminate expression `1` encountered.
         IOFunctions.printMessage(ast.topHead(), "indet", F.List(ast), engine);
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (ast.isAST3()) {
         // 3 args
@@ -1068,8 +1080,8 @@ public class IntegerFunctions {
               m.isComplexNumeric() || n.isComplexNumeric() || d.isComplexNumeric()) {
             // https://mathematica.stackexchange.com/a/114373/21734
             IExpr subExpr = engine.evaluate(F.Divide(F.Subtract(m, d), n));
-            IExpr re = F.Round.of(subExpr.re());
-            IExpr im = F.Round.of(subExpr.im());
+            IExpr re = S.Round.of(subExpr.re());
+            IExpr im = S.Round.of(subExpr.im());
             return F.Plus(m, F.Times(F.CN1, n, re), F.Times(F.CI, im));
           }
         }
@@ -1088,12 +1100,11 @@ public class IntegerFunctions {
       if (m.isReal() && n.isReal()) {
         return F.Subtract(m, F.Times(n, F.Floor(((ISignedNumber) m).divideBy((ISignedNumber) n))));
       }
-      IExpr div = F.Divide.of(engine, m, n);
+      IExpr div = S.Divide.of(engine, m, n);
       if (div.isIndeterminate()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
-      if (div.isNumber()
-          || div.isNumericFunction(true)
+      if (div.isNumericFunction(true) //
           || div.isDirectedInfinity()
           || div.isComplexInfinity()) {
         return F.Subtract(m, F.Times(n, F.Floor(div)));
@@ -1101,6 +1112,7 @@ public class IntegerFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_3;
     }
@@ -1174,6 +1186,7 @@ public class IntegerFunctions {
       }
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_3_3;
     }
@@ -1223,6 +1236,7 @@ public class IntegerFunctions {
    */
   private static class Quotient extends AbstractCoreFunctionEvaluator {
 
+    @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       IExpr z = engine.evaluate(ast.arg1());
       IExpr n = engine.evaluate(ast.arg2());
@@ -1301,6 +1315,7 @@ public class IntegerFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_3;
     }
@@ -1362,7 +1377,7 @@ public class IntegerFunctions {
           if (i1.isZero()) {
             return EvalEngine.get().printMessage("QuotientRemainder: division by zero");
           }
-          IASTMutable list = F.ListAlloc(F.Null, F.Null);
+          IASTMutable list = F.ListAlloc(S.Null, S.Null);
           list.set(1, i0.quotient(i1));
           if (i1.isNegative()) {
             list.set(2, i0.negate().mod(i1.negate()).negate());
@@ -1412,7 +1427,7 @@ public class IntegerFunctions {
               return F.List(F.complexNum(qr[0]).floorFraction(), F.complexNum(qr[1]));
             } else {
               IInteger quotient = F.num(zDouble / nDouble).floorFraction();
-              IExpr remainder = F.Plus.of(engine, arg1, F.Negate(F.Times(quotient, arg2)));
+              IExpr remainder = S.Plus.of(engine, arg1, F.Negate(F.Times(quotient, arg2)));
               return F.List(quotient, remainder);
             }
           } catch (ValidateException ve) {
@@ -1448,8 +1463,98 @@ public class IntegerFunctions {
     Initializer.init();
   }
 
-  private IntegerFunctions() {
+  private IntegerFunctions() {}
 
+  private static class RealDigits extends AbstractFunctionEvaluator {
+
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      IExpr arg1 = ast.arg1();
+      if (arg1.isInteger()) {
+        IInteger number = (IInteger) arg1;
+        if (number.isNegative()) {
+          number = number.abs();
+        }
+        IAST list = integerDigits(number, F.C10, 0);
+        return F.List(list, F.ZZ(list.size() - 1));
+      }
+      try {
+        ISignedNumber number = null;
+        if (arg1.isReal()) {
+          number = (ISignedNumber) arg1;
+        } else {
+          number = arg1.evalReal();
+        }
+        if (number != null) {
+          if (number.isNegative()) {
+            number = number.abs();
+          }
+
+          if (number instanceof ApfloatNum) {
+            Apfloat apfloat = number.apfloatValue(engine.getNumericPrecision());
+            String str = apfloat.toString();
+            IASTAppendable list = F.ListAlloc(str.length() + 1);
+            int numberOfLeftDigits = 0;
+            for (int i = 0; i < str.length(); i++) {
+              char ch = str.charAt(i);
+              if (ch == '.') {
+                numberOfLeftDigits = i;
+                continue;
+              }
+              if (ch == 'e' || ch == 'E') {
+                String exponentStr = str.substring(i + 1);
+                int exponent = Integer.parseInt(exponentStr);
+
+                numberOfLeftDigits += exponent;
+
+                break;
+              }
+              list.append(ch);
+            }
+
+            return F.List(list, F.ZZ(numberOfLeftDigits));
+          } else if (number instanceof Num) {
+            String str = Double.toString(number.doubleValue());
+            IASTAppendable list = F.ListAlloc(str.length() + 1);
+            int numberOfLeftDigits = 0;
+            for (int i = 0; i < str.length(); i++) {
+              char ch = str.charAt(i);
+              if (ch == '.') {
+                numberOfLeftDigits = i;
+                continue;
+              }
+              if (ch == 'e' || ch == 'E') {
+                String exponentStr = str.substring(i + 1);
+                int exponent = Integer.parseInt(exponentStr);
+                numberOfLeftDigits += exponent;
+                break;
+              }
+              list.append(ch);
+            }
+
+            return F.List(list, F.ZZ(numberOfLeftDigits));
+          }
+        }
+      } catch (NumberFormatException | ArgumentTypeException atex) {
+        return IOFunctions.printMessage(ast.topHead(), atex, engine);
+      }
+
+      if (arg1.isNumber()) {
+        // The value `1` is not a real number.
+        return IOFunctions.printMessage(ast.topHead(), "realx", F.List(arg1), engine);
+      }
+      return F.NIL;
+    }
+
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_1_1;
+    }
+
+    @Override
+    public void setUp(ISymbol newSymbol) {
+      newSymbol.setAttributes(ISymbol.LISTABLE);
+    }
   }
 
   /**
@@ -1505,7 +1610,7 @@ public class IntegerFunctions {
       IExpr res = F.NIL;
       try {
         IExpr arg1 = ast.arg1();
-        IExpr temp = engine.evaluateNull(arg1);
+        IExpr temp = engine.evaluateNIL(arg1);
         if (temp.isPresent()) {
           arg1 = temp;
           res = ast.setAtCopy(1, temp);
@@ -1516,7 +1621,7 @@ public class IntegerFunctions {
         if (ast.isAST2()) {
           // Round(z, a)
           IExpr arg2 = ast.arg2();
-          temp = engine.evaluateNull(arg2);
+          temp = engine.evaluateNIL(arg2);
           if (temp.isPresent()) {
             arg2 = temp;
             if (!res.isPresent()) {
@@ -1528,7 +1633,7 @@ public class IntegerFunctions {
           ISignedNumber multiple = arg2.evalReal();
           if (multiple != null) {
             if (multiple.isZero()) {
-              return F.Indeterminate;
+              return S.Indeterminate;
             }
             ISignedNumber signedNumber = arg1.evalReal();
             if (signedNumber != null) {
@@ -1560,7 +1665,7 @@ public class IntegerFunctions {
         }
         INumber number = arg1.evalNumber();
         if (number != null) {
-          return number.round();
+          return number.roundExpr();
         }
         if (arg1.isDirectedInfinity() && arg1.argSize() == 1) {
           return arg1;
@@ -1584,7 +1689,7 @@ public class IntegerFunctions {
           return Negate(Round(negExpr));
         }
         if (arg1.isInterval()) {
-          return IntervalSym.mapSymbol(F.Round, (IAST) arg1);
+          return IntervalSym.mapSymbol(S.Round, (IAST) arg1);
         }
       } catch (ArithmeticException ae) {
         // ISignedNumber#round() may throw ArithmeticException
@@ -1592,6 +1697,7 @@ public class IntegerFunctions {
       return res;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
@@ -1648,7 +1754,7 @@ public class IntegerFunctions {
           IExpr expr = ast.get(i);
           ISignedNumber temp = expr.evalReal();
           if (temp != null) {
-            if (temp.sign() < 0) {
+            if (temp.complexSign() < 0) {
               return F.C0;
             } else {
               continue;
@@ -1673,8 +1779,8 @@ public class IntegerFunctions {
               if (l.isReal() && u.isReal()) {
                 ISignedNumber min = (ISignedNumber) l;
                 ISignedNumber max = (ISignedNumber) u;
-                if (min.sign() < 0) {
-                  if (max.sign() < 0) {
+                if (min.complexSign() < 0) {
+                  if (max.complexSign() < 0) {
                     return F.Interval(F.List(F.C0, F.C0));
                   } else {
                     if (size == 2) {
@@ -1682,7 +1788,7 @@ public class IntegerFunctions {
                     }
                   }
                 } else {
-                  if (max.sign() < 0) {
+                  if (max.complexSign() < 0) {
                     if (size == 2) {
                       return F.Interval(F.List(F.C1, F.C0));
                     }
@@ -1704,8 +1810,7 @@ public class IntegerFunctions {
 
     @Override
     public void setUp(ISymbol newSymbol) {
-      newSymbol.setAttributes(
-          ISymbol.HOLDALL | ISymbol.ORDERLESS | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+      newSymbol.setAttributes(ISymbol.ORDERLESS | ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
     }
   }
 }

@@ -18,7 +18,7 @@ package org.hipparchus.analysis.differentiation;
 
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.MathArrays;
@@ -31,21 +31,15 @@ import org.hipparchus.util.MathArrays;
  * @param <T> the type of the function parameters and value
  * @see FieldDerivativeStructure
  */
-public class FDSFactory<T extends RealFieldElement<T>> {
+public class FDSFactory<T extends CalculusFieldElement<T>> {
 
-    /**
-     * Compiler for the current dimensions.
-     */
+    /** Compiler for the current dimensions. */
     private final DSCompiler compiler;
 
-    /**
-     * Field the value and parameters of the function belongs to.
-     */
+    /** Field the value and parameters of the function belongs to. */
     private final Field<T> valueField;
 
-    /**
-     * Field the {@link FieldDerivativeStructure} instances belong to.
-     */
+    /** Field the {@link FieldDerivativeStructure} instances belong to. */
     private final Field<FieldDerivativeStructure<T>> derivativeField;
 
     /**
@@ -160,7 +154,7 @@ public class FDSFactory<T extends RealFieldElement<T>> {
         }
 
         final FieldDerivativeStructure<T> fds = new FieldDerivativeStructure<>(this);
-        fds.setDerivativeComponent(0, valueField.getZero().add(value));
+        fds.setDerivativeComponent(0, valueField.getZero().newInstance(value));
 
         if (getCompiler().getOrder() > 0) {
             // the derivative of the variable with respect to itself is 1.
@@ -268,16 +262,12 @@ public class FDSFactory<T extends RealFieldElement<T>> {
      *
      * @param <T> the type of the function parameters and value
      */
-    private static class DerivativeField<T extends RealFieldElement<T>> implements Field<FieldDerivativeStructure<T>> {
+    private static class DerivativeField<T extends CalculusFieldElement<T>> implements Field<FieldDerivativeStructure<T>> {
 
-        /**
-         * Constant function evaluating to 0.0.
-         */
+        /** Constant function evaluating to 0.0. */
         private final FieldDerivativeStructure<T> zero;
 
-        /**
-         * Constant function evaluating to 1.0.
-         */
+        /** Constant function evaluating to 1.0. */
         private final FieldDerivativeStructure<T> one;
 
         /**
@@ -292,34 +282,26 @@ public class FDSFactory<T extends RealFieldElement<T>> {
             this.one = one;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public FieldDerivativeStructure<T> getZero() {
             return zero;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public FieldDerivativeStructure<T> getOne() {
             return one;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @SuppressWarnings("unchecked")
         @Override
-        public Class<? extends FieldElement<FieldDerivativeStructure<T>>> getRuntimeClass() {
-            return (Class<? extends FieldElement<FieldDerivativeStructure<T>>>) zero.getClass();
+        public Class<FieldDerivativeStructure<T>> getRuntimeClass() {
+            return (Class<FieldDerivativeStructure<T>>) zero.getClass();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public boolean equals(final Object other) {
             if (this == other) {
@@ -334,9 +316,7 @@ public class FDSFactory<T extends RealFieldElement<T>> {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public int hashCode() {
             final DSCompiler compiler = zero.getFactory().getCompiler();

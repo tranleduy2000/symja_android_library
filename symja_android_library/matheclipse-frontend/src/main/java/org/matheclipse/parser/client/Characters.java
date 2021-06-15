@@ -2151,17 +2151,18 @@ public class Characters {
   /**
    * Return the name for a given unicode character.
    *
-   * @param unicode a string of length 1.
+   * @param unicode a character
    * @return <code>null</code> if no corresponding name was found
    */
-  public static String unicodeName(String unicode) {
+  public static String unicodeName(char unicode) {
+    String str = String.valueOf(unicode);
     if (ReversedNamedCharactersMap.size() == 0) {
       // create unicode to name map
       for (int i = 0; i < NamedCharacters.length; i += 2) {
         ReversedNamedCharactersMap.put(NamedCharacters[i + 1], NamedCharacters[i]);
       }
     }
-    return ReversedNamedCharactersMap.get(unicode);
+    return ReversedNamedCharactersMap.get(str);
   }
 
   /**
@@ -2213,6 +2214,34 @@ public class Characters {
                 break; // while (currentPosition < strLength)
               }
             }
+          } else if (str.charAt(currentPosition) == '.') {
+            try {
+              final int numberOfUnicodeDigits = 2;
+              buf = new StringBuilder(str.length());
+              buf.append(str.substring(0, ++currentPosition - 2));
+              currentPosition = codePointToUTF16(str, currentPosition, numberOfUnicodeDigits, buf);
+            } catch (final NumberFormatException e) {
+            }
+            break;
+          } else if (str.charAt(currentPosition) == ':') {
+            try {
+              final int numberOfUnicodeDigits = 4;
+              buf = new StringBuilder(str.length());
+              buf.append(str.substring(0, ++currentPosition - 2));
+              currentPosition = codePointToUTF16(str, currentPosition, numberOfUnicodeDigits, buf);
+
+            } catch (final NumberFormatException e) {
+            }
+            break;
+          } else if (str.charAt(currentPosition) == '|') {
+            try {
+              final int numberOfUnicodeDigits = 6;
+              buf = new StringBuilder(str.length());
+              buf.append(str.substring(0, ++currentPosition - 2));
+              currentPosition = codePointToUTF16(str, currentPosition, numberOfUnicodeDigits, buf);
+              break;
+            } catch (final NumberFormatException e) {
+            }
           } else {
             // escape next character
             currentPosition++;
@@ -2258,16 +2287,103 @@ public class Characters {
               String subString = str.substring(startPosition, endPosition - 1);
               buf.append(subString);
             }
+          } else if (str.charAt(currentPosition) == '.') {
+            try {
+              final int numberOfUnicodeDigits = 2;
+              currentPosition =
+                  codePointToUTF16(str, ++currentPosition, numberOfUnicodeDigits, buf);
+              continue;
+            } catch (final NumberFormatException e) {
+            }
+          } else if (str.charAt(currentPosition) == ':') {
+            try {
+              final int numberOfUnicodeDigits = 4;
+              currentPosition =
+                  codePointToUTF16(str, ++currentPosition, numberOfUnicodeDigits, buf);
+              continue;
+            } catch (final NumberFormatException e) {
+            }
+          } else if (str.charAt(currentPosition) == '|') {
+            try {
+              final int numberOfUnicodeDigits = 6;
+              currentPosition =
+                  codePointToUTF16(str, ++currentPosition, numberOfUnicodeDigits, buf);
+              continue;
+            } catch (final NumberFormatException e) {
+            }
           } else {
-            // escape next character
+            // escape character
             buf.append(currentChar);
-            currentPosition++;
-          }
         }
-      }
+        } else {
       buf.append(currentChar);
+    }
+      } else {
+        buf.append(currentChar);
+      }
     }
     return buf.toString();
   }
 
+  /**
+   * Append the specified character (Unicode code point with the string length of <code>
+   * numberOfUnicodeDigits</code> starting at <code>startPosition</code>) to its UTF-16
+   * representation stored in a char array and append this array to the <code>buffer</code>. If the
+   * specified code point is a BMP (Basic Multilingual Plane or Plane 0) value, the resulting char
+   * array has the same value as codePoint. If the specified codepoint is a supplementary code
+   * point, the resulting char array has the corresponding surrogate pair.
+   *
+   * @param str the input string
+   * @param startPosition
+   * @param numberOfUnicodeDigits
+   * @param buffer the output string buffer
+   * @return
+   * @throws NumberFormatException
+   */
+  private static int codePointToUTF16(
+      String str, int startPosition, final int numberOfUnicodeDigits, StringBuilder buffer)
+      throws NumberFormatException {
+    if (startPosition + numberOfUnicodeDigits >= str.length()) {
+      throw new NumberFormatException("Number length must be exactly: " + numberOfUnicodeDigits);
+    }
+    final String number = str.substring(startPosition, startPosition + numberOfUnicodeDigits);
+    // parseInt() may also throw NumberFormatException
+    int codePoint = Integer.parseInt(number, 16);
+    buffer.append(Character.toChars(codePoint));
+    return startPosition + numberOfUnicodeDigits;
+  }
+
+  /**
+   * Determines if the specified character is permissible as the first character in a Symja
+   * identifier.
+   *
+   * <p>A character may start a Symja identifier if and only if one of the following conditions is
+   * true: • isLetter(ch) returns true • getType(ch) returns LETTER_NUMBER • ch is a currency symbol
+   * (such as '$').
+   *
+   * @param ch
+   * @return <code>true</code> if the character may start a Symja identifier; false otherwise.
+   */
+  public static boolean isSymjaIdentifierStart(char ch) {
+    return (Character.isJavaIdentifierStart(ch) && (ch != '_'))
+        || (ch >= '\uF800' && ch <= '\uF819'); // FormalA <= ch <= FormalZ
+  }
+
+  /**
+   * Determines if the specified character may be part of a Symja identifier as other than the first
+   * character.
+   *
+   * <p>A character may be part of a Symja identifier if any of the followingare true: • it is a
+   * letter • it is a currency symbol (such as '$') • it is a digit • it is a numeric letter (such
+   * as a Roman numeral character) • it is a combining mark • it is a non-spacing mark • <code>
+   * Character#isIdentifierIgnorable</code> returns true for the character
+   *
+   * @param ch the character to be tested.
+   * @return <code>true</code> if the character may be part of a Symja identifier; false otherwise.
+   */
+  public static boolean isSymjaIdentifierPart(char ch) {
+    return (Character.isJavaIdentifierPart(ch) && (ch != '_'))
+        || (ch == '`') // context name separator character
+        || (ch >= '\uF800' && ch <= '\uF819'); // FormalA <= ch <= FormalZ
+  }
 }

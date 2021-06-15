@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -70,7 +70,7 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  */
 
-public abstract class AdaptiveStepsizeFieldIntegrator<T extends RealFieldElement<T>>
+public abstract class AdaptiveStepsizeFieldIntegrator<T extends CalculusFieldElement<T>>
         extends AbstractFieldIntegrator<T> {
 
     /**
@@ -170,7 +170,7 @@ public abstract class AdaptiveStepsizeFieldIntegrator<T extends RealFieldElement
      * <p>
      * A side effect of this method is to also reset the initial
      * step so it will be automatically computed by the integrator
-     * if {@link #setInitialStepSize(RealFieldElement) setInitialStepSize}
+     * if {@link #setInitialStepSize(CalculusFieldElement) setInitialStepSize}
      * is not called by the user.
      * </p>
      *
@@ -201,7 +201,7 @@ public abstract class AdaptiveStepsizeFieldIntegrator<T extends RealFieldElement
      * <p>
      * A side effect of this method is to also reset the initial
      * step so it will be automatically computed by the integrator
-     * if {@link #setInitialStepSize(RealFieldElement) setInitialStepSize}
+     * if {@link #setInitialStepSize(CalculusFieldElement) setInitialStepSize}
      * is not called by the user.
      * </p>
      *

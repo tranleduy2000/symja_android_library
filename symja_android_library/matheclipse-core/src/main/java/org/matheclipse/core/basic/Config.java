@@ -8,11 +8,14 @@ import com.gx.common.cache.CacheBuilder;
 import java.util.ArrayList;
 import org.hipparchus.util.Precision;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.core.numbertheory.IPrimality;
+import org.matheclipse.core.numbertheory.Primality;
 import org.matheclipse.parser.client.FEConfig;
 
 import java.util.HashSet;
@@ -24,9 +27,9 @@ import org.matheclipse.parser.trie.TrieSequencerIntArray;
 /** General configuration settings. */
 public class Config {
 
+  /** Symja ASCII Art String */
   public static final String SYMJA = //
-      "" //
-          + "     _______.____    ____ .___  ___.        __       ___      \n"
+      "     _______.____    ____ .___  ___.        __       ___      \n"
           + "    /       |\\   \\  /   / |   \\/   |       |  |     /   \\     \n"
           + "   |   (----` \\   \\/   /  |  \\  /  |       |  |    /  ^  \\    \n"
           + "    \\   \\      \\_    _/   |  |\\/|  | .--.  |  |   /  /_\\  \\   \n"
@@ -34,6 +37,12 @@ public class Config {
           + "|_______/        |__|     |__|  |__|  \\______/  /__/     \\__\\ \n"
           + "                                                              \n";
 
+  /** Copyright message */
+  public static final String COPYRIGHT = //
+      "\nCopyright (C) 2009 - 2021 - the Symja team.\n"
+          + "This program comes with ABSOLUTELY NO WARRANTY.\n"
+          + "Distributed under the GNU Public License.\n"
+          + "See the file license.txt\n\n";
   /**
    * A global expression cache which compares keys with <code>==</code> object identity instead of
    * <code>equals()</code>. The keys and values are weak references.
@@ -75,6 +84,8 @@ public class Config {
   public static long MAX_INPUT_LEAVES = Long.MAX_VALUE;
   /** Maximum output size in characters for an output form (i.e. TeXForm, MathMLForm,...I) */
   public static int MAX_OUTPUT_SIZE = Integer.MAX_VALUE;
+  /** Maximum size in characters for a single output line */
+  public static int MAX_OUTPUT_LINE = 80;
   /** Maximum number of elements which could be allocated for an AST */
   public static int MAX_AST_SIZE = Integer.MAX_VALUE;
   /** Maximum number of row or column dimension allowed if creating a new matrix or vector */
@@ -84,6 +95,8 @@ public class Config {
   /** Maximum degree of a polynomial generating function */
   public static int MAX_POLYNOMIAL_DEGREE = Integer.MAX_VALUE;
 
+  /** Maximum number of loop runs in some Symja functions */
+  public static long MAX_LOOP_COUNT = Long.MAX_VALUE;
   static {
     EXPR_CACHE = CacheBuilder.newBuilder().maximumSize(MAX_EXPR_CACHE_SIZE).weakKeys().weakValues()
         .build();
@@ -141,6 +154,13 @@ public class Config {
   public static final Set<ISymbol> SHOW_PATTERN_SYMBOL_STEPS = new HashSet<ISymbol>();
 
   /**
+   * Contains a list of strings. If executed with the <a
+   * href="https://github.com/axkr/symja_android_library/wiki/Console-apps">console apps</a> the
+   * executable is the first string followed by the argument strings. If not executed with a console
+   * app it returns the empty list.
+   */
+  public static IAST SCRIPT_COMMAND_LINE = null;
+  /**
    * Used to serialize the internal Rubi rules or the <code>
    * org.matheclipse.core.reflection.system.rules</code> classes to a file.
    */
@@ -179,6 +199,8 @@ public class Config {
 
   /**
    * Replace <code>double</code> values in root algorithms by 0 if they are below this tolerance.
+   * Assume <code>double</code> values in <code>PossibleZeroQ</code> to be 0 if they are below this
+   * tolerance.
    */
   public static double DEFAULT_ROOTS_CHOP_DELTA = 1.0e-5;
   /**
@@ -209,7 +231,7 @@ public class Config {
   public static boolean JAS_NO_THREADS = false;
 
   /** Use of <code>java.misc.Unsafe</code> is allowed if <code>true</code>. */
-  public static boolean JAVA_UNSAFE = true;
+  public static boolean JAVA_UNSAFE = false;
 
   /**
    * Flag for thread usage in TimeConstrained function.
@@ -232,7 +254,7 @@ public class Config {
    *
    * @deprecated use {@link FEConfig#MACHINE_PRECISION}
    */
-  public static final long MACHINE_PRECISION = FEConfig.MACHINE_PRECISION;
+  @Deprecated public static final long MACHINE_PRECISION = FEConfig.MACHINE_PRECISION;
 
   /** The maximum precision which could be requested from a user for numerical calculations. */
   public static long MAX_PRECISION_APFLOAT = Short.MAX_VALUE;
@@ -267,6 +289,10 @@ public class Config {
     public void accept(IExpr x) {
     }
   };
+
+  /** The algorithm which should be used for the factorization of integer numbers. */
+  //  public static Function<IInteger, IAST> FACTOR_INTEGER =  Primality::factorIInteger;
+  public static IPrimality PRIME_FACTORS = new Primality();
 
   /** Use JavaScript libraries for the <code>Manipulate()</code> function */
   public static boolean USE_MANIPULATE_JS = true;
@@ -513,128 +539,109 @@ public class Config {
    */
   public static final String MATHCELL_PAGE = //
       "<html>\n"
-          + //
-          "<head>\n"
-          + //
-          "<meta charset=\"utf-8\">\n"
-          + //
-          "<title>MathCell</title>\n"
-          + //
-          "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n"
-          + //
-          "</head>\n"
-          + //
-          "\n"
-          + //
-          "<body>\n"
-          + //
-          "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.3/build/math.js\"></script>"
-          + //
-          "\n"
-          + //
-          "\n"
-          + //
-          "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.9.0/build/mathcell.js\"></script>\n"
-          + //
-          "<script src=\"https://cdn.jsdelivr.net/gh/mathjax/MathJax@2.7.5/MathJax.js?config=TeX-AMS_HTML\"></script>"
-          + //
-          "\n" + //
-          "<div class=\"mathcell\" style=\"width: 100%; height: 100%; padding: .25in .5in .5in .5in;\">\n"
-          + //
-          "<script>\n" + //
-          "\n" + //
-          "var parent = document.currentScript.parentNode;\n" + //
-          "\n" + //
-          "var id = generateId();\n" + //
-          "parent.id = id;\n" + //
-          "\n" + //
-          "`1`\n" + //
-          "\n" + //
-          "parent.update( id );\n" + //
-          "\n" + //
-          "</script>\n" + //
-          "</div>\n" + //
-          "\n" + //
-          "</body>\n" + //
-          "</html>";//
+          + "<head>\n"
+          + "<meta charset=\"utf-8\">\n"
+          + "<title>MathCell</title>\n"
+          + "</head>\n"
+          + "\n"
+          + "<body>\n"
+          + "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.4/build/math.js\"></script>"
+          + "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/mathcell@1.9.2/build/mathcell.js\"></script>\n"
+          + "<script src=\"https://cdn.jsdelivr.net/gh/mathjax/MathJax@2.7.5/MathJax.js?config=TeX-AMS_HTML\"></script>"
+          + "\n"
+          + "<div class=\"mathcell\" style=\"width: 100%; height: 100%; padding: .25in .5in .5in .5in;\">\n"
+          + "<script>\n"
+          + "\n"
+          + "var parent = document.currentScript.parentNode;\n"
+          + "\n"
+          + "var id = generateId();\n"
+          + "parent.id = id;\n"
+          + "\n"
+          + "`1`\n"
+          + "\n"
+          + "parent.update( id );\n"
+          + "\n"
+          + "</script>\n"
+          + "</div>\n"
+          + "\n"
+          + "</body>\n"
+          + "</html>"; //
+
+  public static final String GRAPHICS3D_PAGE = //
+      "<html>\n"
+          + "<head>\n"
+          + "<meta charset=\"utf-8\">\n"
+          + "<title>Graphics3D</title>\n"
+          + "<script src=https://cdnjs.cloudflare.com/ajax/libs/three.js/r116/three.min.js></script>\n"
+          + "<script src=https://cdn.jsdelivr.net/gh/JerryI/Mathematica-ThreeJS-graphics-engine@latest/Mathics/Detector.js></script>\n"
+          + "<script src=https://cdn.jsdelivr.net/gh/JerryI/Mathematica-ThreeJS-graphics-engine@latest/graphics3d.js></script>"
+          + "</head>\n"
+          + "\n"
+          + "<body>\n"
+          + "  <div id=\"graphics3d\"></div>\n"
+          + "</body>\n"
+          + "<script>\n"
+          + "var JSONThree = `1`;\n"
+          + "	interpretate(JSONThree);\n"
+          + "</script>"
+          + "</html>"; //
   /** HTML template for JSXGraph */
   public static final String JSXGRAPH_PAGE = //
       "<html>\n"
-          + //
-          "<head>\n"
-          + //
-          "<meta charset=\"utf-8\">\n"
-          + //
-          "<title>JSXGraph</title>\n"
-          + //
-          "</head>\n"
-          + //
-          "\n"
-          + //
-          "<body>\n"
-          + //
-          "\n"
-          + //
-          "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraph.min.css\" />\n"
-          + //
-          "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.3/build/math.js\"></script>\n"
-          + "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.min.js\"\n"
-          + //
-          "        type='text/javascript'></script>\n" + //
-          "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/geonext.min.js\"\n" +
-          //
-          "        type='text/javascript'></script>\n" + //
-          "\n" + //
-          "<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"
-          + //
-          "<script>\n" + //
-          // "var board = JXG.JSXGraph.initBoard('jxgbox', {axis:true});\n" + //
+          + "<head>\n"
+          + "<meta charset=\"utf-8\">\n"
+          + "<title>JSXGraph</title>\n"
+          + "</head>\n"
+          + "\n"
+          + "<body>\n"
+          + "\n"
+          + "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.2/jsxgraph.min.css\" />\n"
+          + "<script src=\"https://cdn.jsdelivr.net/gh/paulmasson/math@1.4.4/build/math.js\"></script>\n"
+          + "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.2/jsxgraphcore.min.js\"\n"
+          + "        type='text/javascript'></script>\n"
+          + "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.2/geonext.min.js\"\n"
+          + "        type='text/javascript'></script>\n"
+          + "\n"
+          + "<div id=\"jxgbox\" class=\"jxgbox\" style=\"display: flex; width:99%; height:99%; margin: 0; flex-direction: column; overflow: hidden\">\n"
+          + "<script>\n"
+          +
+          // "var board = JXG.JSXGraph.initBoard('jxgbox', {axis:true});\n" +
           // ,boundingbox:[-7.0,5.0,4.0,-3.0]
-          // "board.suspendUpdate();\n" + //
-          "`1`\n" + //
-          // "board.unsuspendUpdate();\n" + //
-          "</script>\n" + //
-          "</div>\n" + //
-          "\n" + //
-          "</body>\n" + //
-          "</html>";//
+          // "board.suspendUpdate();\n" +
+          "`1`\n"
+          +
+          // "board.unsuspendUpdate();\n" +
+          "</script>\n"
+          + "</div>\n"
+          + "\n"
+          + "</body>\n"
+          + "</html>"; //
 
   /** HTML template for Plotly */
   public static final String PLOTLY_PAGE = //
       "<html>\n"
-          + //
-          "<head>\n"
-          + //
-          "<meta charset=\"utf-8\">\n"
-          + //
-          "<title>Plotly</title>\n"
-          + //
-          "    <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\r\n"
+          + "<head>\n"
+          + "<meta charset=\"utf-8\">\n"
+          + "<title>Plotly</title>\n"
+          + "    <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\r\n"
           + "</head>\r\n"
-          + "<body>\n" + //
-          "    <div id='plotly' ></div>" + //
-          "`1`\n" + //
-          "</body>\n" + //
-          "</html>";//
+          + "<body>\n"
+          + "    <div id='plotly' ></div>"
+          + "`1`\n"
+          + "</body>\n"
+          + "</html>"; //
 
   /** HTML template */
   public static final String HTML_PAGE = //
       "<html>\n"
-          + //
-          "<head>\n"
-          + //
-          "<meta charset=\"utf-8\">\n"
-          + //
-          "<title>HTML</title>\n"
-          + //
-          "</head>\n"
+          + "<head>\n"
+          + "<meta charset=\"utf-8\">\n"
+          + "<title>HTML</title>\n"
+          + "</head>\n"
           + "<body>\n"
-          + //
-          "`1`\n"
-          + //
-          "</body>\n"
-          + //
-          "</html>";//
+          + "`1`\n"
+          + "</body>\n"
+          + "</html>"; //
 
   public static final double DEFAULT_CHOP_DELTA = 1.0e-10;
 
@@ -680,4 +687,8 @@ public class Config {
   /** A trie builder for mapping strings to IPatternSequence. */
   public static final TrieBuilder<String, IPatternSequence, ArrayList<IPatternSequence>>
       TRIE_STRING2PATTERNSEQUENCE_BUILDER = TrieBuilder.create();
+
+  /** Global switch to make all symbols unprotected if set to {@link ISymbol#NOATTRIBUTE} */
+  public static int BUILTIN_PROTECTED = ISymbol.PROTECTED;
+
 }

@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.FieldEquationsMapper;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
 import org.hipparchus.util.MathArrays;
@@ -56,7 +56,7 @@ import org.hipparchus.util.MathArrays;
  * @see LutherFieldIntegrator
  */
 
-public class EulerFieldIntegrator<T extends RealFieldElement<T>> extends RungeKuttaFieldIntegrator<T> {
+public class EulerFieldIntegrator<T extends CalculusFieldElement<T>> extends RungeKuttaFieldIntegrator<T> {
 
     /**
      * Simple constructor.

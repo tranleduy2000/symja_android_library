@@ -1,5 +1,8 @@
 package org.matheclipse.core.expression;
 
+import it.unimi.dsi.fastutil.objects.Int2IntMap;
+import it.unimi.dsi.fastutil.objects.Int2IntRBTreeMap;
+import java.math.BigInteger;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -29,11 +32,6 @@ import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 
-import java.math.BigInteger;
-
-import it.unimi.dsi.fastutil.objects.Int2IntMap;
-import it.unimi.dsi.fastutil.objects.Int2IntRBTreeMap;
-
 /**
  * Abstract base class for FractionSym and BigFractionSym
  *
@@ -47,11 +45,13 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
   public static final FractionSym ONE = new FractionSym(1, 1);
 
   public static final FractionSym MONE = new FractionSym(-1, 1);
-  /** */
+  /**
+   *
+   */
   private static final long serialVersionUID = -8743141041586314213L;
 
   public static BigInteger gcd(BigInteger i1, BigInteger i2) {
-    if (i1.equals(BigInteger.ONE) || i2.equals(BigInteger.ONE)) return BigInteger.ONE;
+    if (i1.equals(BigInteger.ONE) || i2.equals(BigInteger.ONE)) { return BigInteger.ONE; }
     int l1 = i1.bitLength();
     int l2 = i2.bitLength();
     if (l1 < 31 && l2 < 31) {
@@ -64,7 +64,18 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
   }
 
   public static IFraction valueOf(BigFraction fraction) {
-    return valueOf(fraction.getNumerator(), fraction.getDenominator());
+    BigInteger num = fraction.getNumerator();
+    BigInteger den = fraction.getDenominator();
+    if (BigInteger.ZERO.equals(den)) {
+      // Infinite expression `1` encountered.
+      String str =
+          IOFunctions.getMessage("infy", F.List(F.Rational(F.ZZ(num), F.C0)), EvalEngine.get());
+      throw new ArgumentTypeException(str);
+    }
+    if (den.bitLength() <= 31 && num.bitLength() <= 31) {
+      return valueOf(num.intValue(), den.intValue());
+    }
+    return new BigFractionSym(fraction);
   }
 
   public static IFraction valueOf(BigInteger num) {
@@ -87,23 +98,10 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
           .getMessage("infy", F.List(F.Rational(F.ZZ(num), F.C0)), EvalEngine.get());
       throw new ArgumentTypeException(str);
     }
-    int cp = den.signum();
-    if (cp < 0) {
-      num = num.negate();
-      den = den.negate();
-    }
-    if (!BigInteger.ONE.equals(den)) {
-      BigInteger norm = gcd(num, den).abs();
-      if (!norm.equals(BigInteger.ONE)) {
-        num = num.divide(norm);
-        den = den.divide(norm);
-      }
-    }
     if (den.bitLength() <= 31 && num.bitLength() <= 31) {
       return valueOf(num.intValue(), den.intValue());
-    } else {
-      return new BigFractionSym(num, den);
     }
+    return new BigFractionSym(num, den);
   }
 
   public static IFraction valueOf(IInteger numerator) {
@@ -207,7 +205,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
    *
    * @param value   the double value to convert to a fraction.
    * @param epsilon maximum error allowed. The resulting fraction is within epsilon of value, in
-   *     absolute terms.
+   *                absolute terms.
    * @return
    */
   public static IFraction valueOfEpsilon(final double value, final double epsilon) {
@@ -293,6 +291,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
   @Override
   public abstract IInteger ceilFraction();
 
+  @Override
   public int compareTo(final IExpr expr) {
     if (expr.isNumber()) {
       int c = this.compareTo(((INumber) expr).re());
@@ -303,11 +302,6 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
     return -1;
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public int complexSign() {
-    return sign();
-  }
 
   @Override
   public IExpr copy() {
@@ -366,7 +360,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
     // negate the exponents of the denominator part
     for (int i = 1; i < result.size(); i++) {
       IASTMutable list = (IASTMutable) result.get(i);
-      list.set(2, ((ISignedNumber) list.arg2()).negate());
+      list.set(2, list.second().negate());
     }
 
     // add the factors from the numerator part
@@ -379,7 +373,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
   public IAST factorSmallPrimes(int numerator, int root) {
     BigInteger b = toBigNumerator();
     boolean isNegative = false;
-    if (sign() < 0) {
+    if (complexSign() < 0) {
       b = b.negate();
       isNegative = true;
     }
@@ -410,6 +404,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
   }
 
   /** {@inheritDoc} */
+  @Override
   public IInteger integerPart() {
     return isNegative() ? ceilFraction() : floorFraction();
   }
@@ -459,13 +454,13 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
     if (!multiple.isRational()) {
       multiple = F.fraction(multiple.doubleValue(), Config.DOUBLE_EPSILON);
     }
-    IInteger ii = this.divideBy((IRational) multiple).round();
+    IInteger ii = this.divideBy((IRational) multiple).roundExpr();
     return ii.multiply((IRational) multiple);
   }
 
   @Override
   public ISymbol head() {
-    return F.Rational;
+    return S.Rational;
   }
 
   @Override
@@ -549,6 +544,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
       return ((IFraction) this).negate();
     }
 
+    // objc-changed
     BigInteger bigNumerator = toBigNumerator();
     BigInteger otherBigNumerator = other.toBigNumerator();
     OperationSystem
@@ -605,7 +601,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 
   /** {@inheritDoc} */
   @Override
-  public final IFraction pow(final long n) throws ArithmeticException {
+  public final IFraction powerRational(final long n) throws ArithmeticException {
     if (n == 0L) {
       if (!this.isZero()) {
         return AbstractFractionSym.ONE;
@@ -651,6 +647,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
     return result;
   }
 
+  @Override
   public void checkBitLength() {
     if (Integer.MAX_VALUE > Config.MAX_BIT_LENGTH) {
       final long bitLength = toBigNumerator().bitLength() + toBigDenominator().bitLength();
@@ -662,7 +659,7 @@ public abstract class AbstractFractionSym extends IFractionImpl implements IFrac
 
   /** {@inheritDoc} */
   @Override
-  public int sign() {
+  public int complexSign() {
     return toBigNumerator().signum();
   }
 

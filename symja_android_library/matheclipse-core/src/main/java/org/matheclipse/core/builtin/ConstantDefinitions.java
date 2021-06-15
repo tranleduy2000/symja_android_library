@@ -1,12 +1,19 @@
 package org.matheclipse.core.builtin;
 
+import static org.matheclipse.core.expression.F.Power;
+import static org.matheclipse.core.expression.F.Times;
+
 import java.io.File;
+import java.util.Calendar;
+import java.util.Locale;
+import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
 import org.apfloat.Aprational;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.EvalHistory;
 import org.matheclipse.core.eval.interfaces.AbstractSymbolEvaluator;
 import org.matheclipse.core.eval.interfaces.ISetValueEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstantAbstractSymbolEvaluator;
@@ -17,19 +24,12 @@ import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.ISymbol;
-
-import java.util.Calendar;
-import java.util.Properties;
-
-import org.matheclipse.core.tensor.io.ResourceData;
 import org.matheclipse.parser.client.FEConfig;
-
-import static org.matheclipse.core.expression.F.Power;
-import static org.matheclipse.core.expression.F.Times;
 
 public class ConstantDefinitions {
 
-  public static String VERSION = "1.0.0";
+  // load version string from MAVEN
+  public static String VERSION = "?";
   public static String TIMESTAMP = "";
   private static int YEAR = Calendar.getInstance().get(Calendar.YEAR);
   private static int MONTH = Calendar.getInstance().get(Calendar.MONTH);
@@ -40,75 +40,90 @@ public class ConstantDefinitions {
   public static final double EULER_GAMMA = 0.57721566490153286060651209008240243104215933593992;
 
   /**
-   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
-   * initializer</a>
+   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation
+   * in static initializer</a>
    */
   private static class Initializer {
 
     private static void init() {
-      Properties properties = ResourceData.properties("/version.txt");
 
-      String versionString = properties.getProperty("version");
-      if (versionString != null && versionString.charAt(0) != '$') {
+      String versionString = Config.getVersion();
+      if (versionString != null) {
         VERSION = versionString;
       }
 
-      String timestamp = properties.getProperty("timestamp");
-      if (timestamp != null && timestamp.charAt(0) != '$') {
-        TIMESTAMP = timestamp;
-        try {
-          YEAR = Integer.parseInt(TIMESTAMP.substring(0, 4));
-          MONTH = Integer.parseInt(TIMESTAMP.substring(4, 6));
-          DAY = Integer.parseInt(TIMESTAMP.substring(6, 8));
-          HOUR = Integer.parseInt(TIMESTAMP.substring(8, 10));
-          MINUTE = Integer.parseInt(TIMESTAMP.substring(10, 12));
-          SECOND = Integer.parseInt(TIMESTAMP.substring(12, 14));
-        } catch (NumberFormatException nfe) {
-          nfe.printStackTrace();
-        }
-      }
+      // Properties properties = ResourceData.properties("/version.txt");
+      // String timestamp = properties.getProperty("timestamp");
+      // if (timestamp != null && timestamp.charAt(0) != '$') {
+      // TIMESTAMP = timestamp;
+      // try {
+      // YEAR = Integer.parseInt(TIMESTAMP.substring(0, 4));
+      // MONTH = Integer.parseInt(TIMESTAMP.substring(4, 6));
+      // DAY = Integer.parseInt(TIMESTAMP.substring(6, 8));
+      // HOUR = Integer.parseInt(TIMESTAMP.substring(8, 10));
+      // MINUTE = Integer.parseInt(TIMESTAMP.substring(10, 12));
+      // SECOND = Integer.parseInt(TIMESTAMP.substring(12, 14));
+      // } catch (NumberFormatException nfe) {
+      // nfe.printStackTrace();
+      // }
+      // }
 
       // System.out.println(VERSION);
       // System.out.println(TIMESTAMP);
-      F.$Context.setEvaluator(new $Context());
-      F.$ContextPath.setEvaluator(new $ContextPath());
-      F.$CreationDate.setEvaluator(new $CreationDate());
-//      F.$HistoryLength.setEvaluator(new $HistoryLength());
-      F.$HomeDirectory.setEvaluator(new $HomeDirectory());
-      F.$IterationLimit.setEvaluator(new $IterationLimit());
-//      F.$Line.setEvaluator(new $Line());
-      F.$MachineEpsilon.setEvaluator(new $MachineEpsilon());
-      F.$MachinePrecision.setEvaluator(new $MachinePrecision());
-//      F.$Packages.setEvaluator(new $Packages());
-      F.$Path.setEvaluator(new $Path());
-      F.$PathnameSeparator.setEvaluator(new $PathnameSeparator());
+      S.$Assumptions.setEvaluator(new $Assumptions());
+//      S.$BaseDirectory.setEvaluator(new $BaseDirectory());
+      S.$Context.setEvaluator(new $Context());
+      S.$ContextPath.setEvaluator(new $ContextPath());
+      S.$CreationDate.setEvaluator(new $CreationDate());
+//      S.$HistoryLength.setEvaluator(new $HistoryLength());
+//      S.$HomeDirectory.setEvaluator(new $HomeDirectory());
+//      S.$Input.setEvaluator(new $Input());
+//      S.$InputFileName.setEvaluator(new $InputFileName());
+      S.$IterationLimit.setEvaluator(new $IterationLimit());
+//      S.$Line.setEvaluator(new $Line());
+      S.$MachineEpsilon.setEvaluator(new $MachineEpsilon());
+      S.$MachinePrecision.setEvaluator(new $MachinePrecision());
+//      S.$MaxMachineNumber.setEvaluator(new $MaxMachineNumber());
+//      S.$MinMachineNumber.setEvaluator(new $MinMachineNumber());
+//      S.$Notebooks.setEvaluator(new $Notebooks());
+//      S.$OperatingSystem.setEvaluator(new $OperatingSystem());
+//      S.$Packages.setEvaluator(new $Packages());
+      S.$Path.setEvaluator(new $Path());
+      S.$PathnameSeparator.setEvaluator(new $PathnameSeparator());
 
-      F.$UserName.setEvaluator(new $UserName());
-      F.$RecursionLimit.setEvaluator(new $RecursionLimit());
-//      F.$RootDirectory.setEvaluator(new $RootDirectory());
-//      F.$TemporaryDirectory.setEvaluator(new $TemporaryDirectory());
-      F.$Version.setEvaluator(new $Version());
+      S.$UserName.setEvaluator(new $UserName());
+      S.$RecursionLimit.setEvaluator(new $RecursionLimit());
+//      S.$RootDirectory.setEvaluator(new $RootDirectory());
+//      S.$ScriptCommandLine.setEvaluator(new $ScriptCommandLine());
+//      S.$SystemCharacterEncoding.setEvaluator(new $SystemCharacterEncoding());
+//      S.$SystemMemory.setEvaluator(new $SystemMemory());
+//      S.$TemporaryDirectory.setEvaluator(new $TemporaryDirectory());
+//      S.$UserBaseDirectory.setEvaluator(new $UserBaseDirectory());
+      S.$Version.setEvaluator(new $Version());
+
+      S.RecordSeparators.setEvaluator(new RecordSeparators());
+      S.WordSeparators.setEvaluator(new WordSeparators());
 
       // System.out.println(S.$CreationDate.of().toString());
-      F.Catalan.setEvaluator(new Catalan());
-      F.ComplexInfinity.setEvaluator(new ComplexInfinity());
-      F.Degree.setEvaluator(new Degree());
-      F.E.setEvaluator(new E());
-      F.EulerGamma.setEvaluator(new EulerGamma());
-      F.Glaisher.setEvaluator(new Glaisher());
-      F.GoldenAngle.setEvaluator(new GoldenAngle());
-      F.GoldenRatio.setEvaluator(new GoldenRatio());
-      F.I.setEvaluator(new I());
-      F.Infinity.setEvaluator(new Infinity());
-      F.Khinchin.setEvaluator(new Khinchin());
-      F.Pi.setEvaluator(new Pi());
+      S.Catalan.setEvaluator(new Catalan());
+      S.ComplexInfinity.setEvaluator(new ComplexInfinity());
+      S.Degree.setEvaluator(new Degree());
+      S.E.setEvaluator(new E());
+      S.EulerGamma.setEvaluator(new EulerGamma());
+      S.Glaisher.setEvaluator(new Glaisher());
+      S.GoldenAngle.setEvaluator(new GoldenAngle());
+      S.GoldenRatio.setEvaluator(new GoldenRatio());
+      S.I.setEvaluator(new I());
+      S.Infinity.setEvaluator(new Infinity());
+      S.Khinchin.setEvaluator(new Khinchin());
+      S.Pi.setEvaluator(new Pi());
 
-//      F.Now.setEvaluator(new Now());
-//      F.Today.setEvaluator(new Today());
+//      S.Now.setEvaluator(new Now());
+//      S.Today.setEvaluator(new Today());
 
-      F.False.setEvaluator(NILEvaluator.CONST);
-      F.True.setEvaluator(NILEvaluator.CONST);
-      F.Null.setEvaluator(NILEvaluator.CONST);
+      S.False.setEvaluator(NILEvaluator.CONST);
+      S.True.setEvaluator(NILEvaluator.CONST);
+      S.Null.setEvaluator(NILEvaluator.CONST);
     }
   }
 
@@ -141,6 +156,40 @@ public class ConstantDefinitions {
     }
   }
 
+  private static class $Assumptions extends AbstractSymbolEvaluator implements ISetValueEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      //      IAssumptions assumptions = engine.getAssumptions();
+      //      if (assumptions == null) {
+      //        return F.True;
+      //      }
+      IExpr assume = S.$Assumptions.assignedValue();
+      if (assume != null) {
+        return assume;
+      }
+      return F.True;
+    }
+
+    @Override
+    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
+      S.$Assumptions.assignValue(rightHandSide, setDelayed);
+      return rightHandSide;
+    }
+  }
+
+  //  private static class $BaseDirectory extends AbstractSymbolEvaluator {
+//
+//    @Override
+//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+//      String userHome = System.getProperty("user.home");
+//      if (userHome == null) {
+//        return F.CEmptyString;
+//      }
+//      Path path = Paths.get(userHome, "Symja");
+//      return F.stringx(path.toString());
+//    }
+//  }
   private static class $Context extends AbstractSymbolEvaluator {
 
     @Override
@@ -167,64 +216,83 @@ public class ConstantDefinitions {
     }
   }
 
-//  private static class $HistoryLength extends AbstractSymbolEvaluator {
-//
-//    @Override
-//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
-//      EvalHistory history = engine.getEvalHistory();
-//      if (history == null) {
-//        return F.C0;
-//      }
-//      short historyLength = history.getHistoryLength();
-//      if (historyLength == Short.MAX_VALUE) {
-//        return F.CInfinity;
-//      }
-//      return F.ZZ(historyLength);
-//    }
-//
-//    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
-//      int iValue = rightHandSide.toIntDefault();
-//      short historyLength;
-//      if (iValue < 0) {
-//        if (rightHandSide.isInfinity()) {
-//          historyLength = Short.MAX_VALUE;
-//        } else {
-//          // Positive machine-sized integer expected at position `2` in `1`.
-//          return IOFunctions.printMessage(
-//              F.$HistoryLength,
-//              "intpm",
-//              F.List(F.C2, F.Set(F.$HistoryLength, rightHandSide)),
-//              engine);
-//        }
-//      } else if (iValue < Short.MAX_VALUE) {
-//        historyLength = (short) iValue;
-//      } else {
-//        historyLength = Short.MAX_VALUE;
-//      }
-//      IInteger value = F.ZZ(historyLength);
-//      F.$HistoryLength.assignValue(value, setDelayed);
-//      EvalHistory history = engine.getEvalHistory();
-//      if (history == null) {
-//        history = new EvalHistory(historyLength);
-//        engine.setOutListDisabled(history);
-//      } else {
-//        history.setHistoryLength(historyLength);
-//      }
-//      return value;
-//    }
-//  }
-
-  private static class $HomeDirectory extends AbstractSymbolEvaluator {
+  private static class $HistoryLength extends AbstractSymbolEvaluator
+      implements ISetValueEvaluator {
 
     @Override
     public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
-      String userHome = System.getProperty("user.home");
-      if (userHome == null) {
-        return F.CEmptyString;
+      EvalHistory history = engine.getEvalHistory();
+      if (history == null) {
+        return F.C0;
       }
-      return F.stringx(userHome);
+      short historyLength = history.getHistoryLength();
+      if (historyLength == Short.MAX_VALUE) {
+        return F.CInfinity;
+      }
+      return F.ZZ(historyLength);
+    }
+
+    @Override
+    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
+      int iValue = rightHandSide.toIntDefault();
+      short historyLength;
+      if (iValue < 0) {
+        if (rightHandSide.isInfinity()) {
+          historyLength = Short.MAX_VALUE;
+        } else {
+          // Positive machine-sized integer expected at position `2` in `1`.
+          return IOFunctions.printMessage(
+              S.$HistoryLength,
+              "intpm",
+              F.List(F.C2, F.Set(S.$HistoryLength, rightHandSide)),
+              engine);
+        }
+      } else if (iValue < Short.MAX_VALUE) {
+        historyLength = (short) iValue;
+      } else {
+        historyLength = Short.MAX_VALUE;
+      }
+      IInteger value = F.ZZ(historyLength);
+      S.$HistoryLength.assignValue(value, setDelayed);
+      EvalHistory history = engine.getEvalHistory();
+      if (history == null) {
+        history = new EvalHistory(historyLength);
+        engine.setOutListDisabled(history);
+      } else {
+        history.setHistoryLength(historyLength);
+      }
+      return value;
     }
   }
+
+//  private static class $HomeDirectory extends AbstractSymbolEvaluator {
+//
+//    @Override
+//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+//      String userHome = System.getProperty("user.home");
+//      if (userHome == null) {
+//        return F.CEmptyString;
+//      }
+//      Path path = Paths.get(userHome);
+//      return F.stringx(path.toString());
+//    }
+//  }
+
+//  private static class $Input extends AbstractSymbolEvaluator {
+//
+//    @Override
+//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+//      return F.stringx(EvalEngine.get().get$Input());
+//    }
+//  }
+
+//  private static class $InputFileName extends AbstractSymbolEvaluator {
+//
+//    @Override
+//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+//      return F.stringx(EvalEngine.get().get$InputFileName());
+//    }
+//  }
 
   private static class $IterationLimit extends AbstractSymbolEvaluator
       implements ISetValueEvaluator {
@@ -241,6 +309,7 @@ public class ConstantDefinitions {
       return F.ZZ(iterationLimit);
     }
 
+    @Override
     public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
       if (rightHandSide.isInfinity()) {
         S.$IterationLimit.assignValue(F.CN1, false);
@@ -258,31 +327,32 @@ public class ConstantDefinitions {
     }
   }
 
-//  private static class $Line extends AbstractSymbolEvaluator implements ISetValueEvaluator {
-//
-//    @Override
-//    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
-//      EvalHistory history = engine.getEvalHistory();
-//      if (history == null) {
-//        return F.C0;
-//      }
-//      int line = history.getLineCounter();
-//      return F.ZZ(line);
-//    }
-//
-//    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
-//      int line = rightHandSide.toIntDefault();
-//      IInteger value = F.ZZ(line);
-//      F.$Line.assignValue(value, setDelayed);
-//      EvalHistory history = engine.getEvalHistory();
-//      if (history == null) {
-//        history = new EvalHistory((short) 100);
-//        engine.setOutListDisabled(history);
-//      }
-//      history.resetLineCounter(line);
-//      return value;
-//    }
-//  }
+  private static class $Line extends AbstractSymbolEvaluator implements ISetValueEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      EvalHistory history = engine.getEvalHistory();
+      if (history == null) {
+        return F.C0;
+      }
+      int line = history.getLineCounter();
+      return F.ZZ(line);
+    }
+
+    @Override
+    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
+      int line = rightHandSide.toIntDefault();
+      IInteger value = F.ZZ(line);
+      S.$Line.assignValue(value, setDelayed);
+      EvalHistory history = engine.getEvalHistory();
+      if (history == null) {
+        history = new EvalHistory((short) 100);
+        engine.setOutListDisabled(history);
+      }
+      history.resetLineCounter(line);
+      return value;
+    }
+  }
 
   private static class $MachineEpsilon extends AbstractSymbolEvaluator {
 
@@ -299,6 +369,57 @@ public class ConstantDefinitions {
     @Override
     public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
       return F.ZZ(FEConfig.MACHINE_PRECISION);
+    }
+  }
+
+  private static class $MaxMachineNumber extends AbstractSymbolEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      return F.num(Double.MAX_VALUE);
+    }
+  }
+
+  private static class $MinMachineNumber extends AbstractSymbolEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      return F.num(Double.valueOf("2.2250738585072014E-308"));
+    }
+  }
+
+  private static class $Notebooks extends AbstractSymbolEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      return F.False;
+    }
+  }
+
+  private static class $OperatingSystem extends AbstractSymbolEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      String operatingSystem = System.getProperty("os.name", "Unknown").toLowerCase(Locale.ENGLISH);
+      if (operatingSystem == null) {
+        return F.stringx("Unknown");
+      }
+      operatingSystem = operatingSystem.toLowerCase(Locale.US);
+      if (operatingSystem.contains("mac") //
+          || operatingSystem.contains("os2") //
+          || operatingSystem.contains("darwin")) {
+        return F.stringx("MaxOSX");
+      }
+      if (operatingSystem.contains("win")) {
+        return F.stringx("Windows");
+      }
+      if (operatingSystem.contains("six")
+          || operatingSystem.contains("nix")
+          || operatingSystem.contains("nux")
+          || operatingSystem.contains("aix")) {
+        return F.stringx("Unix");
+      }
+      return F.stringx("Unknown");
     }
   }
 
@@ -349,6 +470,7 @@ public class ConstantDefinitions {
       return F.ZZ(recursionLimit);
     }
 
+    @Override
     public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
       if (rightHandSide.isInfinity()) {
         S.$RecursionLimit.assignValue(F.CN1, false);
@@ -414,12 +536,60 @@ public class ConstantDefinitions {
     public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
       return F.stringx(VERSION);
     }
+  }
 
+  private static class RecordSeparators extends AbstractSymbolEvaluator
+      implements ISetValueEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      if (symbol.hasAssignedSymbolValue()) {
+        return symbol.assignedValue();
+      }
+
+      return F.NIL;
+    }
+
+    @Override
+    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
+      S.RecordSeparators.assignValue(rightHandSide, setDelayed);
+      return rightHandSide;
+    }
+
+    @Override
+    public void setUp(ISymbol newSymbol) {
+      super.setUp(newSymbol);
+      S.RecordSeparators.assignValue(
+          F.List(F.stringx("\n"), F.stringx("\r\n"), F.stringx("\r")), false);
+    }
+  }
+
+  private static class WordSeparators extends AbstractSymbolEvaluator
+      implements ISetValueEvaluator {
+
+    @Override
+    public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
+      if (symbol.hasAssignedSymbolValue()) {
+        return symbol.assignedValue();
+      }
+
+      return F.NIL;
+    }
+
+    @Override
+    public IExpr evaluateSet(IExpr rightHandSide, boolean setDelayed, final EvalEngine engine) {
+      S.WordSeparators.assignValue(rightHandSide, setDelayed);
+      return rightHandSide;
+    }
+
+    @Override
+    public void setUp(ISymbol newSymbol) {
+      super.setUp(newSymbol);
+      S.WordSeparators.assignValue(F.List(F.stringx(" "), F.stringx("\t")), false);
+    }
   }
 
   /**
-   *
-   *
    * <blockquote>
    *
    * <p>Catalan's constant
@@ -449,7 +619,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -510,16 +680,17 @@ public class ConstantDefinitions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * the constant <code>Degree</code> converts angles from degree to <code>Pi/180</code> radians.
-   * </p>
+   *
+   * <p>the constant <code>Degree</code> converts angles from degree to <code>Pi/180</code> radians.
+   *
    * </blockquote>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="http://en.wikipedia.org/wiki/Degree_(angle)">Wikipedia - Degree (angle)</a></li>
+   *   <li><a href="http://en.wikipedia.org/wiki/Degree_(angle)">Wikipedia - Degree (angle)</a>
    * </ul>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -542,12 +713,13 @@ public class ConstantDefinitions {
    * </pre>
    */
   private static class Degree extends ISignedNumberConstantAbstractSymbolEvaluator {
+
     public static final double DEGREE = 0.017453292519943295769236907684886127134428718885417;
 
     /** Constant Degree converted to Pi/180 */
     @Override
     public IExpr evaluate(final ISymbol symbol, EvalEngine engine) {
-      return Times(F.Pi, Power(F.ZZ(180), F.CN1));
+      return Times(S.Pi, Power(F.ZZ(180), F.CN1));
     }
 
     @Override
@@ -569,13 +741,11 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
   }
 
   /**
-   *
-   *
    * <blockquote>
    *
    * <p>Euler's constant E
@@ -599,7 +769,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -629,12 +799,17 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
     public IExpr numericEval(final ISymbol symbol, EvalEngine engine) {
       return F.num(EULER_GAMMA);
+    }
+
+    @Override
+    public IExpr apfloatEval(ISymbol symbol, EvalEngine engine) {
+      return F.num(ApfloatMath.euler(engine.getNumericPrecision()));
     }
 
     @Override
@@ -645,8 +820,6 @@ public class ConstantDefinitions {
   }
 
   /**
-   *
-   *
    * <blockquote>
    *
    * <p>Glaisher constant.
@@ -666,9 +839,10 @@ public class ConstantDefinitions {
   private static class Glaisher extends ISignedNumberConstantAbstractSymbolEvaluator {
 
     public static final double GLAISHER = 1.2824271291006226368753425688697917277676889273250;
+
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -696,7 +870,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -725,9 +899,9 @@ public class ConstantDefinitions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * is the golden ratio.
-   * </p>
+   *
+   * <p>is the golden ratio.
+   *
    * </blockquote>
    * <p>
    * See:
@@ -755,15 +929,15 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
     public IExpr apfloatEval(ISymbol symbol, EvalEngine engine) {
       // (1/2)*(1+Sqrt(5))
       Apfloat five = new Apfloat(5, engine.getNumericPrecision());
-      Apfloat half = new Aprational(Apint.ONE, new Apint(2));
-      return F.num(ApfloatMath.sqrt(five).add(Apfloat.ONE).multiply(half));
+      Apfloat half = new Aprational(Apcomplex.ONE, new Apint(2));
+      return F.num(ApfloatMath.sqrt(five).add(Apcomplex.ONE).multiply(half));
     }
 
     @Override
@@ -807,7 +981,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -822,8 +996,6 @@ public class ConstantDefinitions {
   }
 
   /**
-   *
-   *
    * <pre>
    * Infinity
    * </pre>
@@ -908,9 +1080,8 @@ public class ConstantDefinitions {
 //      // don't set CONSTANT attribute !
 //    }
 //  }
+
   /**
-   *
-   *
    * <pre>
    * Khinchin
    * </pre>
@@ -941,7 +1112,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override
@@ -978,7 +1149,7 @@ public class ConstantDefinitions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.CONSTANT | ISymbol.PROTECTED);
+      newSymbol.setAttributes(ISymbol.CONSTANT);
     }
 
     @Override

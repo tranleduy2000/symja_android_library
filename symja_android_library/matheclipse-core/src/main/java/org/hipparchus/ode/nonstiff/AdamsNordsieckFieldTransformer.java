@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.linear.Array2DRowFieldMatrix;
 import org.hipparchus.linear.ArrayFieldVector;
 import org.hipparchus.linear.FieldDecompositionSolver;
@@ -136,14 +136,14 @@ import java.util.Map;
  *
  * @param <T> the type of the field elements
  */
-public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
+public class AdamsNordsieckFieldTransformer<T extends CalculusFieldElement<T>> {
 
     /**
      * Cache for already computed coefficients.
      */
     private static final Map<Integer,
-            Map<Field<? extends RealFieldElement<?>>,
-                    AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>>> CACHE = new HashMap<>();
+            Map<Field<? extends CalculusFieldElement<?>>,
+                    AdamsNordsieckFieldTransformer<? extends CalculusFieldElement<?>>>> CACHE = new HashMap<>();
 
     /**
      * Field to which the time and state vector elements belong.
@@ -204,14 +204,14 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
      * @param <T>    the type of the field elements
      * @return Nordsieck transformer for the specified field and number of steps
      */
-    public static <T extends RealFieldElement<T>> AdamsNordsieckFieldTransformer<T> // NOPMD - PMD false positive
+    public static <T extends CalculusFieldElement<T>> AdamsNordsieckFieldTransformer<T> // NOPMD - PMD false positive
     getInstance(final Field<T> field, final int nSteps) {
         synchronized (CACHE) {
-            Map<Field<? extends RealFieldElement<?>>,
-                    AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>> map = CACHE.get(nSteps);
+            Map<Field<? extends CalculusFieldElement<?>>,
+                    AdamsNordsieckFieldTransformer<? extends CalculusFieldElement<?>>> map = CACHE.get(nSteps);
             if (map == null) {
-                map = new HashMap<Field<? extends RealFieldElement<?>>,
-                        AdamsNordsieckFieldTransformer<? extends RealFieldElement<?>>>();
+                map = new HashMap<Field<? extends CalculusFieldElement<?>>,
+                        AdamsNordsieckFieldTransformer<? extends CalculusFieldElement<?>>>();
                 CACHE.put(nSteps, map);
             }
             @SuppressWarnings("unchecked")
@@ -348,7 +348,7 @@ public class AdamsNordsieckFieldTransformer<T extends RealFieldElement<T>> {
      * @param highOrder high order scaled derivatives
      *                  (h<sup>2</sup>/2 y'', ... h<sup>k</sup>/k! y(k))
      * @return updated high order derivatives
-     * @see #updateHighOrderDerivativesPhase2(RealFieldElement[], RealFieldElement[], Array2DRowFieldMatrix)
+     * @see #updateHighOrderDerivativesPhase2(CalculusFieldElement[], CalculusFieldElement[], Array2DRowFieldMatrix)
      */
     public Array2DRowFieldMatrix<T> updateHighOrderDerivativesPhase1(final Array2DRowFieldMatrix<T> highOrder) {
         return update.multiply(highOrder);

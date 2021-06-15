@@ -10,7 +10,9 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.WrongArgumentType;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -455,10 +457,9 @@ public class Eliminate extends AbstractFunctionEvaluator {
 		return F.NIL;
 	}
 	/**
-	 * <p>
-	 * Match <code>a_.*variable^n_+b_.*variable^m_</code> to
-	 * <code>E^(((-I)*Pi + Log(a) - Log(b))/(m - n)) /; FreeQ(a,x)&&FreeQ(b,x)&&FreeQ(n,x)&&FreeQ(m,x)</code>
-	 * </p>
+   * Match <code>a_.*variable^n_+b_.*variable^m_</code> to <code>
+   * E^(((-I)*Pi + Log(a) - Log(b))/(m - n)) /; FreeQ(a,x)&&FreeQ(b,x)&&FreeQ(n,x)&&FreeQ(m,x)
+   * </code>
 	 *
 	 * @param ast
 	 * @param x
@@ -488,7 +489,8 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 * Analyze the <code>Equal()</code> terms, if we find an expression which equals the given <code>variabe</code>
+   * Analyze the <code>Equal()</code> terms, if we find an expression which equals the given <code>
+   * variabe</code>
 	 * 
 	 * @param analyzerList
 	 *            the list of <code>Equal()</code> terms with statistics of it's equations.
@@ -535,7 +537,7 @@ public class Eliminate extends AbstractFunctionEvaluator {
 			if (!termsEqualZeroList.isPresent()) {
 				return F.NIL;
 			}
-			IAST vars = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+      IAST vars = Validate.checkIsVariableOrVariableList(ast, 2, ast.topHead(), engine);
 			if (!vars.isPresent()) {
 				return F.NIL;
 			}
@@ -565,25 +567,24 @@ public class Eliminate extends AbstractFunctionEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_2_2;
+    return IFunctionEvaluator.ARGS_2_2;
 	}
 	private static IExpr resultAsAndEquations(IAST result) {
 		if (result.isList()) {
 			if (result.equals(F.CEmptyList)) {
-				return F.True;
+        return S.True;
 			}
-			return result.apply(F.And);
+      return result.apply(S.And);
 		}
 		return result;
 	}
 
 	/**
-	 *
 	 * @param result
 	 * @param variable
-	 * @return <code>null</code> if we can't eliminate an equation from the list for the given <code>variable</code> or
-	 *         the eliminated list of equations in index <code>[0]</code> and the last rule which is used for variable
-	 *         elimination in index <code>[1]</code>.
+   * @return <code>null</code> if we can't eliminate an equation from the list for the given <code>
+   *     variable</code> or the eliminated list of equations in index <code>[0]</code> and the last
+   *     rule which is used for variable elimination in index <code>[1]</code>.
 	 */
 	public static IAST[] eliminateOneVariable(IAST result, IExpr variable, EvalEngine engine) {
 		IAST equalAST;
@@ -601,12 +602,11 @@ public class Eliminate extends AbstractFunctionEvaluator {
 	}
 
 	/**
-	 *
 	 * @param result
 	 * @param slot
-	 * @return <code>null</code> if we can't eliminate an equation from the list for the given <code>variable</code> or
-	 *         the eliminated list of equations in index <code>[0]</code> and the last rule which is used for variable
-	 *         elimination in index <code>[1]</code>.
+   * @return <code>null</code> if we can't eliminate an equation from the list for the given <code>
+   *     variable</code> or the eliminated list of equations in index <code>[0]</code> and the last
+   *     rule which is used for variable elimination in index <code>[1]</code>.
 	 */
 	public static IAST[] eliminateSlot(IAST result, IExpr slot, EvalEngine engine) {
 

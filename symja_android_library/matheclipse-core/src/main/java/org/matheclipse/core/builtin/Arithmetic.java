@@ -49,6 +49,11 @@ import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
+import org.apfloat.ApfloatRuntimeException;
+import org.apfloat.InfiniteExpansionException;
+import org.apfloat.LossOfPrecisionException;
+import org.apfloat.OverflowException;
+import org.apfloat.internal.BackingStorageException;
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.ArrayRealVector;
@@ -150,51 +155,52 @@ public final class Arithmetic {
   private static class Initializer {
 
     private static void init() {
-      F.Plus.setDefaultValue(F.C0);
-      F.Plus.setEvaluator(CONST_PLUS);
-      F.Times.setDefaultValue(F.C1);
-      F.Times.setEvaluator(CONST_TIMES);
-      F.Power.setDefaultValue(2, F.C1);
-      F.Power.setEvaluator(CONST_POWER);
-      F.Sqrt.setEvaluator(new Sqrt());
-      F.Surd.setEvaluator(new Surd());
-      F.Minus.setEvaluator(new Minus());
+      S.Plus.setDefaultValue(F.C0);
+      S.Plus.setEvaluator(CONST_PLUS);
+      S.Times.setDefaultValue(F.C1);
+      S.Times.setEvaluator(CONST_TIMES);
+      S.Power.setDefaultValue(2, F.C1);
+      S.Power.setEvaluator(CONST_POWER);
+      S.Sqrt.setEvaluator(new Sqrt());
+      S.Surd.setEvaluator(new Surd());
+      S.Minus.setEvaluator(new Minus());
 
-      F.Abs.setEvaluator(new Abs());
-      F.AbsArg.setEvaluator(new AbsArg());
-      F.AddTo.setEvaluator(new AddTo());
-      F.Arg.setEvaluator(new Arg());
-      F.Chop.setEvaluator(new Chop());
-      F.Clip.setEvaluator(new Clip());
-      F.Complex.setEvaluator(CONST_COMPLEX);
-      F.ConditionalExpression.setEvaluator(new ConditionalExpression());
-      F.Conjugate.setEvaluator(new Conjugate());
-      F.Decrement.setEvaluator(new Decrement());
-      F.Differences.setEvaluator(new Differences());
-      F.DirectedInfinity.setEvaluator(new DirectedInfinity());
-      F.Divide.setEvaluator(new Divide());
-      F.DivideBy.setEvaluator(new DivideBy());
-      F.Gamma.setEvaluator(new Gamma());
-      F.GCD.setEvaluator(new GCD());
-      F.HarmonicNumber.setEvaluator(new HarmonicNumber());
-      F.Im.setEvaluator(new Im());
-      F.Increment.setEvaluator(new Increment());
-      F.LCM.setEvaluator(new LCM());
-      F.MantissaExponent.setEvaluator(new MantissaExponent());
-      F.N.setEvaluator(new N());
-      F.Piecewise.setEvaluator(new Piecewise());
-      F.PiecewiseExpand.setEvaluator(new PiecewiseExpand());
-      F.Pochhammer.setEvaluator(new Pochhammer());
-      F.Precision.setEvaluator(new Precision());
-      F.PreDecrement.setEvaluator(new PreDecrement());
-      F.PreIncrement.setEvaluator(new PreIncrement());
-      F.Rational.setEvaluator(CONST_RATIONAL);
-      F.Re.setEvaluator(new Re());
-      F.Sign.setEvaluator(new Sign());
-      F.SignCmp.setEvaluator(new SignCmp());
-      F.Subtract.setEvaluator(new Subtract());
-      F.SubtractFrom.setEvaluator(new SubtractFrom());
-      F.TimesBy.setEvaluator(new TimesBy());
+      S.Abs.setEvaluator(new Abs());
+      S.AbsArg.setEvaluator(new AbsArg());
+      S.AddTo.setEvaluator(new AddTo());
+      S.Arg.setEvaluator(new Arg());
+      S.Chop.setEvaluator(new Chop());
+      S.Clip.setEvaluator(new Clip());
+      S.Complex.setEvaluator(CONST_COMPLEX);
+      S.ConditionalExpression.setEvaluator(new ConditionalExpression());
+      S.Conjugate.setEvaluator(new Conjugate());
+      S.CubeRoot.setEvaluator(new CubeRoot());
+      S.Decrement.setEvaluator(new Decrement());
+      S.Differences.setEvaluator(new Differences());
+      S.DirectedInfinity.setEvaluator(new DirectedInfinity());
+      S.Divide.setEvaluator(new Divide());
+      S.DivideBy.setEvaluator(new DivideBy());
+      S.Gamma.setEvaluator(new Gamma());
+      S.GCD.setEvaluator(new GCD());
+      S.HarmonicNumber.setEvaluator(new HarmonicNumber());
+      S.Im.setEvaluator(new Im());
+      S.Increment.setEvaluator(new Increment());
+      S.LCM.setEvaluator(new LCM());
+      S.MantissaExponent.setEvaluator(new MantissaExponent());
+      S.N.setEvaluator(new N());
+      S.Piecewise.setEvaluator(new Piecewise());
+      S.PiecewiseExpand.setEvaluator(new PiecewiseExpand());
+      S.Pochhammer.setEvaluator(new Pochhammer());
+      S.Precision.setEvaluator(new Precision());
+      S.PreDecrement.setEvaluator(new PreDecrement());
+      S.PreIncrement.setEvaluator(new PreIncrement());
+      S.Rational.setEvaluator(CONST_RATIONAL);
+      S.Re.setEvaluator(new Re());
+      S.Sign.setEvaluator(new Sign());
+      S.SignCmp.setEvaluator(new SignCmp());
+      S.Subtract.setEvaluator(new Subtract());
+      S.SubtractFrom.setEvaluator(new SubtractFrom());
+      S.TimesBy.setEvaluator(new TimesBy());
 
     }
   }
@@ -427,7 +433,16 @@ public final class Arithmetic {
      * @return
      */
     protected ISymbol getArithmeticSymbol() {
-      return F.Plus;
+      return S.Plus;
+    }
+
+    private IExpr assignPart(IExpr part, IExpr value, EvalEngine engine) {
+      IExpr oldValue = engine.evaluate(part);
+      IASTMutable operator = getAST(value);
+      operator.set(1, oldValue);
+      IExpr newResult = engine.evaluate(operator);
+      engine.evaluate(F.Set(part, newResult));
+      return newResult;
     }
 
     @Override
@@ -438,13 +453,21 @@ public final class Arithmetic {
         if (head.isBuiltInSymbol() && leftHandSide.isAST()) {
           IEvaluator eval = ((IBuiltInSymbol) head).getEvaluator();
           if (eval instanceof ISetEvaluator) {
-            IExpr temp = engine.evaluateNull(leftHandSide);
+            IExpr temp = engine.evaluateNIL(leftHandSide);
             if (!temp.isPresent()) {
               return F.NIL;
             }
             IExpr rhs = engine.evaluate(F.binaryAST2(getArithmeticSymbol(), temp, ast.arg2()));
-            return ((ISetEvaluator) eval).evaluateSet(leftHandSide, rhs, F.Set, engine);
+            return ((ISetEvaluator) eval).evaluateSet(leftHandSide, rhs, S.Set, engine);
           }
+        }
+        if (leftHandSide.isASTSizeGE(S.Part, 3) && leftHandSide.first().isSymbol()) {
+          ISymbol sym = (ISymbol) leftHandSide.first();
+          if (sym.hasAssignedSymbolValue()) {
+            return assignPart(leftHandSide, ast.arg2(), engine);
+          }
+          // `1` is not a variable with a value, so its value cannot be changed.
+          return IOFunctions.printMessage(ast.topHead(), "rvalue", F.List(sym), engine);
         }
         if (leftHandSide.isSymbol()) {
           ISymbol sym = (ISymbol) leftHandSide;
@@ -469,6 +492,7 @@ public final class Arithmetic {
       return IOFunctions.printMessage(getFunctionSymbol(), "rvalue", F.List(leftHandSide), engine);
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -532,7 +556,7 @@ public final class Arithmetic {
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
       IExpr result = F.NIL;
-      IExpr arg1 = engine.evaluateNull(ast.arg1());
+      IExpr arg1 = engine.evaluateNIL(ast.arg1());
       if (arg1.isPresent()) {
         result = F.Arg(arg1);
       } else {
@@ -542,7 +566,7 @@ public final class Arithmetic {
         return ((IAST) arg1).mapThread(F.Arg(F.Slot1), 1);
       }
       if (arg1.isIndeterminate()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (arg1.isDirectedInfinity()) {
         IAST directedInfininty = (IAST) arg1;
@@ -552,7 +576,9 @@ public final class Arithmetic {
           }
           return F.Arg(directedInfininty.arg1());
         } else if (arg1.isComplexInfinity()) {
-          return F.Interval(F.List(F.Pi.negate(), F.Pi));
+          // Indeterminate expression `1` encountered.
+          IOFunctions.printMessage(ast.topHead(), "indet", F.List(ast), engine);
+          return F.Interval(F.List(S.Pi.negate(), S.Pi));
         }
       } else if (arg1.isNumber()) {
         return ((INumber) arg1).complexArg();
@@ -583,14 +609,20 @@ public final class Arithmetic {
             if (rePart.isZero() && !imPart.isZero()) {
               // Arg(E^(I*z)) => Re(z) + 2*Pi*Floor((Pi - Re(z))/(2*Pi))
               return F.Plus(
-                  F.Times(F.C2, F.Pi, F.Floor(
-                      F.Times(F.C1D2, F.Power(F.Pi, -1), F.Plus(F.Pi, F.Negate(F.Re(imPart)))))),
+                  F.Times(
+                      F.C2,
+                      S.Pi,
+                      F.Floor(
+                          F.Times(
+                              F.C1D2, F.Power(S.Pi, -1), F.Plus(S.Pi, F.Negate(F.Re(imPart)))))),
                   F.Re(imPart));
             }
             // Arg(E^z) => Im(z) + 2*Pi*Floor((Pi - Im(z))/(2*Pi))
             return F.Plus(
-                F.Times(F.C2, F.Pi,
-                    F.Floor(F.Times(F.C1D2, F.Power(F.Pi, -1), F.Plus(F.Pi, F.Negate(imPart))))),
+                F.Times(
+                    F.C2,
+                    S.Pi,
+                    F.Floor(F.Times(F.C1D2, F.Power(S.Pi, -1), F.Plus(S.Pi, F.Negate(imPart))))),
                 imPart);
           }
         }
@@ -599,7 +631,7 @@ public final class Arithmetic {
         IExpr temp = engine.evalN(arg1);
         if (temp.isRealResult()) {
           if (temp.isNegative()) {
-            return F.Pi;
+            return S.Pi;
           }
           return F.C0;
         } else if (temp.isNumber() && engine.isNumericMode()) {
@@ -608,7 +640,7 @@ public final class Arithmetic {
       }
 
       if (AbstractAssumptions.assumeNegative(arg1)) {
-        return F.Pi;
+        return S.Pi;
       }
       if (AbstractAssumptions.assumePositive(arg1)) {
         return F.C0;
@@ -620,6 +652,7 @@ public final class Arithmetic {
       return result;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -650,7 +683,7 @@ public final class Arithmetic {
    * 0
    * </pre>
    */
-  private static class Chop extends AbstractCoreFunctionEvaluator {
+  private static class Chop extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -661,7 +694,7 @@ public final class Arithmetic {
         delta = ((INum) ast.arg2()).getRealPart();
       }
       try {
-        arg1 = engine.evaluate(arg1);
+        // arg1 = engine.evaluate(arg1);
         if (arg1.isAST()) {
           IAST list = (IAST) arg1;
           // Chop[{a,b,c}] -> {Chop[a],Chop[b],Chop[c]}
@@ -684,10 +717,6 @@ public final class Arithmetic {
       return ARGS_1_2;
     }
 
-    @Override
-    public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.HOLDALL | ISymbol.LISTABLE);
-    }
   }
 
   /**
@@ -800,7 +829,7 @@ public final class Arithmetic {
           if (minEvaled != null) {
             ISignedNumber maxEvaled = max.evalReal();
             if (maxEvaled != null) {
-              return clip(x, (ISignedNumber) minEvaled, (ISignedNumber) maxEvaled, vMin, vMax);
+              return clip(x, minEvaled, maxEvaled, vMin, vMax);
             }
           }
         }
@@ -840,9 +869,9 @@ public final class Arithmetic {
     /**
      * gives <code>vMin</code> for <code>x<min</code> and <code>vMax</code> for <code>x>max</code>.
      *
-     * @param x the expression value
-     * @param min minimum value
-     * @param max maximum value
+     * @param x    the expression value
+     * @param min  minimum value
+     * @param max  maximum value
      * @param vMin value for x less than minimum
      * @param vMax value for x greater than minimum
      * @return x if x is in the range min to max. Return vMin if x is less than min.Return vMax if x
@@ -1019,6 +1048,7 @@ public final class Arithmetic {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
@@ -1039,11 +1069,12 @@ public final class Arithmetic {
         return ast.arg1();
       }
       if (arg2.isFalse()) {
-        return F.Undefined;
+        return S.Undefined;
       }
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -1151,7 +1182,7 @@ public final class Arithmetic {
         }
       }
       if (arg1.isPlus()) {
-        return ((IAST) arg1).mapThread((IASTMutable) F.Conjugate(F.Slot1), 1);
+        return ((IAST) arg1).mapThread(F.Conjugate(F.Slot1), 1);
       }
       if (arg1.isTimes()) {
         IASTAppendable result = F.NIL;
@@ -1210,10 +1241,39 @@ public final class Arithmetic {
       newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
       super.setUp(newSymbol);
     }
+  }
 
+  private static class CubeRoot extends AbstractFunctionEvaluator {
+
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      IExpr base = ast.arg1();
+      if (base.isNumericFunction(true)) {
+        if (base.isComplex() || base.isComplexNumeric()) {
+          return IOFunctions.printMessage(ast.topHead(), "preal", F.List(base), engine);
+        }
+        if (base.isPositiveResult()) {
+          return F.Power(base, F.C1D3);
+        }
+        return F.Times(F.CN1, F.Power(F.Negate(base), F.C1D3));
+      }
+      return F.Surd(base, F.C3);
+    }
+
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_1_1;
+    }
+
+    @Override
+    public void setUp(final ISymbol newSymbol) {
+      newSymbol.setAttributes(ISymbol.LISTABLE | ISymbol.NUMERICFUNCTION);
+    }
   }
 
   /**
+   *
+   *
    * <pre>
    * Decrement(x)
    *
@@ -1249,13 +1309,27 @@ public final class Arithmetic {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      IExpr symbol = ast.arg1();
+      IExpr arg1 = ast.arg1();
       try {
-        if (symbol.isSymbol() && ((ISymbol) symbol).hasAssignedSymbolValue()) {
-          IExpr[] results = ((ISymbol) symbol)
-              .reassignSymbolValue(getAST(), getFunctionSymbol(), engine);
-          if (results != null) {
-            return getResult(results[0], results[1]);
+        if (arg1.isASTSizeGE(S.Part, 3) && arg1.first().isSymbol()) {
+          ISymbol sym = (ISymbol) arg1.first();
+          if (sym.hasAssignedSymbolValue()) {
+            return assignPart(arg1, F.CN1, engine);
+          }
+          // `1` is not a variable with a value, so its value cannot be changed.
+          return IOFunctions.printMessage(ast.topHead(), "rvalue", F.List(sym), engine);
+        }
+        if (arg1.isSymbol()) {
+          ISymbol sym = (ISymbol) arg1;
+          if (sym.hasAssignedSymbolValue()) {
+            IExpr[] results =
+                ((ISymbol) arg1).reassignSymbolValue(getAST(), getFunctionSymbol(), engine);
+            if (results != null) {
+              return getResult(results[0], results[1]);
+            }
+          } else {
+            // `1` is not a variable with a value, so its value cannot be changed.
+            return IOFunctions.printMessage(ast.topHead(), "rvalue", F.List(sym), engine);
           }
         }
       } catch (ValidateException ve) {
@@ -1267,12 +1341,23 @@ public final class Arithmetic {
       return F.NIL;
     }
 
+    private IExpr assignPart(IExpr part, IExpr value, EvalEngine engine) {
+      IExpr oldResult = engine.evaluate(part);
+      IASTMutable operator = getAST();
+      operator.set(1, oldResult);
+      IExpr newResult = engine.evaluate(operator);
+      engine.evaluate(F.Set(part, newResult));
+      //      return oldResult;
+      return getResult(oldResult, newResult);
+    }
+
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
 
     protected ISymbol getFunctionSymbol() {
-      return F.Decrement;
+      return S.Decrement;
     }
 
     protected IExpr getResult(IExpr symbolValue, IExpr calculatedResult) {
@@ -1379,6 +1464,7 @@ public final class Arithmetic {
       return F.Divide(ast.arg1(), ast.arg2());
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -1417,16 +1503,17 @@ public final class Arithmetic {
 
     @Override
     protected IASTMutable getAST(final IExpr value) {
-      return (IASTMutable) F.Times(null, F.Power(value, F.CN1));
+      return F.Times(null, F.Power(value, F.CN1));
     }
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.DivideBy;
+      return S.DivideBy;
     }
 
+    @Override
     protected ISymbol getArithmeticSymbol() {
-      return F.Divide;
+      return S.Divide;
     }
   }
 
@@ -1441,7 +1528,7 @@ public final class Arithmetic {
         try {
           engine.setNumericMode(false);
           IExpr arg1 = ast.arg1();
-          IExpr temp = engine.evaluateNull(arg1);
+          IExpr temp = engine.evaluateNIL(arg1);
           if (temp.isPresent()) {
             arg1 = temp;
             evaled = true;
@@ -1589,8 +1676,12 @@ public final class Arithmetic {
     public IExpr e1ApfloatArg(Apfloat arg1) {
       try {
         return F.num(ApfloatMath.gamma(arg1));
-      } catch (ArithmeticException ae) {
-        return F.complexNum(ApcomplexMath.gamma(new Apcomplex(arg1, Apcomplex.ZERO)));
+      } catch (ArithmeticException aex1) {
+        try {
+          return F.complexNum(ApcomplexMath.gamma(new Apcomplex(arg1, Apcomplex.ZERO)));
+        } catch (ArithmeticException aex2) {
+          return F.NIL;
+        }
       }
     }
 
@@ -1617,6 +1708,30 @@ public final class Arithmetic {
       return F.complexNum(GammaJS.gamma(d0.evalComplex(), d1.evalComplex()));
     }
 
+    @Override
+    public IExpr e2ApcomplexArg(final ApcomplexNum arg1, final ApcomplexNum arg2) {
+      try {
+        return F.complexNum(ApcomplexMath.gamma(arg1.apcomplexValue(), arg2.apcomplexValue()));
+      } catch (ArithmeticException ae) {
+      }
+      return F.NIL;
+    }
+
+    @Override
+    public IExpr e2ApfloatArg(final ApfloatNum arg1, final ApfloatNum arg2) {
+      try {
+        return F.num(ApfloatMath.gamma(arg1.apfloatValue(), arg2.apfloatValue()));
+      } catch (ArithmeticException aex1) {
+        try {
+          return e2ApcomplexArg(
+              ApcomplexNum.valueOf(arg1.apfloatValue()), ApcomplexNum.valueOf(arg2.apfloatValue()));
+        } catch (ArithmeticException aex2) {
+        }
+      }
+      return F.NIL;
+    }
+
+    @Override
     public IExpr e2DblArg(final INum d0, final INum d1) {
       if (d0.isZero() && d1.isZero()) {
         return F.CInfinity;
@@ -1633,6 +1748,7 @@ public final class Arithmetic {
       // d1.doubleValue()));
     }
 
+    @Override
     public IExpr e2ObjArg(final IExpr o0, final IExpr z) {
       if (z.isZero()) {
         if (o0.isZero()) {
@@ -1675,13 +1791,18 @@ public final class Arithmetic {
       try {
         IExpr a = ast.arg1();
         if (ast.isAST3()) {
-          // see GammaRules.m
+          // see GammaRules.m - Gamma(a_, x_, y_) := Gamma(a, x) - Gamma(a, y)
           return F.NIL;
         }
         if (ast.size() != 3) {
           return unaryOperator(a);
         }
         return binaryOperator(ast, a, ast.arg2());
+      } catch (ApfloatRuntimeException arex) {
+        if (FEConfig.SHOW_STACKTRACE) {
+          arex.printStackTrace();
+        }
+        return engine.printMessage(ast.topHead(), arex);
       } catch (ValidateException ve) {
         if (FEConfig.SHOW_STACKTRACE) {
           ve.printStackTrace();
@@ -1792,7 +1913,7 @@ public final class Arithmetic {
 
     @Override
     public IExpr eComIntArg(final IComplex c0, final IInteger i1) {
-      return e2ComArg(c0, F.complex((IInteger) i1, F.C0));
+      return e2ComArg(c0, F.complex(i1, F.C0));
     }
 
     @Override
@@ -1991,12 +2112,8 @@ public final class Arithmetic {
             }
             IRational result = F.C0;
             for (int i = 1; i <= n; i++) {
-              IInteger pow = F.ZZ(i).pow(exponent);
-              if (intArg2 < 0) {
-                result = result.add(pow);
-              } else {
-                result = result.add(pow.inverse());
-              }
+              final IInteger pow = F.ZZ(i).powerRational(exponent);
+              result = result.add(intArg2 < 0 ? pow : pow.inverse());
               result.checkBitLength();
             }
             return result;
@@ -2026,10 +2143,11 @@ public final class Arithmetic {
      *
      * @param n the index, non-negative.
      * @return the H_1=1 for n=1, H_2=3/2 for n=2 etc. For values of n less than 1, zero is
-     * returned.
+     *     returned.
      */
     public static BigFraction harmonicNumber(int n) {
-      if (n < 1) { return BigFraction.ZERO; } else {
+      if (n < 1) return BigFraction.ZERO;
+      else {
         int iterationLimit = EvalEngine.get().getIterationLimit();
         if (iterationLimit >= 0 && iterationLimit <= n) {
           IterationLimitExceeded.throwIt(n, F.HarmonicNumber(F.ZZ(n)));
@@ -2086,7 +2204,7 @@ public final class Arithmetic {
       if (arg1.isDirectedInfinity()) {
         IAST directedInfininty = (IAST) arg1;
         if (directedInfininty.isComplexInfinity()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (directedInfininty.isAST1()) {
           if (directedInfininty.isInfinity()) {
@@ -2170,11 +2288,12 @@ public final class Arithmetic {
             return F.C0;
           }
         }
-        return IntervalSym.mapSymbol(F.Im, (IAST) arg1);
+        return IntervalSym.mapSymbol(S.Im, (IAST) arg1);
       }
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -2190,7 +2309,7 @@ public final class Arithmetic {
     private IExpr imPowerComplex(IExpr x, IExpr a, IExpr b) {
       if (x.isE()) {
         // Im(E^(a+I*b)) -> E^a*Sin[b]
-        return Times(Power(F.E, a), Sin(b));
+        return Times(Power(S.E, a), Sin(b));
       }
       return Times(Times(Power(Power(x, C2), Times(C1D2, a)), Power(E, Times(Negate(b), Arg(x)))),
           Sin(Plus(Times(a, Arg(x)), Times(Times(C1D2, b), Log(Power(x, C2))))));
@@ -2243,7 +2362,7 @@ public final class Arithmetic {
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.Increment;
+      return S.Increment;
     }
   }
 
@@ -2570,14 +2689,13 @@ public final class Arithmetic {
         defaultValue = ast.arg2();
       }
       IExpr condition;
-      IAST row;
       int matrixSize = matrix.size();
       IASTAppendable result = F.NIL;
       IASTAppendable piecewiseAST = F.NIL;
       boolean evaluated = false;
       boolean noBoolean = false;
       for (int i = 1; i < matrixSize; i++) {
-        row = matrix.getAST(i);
+        final IAST row = matrix.getAST(i);
         condition = row.arg2();
         if (condition.isTrue()) {
           if (!evaluated && i == matrixSize - 1) {
@@ -2597,7 +2715,7 @@ public final class Arithmetic {
           evaluated = true;
           continue;
         }
-        condition = engine.evaluateNull(condition);
+        condition = engine.evaluateNIL(condition);
         if (condition.isPresent()) {
           evaluated = true;
           if (condition.isTrue()) {
@@ -2610,11 +2728,15 @@ public final class Arithmetic {
             continue;
           }
         }
-        IExpr rowArg1 = engine.evaluateNull(row.arg1());
+        IExpr rowArg1 = engine.evaluateNIL(row.arg1());
         if (rowArg1.isPresent()) {
           evaluated = true;
         } else {
           rowArg1 = row.arg1();
+        }
+        if (i == matrixSize - 1 && rowArg1.equals(defaultValue)) {
+          evaluated = true;
+          continue;
         }
         result = appendPiecewise(result, rowArg1, condition.orElse(row.arg2()), matrixSize);
         piecewiseAST = createPiecewise(piecewiseAST, result);
@@ -2641,7 +2763,7 @@ public final class Arithmetic {
 
     private static IASTAppendable createPiecewise(IASTAppendable piecewiseAST, IAST resultList) {
       if (!piecewiseAST.isPresent()) {
-        piecewiseAST = F.ast(F.Piecewise);
+        piecewiseAST = F.ast(S.Piecewise);
         piecewiseAST.append(resultList);
       }
       return piecewiseAST;
@@ -2701,7 +2823,7 @@ public final class Arithmetic {
         IAssumptions assumptions = null;
         if (ast.isAST2()) {
           IExpr arg2 = ast.arg2();
-          if (arg2.equals(F.Reals) || arg2.equals(F.Complexes)) {
+          if (arg2.equals(S.Reals) || arg2.equals(F.Complexes)) {
             domain = ((IBuiltInSymbol) arg2);
           } else {
             assumptions = Assumptions.getInstance(arg2);
@@ -2709,7 +2831,7 @@ public final class Arithmetic {
         } else if (ast.isAST3()) {
           IExpr arg2 = ast.arg2();
           IExpr arg3 = ast.arg3();
-          if (arg3.equals(F.Reals) || arg3.equals(F.Complexes)) {
+          if (arg3.equals(S.Reals) || arg3.equals(F.Complexes)) {
             domain = ((IBuiltInSymbol) arg3);
           }
           assumptions = Assumptions.getInstance(arg2);
@@ -2849,18 +2971,18 @@ public final class Arithmetic {
       INum number = F.CD0;
       int start = -1;
       for (int i = 1; i < ast.size(); i++) {
-        IExpr temp = ast.get(i);
-        if (temp instanceof INum) {
-          if (temp instanceof ApfloatNum) {
-            number = number.add((INum) temp);
+        final IExpr arg = ast.get(i);
+        if (arg instanceof INum) {
+          if (arg instanceof ApfloatNum) {
+            number = number.add((INum) arg);
           } else {
             if (number instanceof ApfloatNum) {
-              number = number.add(((INum) temp).apfloatNumValue(number.precision()));
+              number = number.add(((INum) arg).apfloatNumValue(number.precision()));
             } else {
-              number = number.add((INum) temp);
+              number = number.add((INum) arg);
             }
           }
-        } else if (temp instanceof IComplexNum) {
+        } else if (arg instanceof IComplexNum) {
           start = i;
           break;
         } else {
@@ -2877,21 +2999,21 @@ public final class Arithmetic {
         complexNumber = F.complexNum(number.apfloatValue(number.precision()));
       }
       for (int i = start; i < ast.size(); i++) {
-        IExpr temp = ast.get(i);
-        if (temp instanceof INum) {
-          number = (INum) temp;
+        final IExpr arg = ast.get(i);
+        if (arg instanceof INum) {
+          number = (INum) arg;
           if (number instanceof Num) {
             complexNumber = complexNumber.add(F.complexNum(((Num) number).doubleValue()));
           } else {
             complexNumber = complexNumber
                 .add(F.complexNum(number.apfloatValue(number.precision())));
           }
-        } else if (temp instanceof IComplexNum) {
+        } else if (arg instanceof IComplexNum) {
           if (complexNumber instanceof ApcomplexNum) {
             complexNumber = complexNumber
-                .add(((IComplexNum) temp).apcomplexNumValue(complexNumber.precision()));
+                .add(((IComplexNum) arg).apcomplexNumValue(complexNumber.precision()));
           } else {
-            complexNumber = complexNumber.add((IComplexNum) temp);
+            complexNumber = complexNumber.add((IComplexNum) arg);
           }
         } else {
           return F.NIL;
@@ -2914,7 +3036,7 @@ public final class Arithmetic {
      * Hash-coded Algebraic Simplification</a>
      *
      * @param ast the abstract syntax tree (AST) of the form <code>Plus(...)</code> which should be
-     * evaluated
+     *            evaluated
      * @return the evaluated object or <code>null</code>, if evaluation isn't possible
      */
     @Override
@@ -2941,18 +3063,12 @@ public final class Arithmetic {
         if (temp.isPresent()) {
           return temp;
         }
-        // for (int i = 1; i < size; i++) {
-        // final IExpr temp = plusOp.plus(ast.get(i));
-        // if (temp.isPresent()) {
-        // return temp;
-        // }
-        // }
         if (plusOp.isEvaled()) {
           return plusOp.getSum();
         }
 
         temp = evaluateHashsRepeated(ast, engine);
-        if (temp.isAST(F.Plus, 2)) {
+        if (temp.isAST(S.Plus, 2)) {
           return temp.first();
         }
         if (!temp.isPresent()) {
@@ -2963,7 +3079,7 @@ public final class Arithmetic {
         if (size == 1) {
           return F.C0;
         }
-        if (size == 2 && ast.head() == F.Plus) {
+        if (size == 2 && ast.head() == S.Plus) {
           return ast.arg1();
         }
       }
@@ -2992,19 +3108,14 @@ public final class Arithmetic {
           .setAttributes(ISymbol.ONEIDENTITY | ISymbol.ORDERLESS | ISymbol.FLAT | ISymbol.LISTABLE
               | ISymbol.NUMERICFUNCTION);
 
-      // ORDERLESS_MATCHER.setUpHashRule("Sin[x_]^2", "Cos[x_]^2", "a");
       ORDERLESS_MATCHER.definePatternHashRule(Power(Sin(x_), C2), Power(Cos(x_), C2), C1);
       ORDERLESS_MATCHER.definePatternHashRule(Power(F.Sech(x_), C2), Power(F.Tanh(x_), C2), C1);
+      ORDERLESS_MATCHER.definePatternHashRule(
+          Power(F.Cosh(x_), C2), Power(F.Sinh(x_), C2), C1, true);
+      ORDERLESS_MATCHER.definePatternHashRule(Power(F.Csc(x_), C2), Power(F.Cot(x_), C2), C1, true);
 
-      // ORDERLESS_MATCHER.setUpHashRule("a_*Sin[x_]^2", "a_*Cos[x_]^2", "a");
-      // ORDERLESS_MATCHER.defineHashRule(Times(a_, Power(Sin(x_), C2)), Times(a_,
-      // Power(Cos(x_), C2)), a);
-
-      // ORDERLESS_MATCHER.setUpHashRule("ArcSin[x_]", "ArcCos[x_]", "Pi/2");
       ORDERLESS_MATCHER.defineHashRule(ArcSin(x_), ArcCos(x_), F.CPiHalf);
-      // ORDERLESS_MATCHER.setUpHashRule("ArcTan[x_]", "ArcCot[x_]", "Pi/2");
       ORDERLESS_MATCHER.defineHashRule(ArcTan(x_), ArcCot(x_), F.CPiHalf);
-      // ORDERLESS_MATCHER.setUpHashRule("ArcTan[x_]", "ArcTan[y_]", "Pi/2",
       // "Positive[x]&&(y==1/x)");
       ORDERLESS_MATCHER.defineHashRule(ArcTan(x_), ArcTan(y_), //
           Times(C1D2, Pi), //
@@ -3021,10 +3132,6 @@ public final class Arithmetic {
       // ORDERLESS_MATCHER.definePatternHashRule(Times(CN1, ArcTan(x_)), Times(CN1,
       // ArcTan(y_)), Times(CN1D2, Pi),
       // And(Positive(x), Equal(y, Power(x, CN1))));
-      // ORDERLESS_MATCHER.setUpHashRule("Cosh[x_]^2", "-Sinh[x_]^2",
-      // "1");
-      // ORDERLESS_MATCHER.definePatternHashRule(Power(Cosh(x_), C2), Times(CN1,
-      // Power(Sinh(x_), C2)), C1);
       super.setUp(newSymbol);
     }
 
@@ -3117,7 +3224,7 @@ public final class Arithmetic {
      * Compute Pochhammer's symbol (that)_n.
      *
      * @param that
-     * @param n The number of product terms in the evaluation.
+     * @param n    The number of product terms in the evaluation.
      * @return Gamma(that + n)/Gamma(that) = that*(that+1)*...*(that+n-1).
      */
     private static IExpr pochhammer(BigFraction that, final int n, IAST ast) {
@@ -3273,154 +3380,186 @@ public final class Arithmetic {
   public static class Power extends AbstractFunctionEvaluator implements INumeric, PowerRules {
 
     public static IExpr binaryOperator(IAST ast, final IExpr base, final IExpr exponent) {
-      if (base.isInexactNumber() && exponent.isInexactNumber()) {
-        IExpr result = e2NumericArg(ast, base, exponent);
-        if (result.isPresent()) {
-          return result;
+      try {
+        if (base.isInexactNumber() && exponent.isInexactNumber()) {
+          IExpr result = e2NumericArg(ast, base, exponent);
+          if (result.isPresent()) {
+            return result;
+          }
         }
-      }
 
-      if (exponent.isDirectedInfinity()) {
-        IExpr temp = evalDirectedInfinityArg2(base, (IAST) exponent);
-        if (temp.isPresent()) {
-          return temp;
+        if (exponent.isDirectedInfinity()) {
+          IExpr temp = evalDirectedInfinityArg2(base, (IAST) exponent);
+          if (temp.isPresent()) {
+            return temp;
+          }
         }
-      }
-      if (base.isDirectedInfinity()) {
-        IExpr temp = evalDirectedInfinityArg1((IAST) base, exponent);
-        if (temp.isPresent()) {
-          return temp;
+        if (base.isDirectedInfinity()) {
+          IExpr temp = evalDirectedInfinityArg1((IAST) base, exponent);
+          if (temp.isPresent()) {
+            return temp;
+          }
         }
-      }
 
-      if (base.isZero()) {
-        if (exponent.isInterval()) {
-          return org.matheclipse.core.expression.IntervalSym.power(base, (IAST) exponent);
-        }
-        return powerZeroArg1(exponent);
-      }
-      if (base.isQuantity()) {
-        try {
-          IQuantity q = (IQuantity) base;
-          return q.power(exponent);
-        } catch (MathException mex) {
-          return F.NIL;
-        }
-      } else if (base.isAST()) {
-        if (base.isInterval()) {
-          if (exponent.isInteger()) {
-            return IntervalSym.power((IAST) base, (IInteger) exponent);
-            // return powerInterval(base, ii);
+        if (base.isZero()) {
+          if (exponent.isInterval()) {
+            return org.matheclipse.core.expression.IntervalSym.power(base, (IAST) exponent);
           }
-          if (exponent.isReal()) {
-            return IntervalSym.power((IAST) base, (ISignedNumber) exponent);
-            // return powerInterval(base, ii);
-          }
-          // } else if (base.isQuantity()) {
-          // try {
-          // IQuantity q = (IQuantity) base;
-          // return q.power(exponent);
-          // } catch (MathException mex) {
-          // return F.NIL;
-          // }
-        } else if (base instanceof ASTSeriesData) {
-          int exp = exponent.toIntDefault(Integer.MIN_VALUE);
-          if (exp != Integer.MIN_VALUE) {
-            return ((ASTSeriesData) base).pow(exp);
-          }
-          return F.NIL;
+          return powerZeroArg1(exponent);
         }
-      }
-
-      if (exponent.isInterval()) {
-        if (base.isRealResult()) {
-          return org.matheclipse.core.expression.IntervalSym.power(base, (IAST) exponent);
-        }
-      }
-      if (exponent.isReal()) {
-        if (exponent.isZero()) {
-          return (base.isInfinity() || base.isNegativeInfinity()) ? F.Indeterminate : F.C1;
-        }
-        if (exponent.isOne()) {
-          return base;
-        }
-        if (exponent.isInteger()) {
-          if (base.isInteger()) {
-            return integerInteger((IInteger) base, (IInteger) exponent);
+        if (base.isQuantity()) {
+          try {
+            IQuantity q = (IQuantity) base;
+            return q.power(exponent);
+          } catch (MathException mex) {
+            return F.NIL;
           }
-          if (base instanceof IFraction) {
-            return fractionInteger((IFraction) base, (IInteger) exponent);
-          }
-          if (base instanceof IComplex) {
-            return complexInteger((IComplex) base, (IInteger) exponent);
-          }
-          if (base.isAtom()) {
+        } else if (base.isAST()) {
+          if (base.isInterval()) {
+            if (exponent.isInteger()) {
+              return IntervalSym.power((IAST) base, (IInteger) exponent);
+              // return powerInterval(base, ii);
+            }
+            if (exponent.isReal()) {
+              return IntervalSym.power((IAST) base, (ISignedNumber) exponent);
+              // return powerInterval(base, ii);
+            }
+            // } else if (base.isQuantity()) {
+            // try {
+            // IQuantity q = (IQuantity) base;
+            // return q.power(exponent);
+            // } catch (MathException mex) {
+            // return F.NIL;
+            // }
+          } else if (base instanceof ASTSeriesData) {
+            int exp = exponent.toIntDefault(Integer.MIN_VALUE);
+            if (exp != Integer.MIN_VALUE) {
+              return ((ASTSeriesData) base).pow(exp);
+            }
             return F.NIL;
           }
         }
-      }
 
-      if (base.isOne()) {
-        return F.C1;
-      }
-      if (base.isMinusOne()) {
-        // if (exponent.isInteger()) {
-        // return (((IInteger) exponent).isEven()) ? F.C1 : F.CN1;
-        // }
-        if (exponent.isEvenResult()) {
+        if (exponent.isInterval()) {
+          if (base.isRealResult()) {
+            return org.matheclipse.core.expression.IntervalSym.power(base, (IAST) exponent);
+          }
+        }
+        if (exponent.isReal()) {
+          if (exponent.isZero()) {
+            return (base.isInfinity() || base.isNegativeInfinity()) ? S.Indeterminate : F.C1;
+          }
+          if (exponent.isOne()) {
+            return base;
+          }
+          if (exponent.isInteger()) {
+            if (base.isInteger()) {
+              return integerInteger((IInteger) base, (IInteger) exponent);
+            }
+            if (base instanceof IFraction) {
+              return fractionInteger((IFraction) base, (IInteger) exponent);
+            }
+            if (base instanceof IComplex) {
+              return complexInteger((IComplex) base, (IInteger) exponent);
+            }
+            if (base.isAtom()) {
+              return F.NIL;
+            }
+          }
+        }
+
+        if (base.isOne()) {
           return F.C1;
         }
-        if (exponent.isIntegerResult()) {
-          if (exponent.isPlus() && exponent.first().isInteger()) {
-            IInteger arg1Plus = (IInteger) exponent.first();
-            if (!arg1Plus.isOne()) {
-              IInteger factor = (((IInteger) exponent.first()).isEven()) ? F.C1 : F.CN1;
-              if (factor.isMinusOne()) {
-                return F.Power(F.CN1, F.Plus(1, exponent.rest().oneIdentity1()));
+        if (base.isMinusOne()) {
+          // if (exponent.isInteger()) {
+          // return (((IInteger) exponent).isEven()) ? F.C1 : F.CN1;
+          // }
+          if (exponent.isEvenResult()) {
+            return F.C1;
+          }
+          if (exponent.isIntegerResult()) {
+            if (exponent.isPlus() && exponent.first().isInteger()) {
+              IInteger arg1Plus = (IInteger) exponent.first();
+              if (!arg1Plus.isOne()) {
+                IInteger factor = (((IInteger) exponent.first()).isEven()) ? F.C1 : F.CN1;
+                if (factor.isMinusOne()) {
+                  return F.Power(F.CN1, F.Plus(1, exponent.rest().oneIdentity1()));
+                }
+                return F.Times(factor, F.Power(F.CN1, exponent.rest().oneIdentity1()));
               }
-              return F.Times(factor, F.Power(F.CN1, exponent.rest().oneIdentity1()));
+            } else if (exponent.isTimes() && exponent.first().isInteger()) {
+              IInteger arg1Times = (IInteger) exponent.first();
+              return F.Power(F.Power(F.CN1, arg1Times), exponent.rest().oneIdentity1());
             }
-          } else if (exponent.isTimes() && exponent.first().isInteger()) {
-            IInteger arg1Times = (IInteger) exponent.first();
-            return F.Power(F.Power(F.CN1, arg1Times), exponent.rest().oneIdentity1());
+          }
+        }
+
+        IExpr result = e2ObjArg(ast, base, exponent);
+        if (result.isPresent()) {
+          return result;
+        }
+
+        if (base instanceof IInteger) {
+          if (exponent instanceof IFraction) {
+            return fractionFraction(F.fraction((IInteger) base, F.C1), (IFraction) exponent);
+          }
+          if (exponent instanceof IComplex) {
+            return complexComplex(F.complex((IInteger) base, F.C0), (IComplex) exponent);
+          }
+          return F.NIL;
+        }
+
+        if (base instanceof IFraction) {
+          if (exponent instanceof IFraction) {
+            return fractionFraction((IFraction) base, (IFraction) exponent);
+          }
+          if (exponent instanceof IComplex) {
+            return complexComplex(F.complex((IFraction) base), (IComplex) exponent);
+          }
+          return F.NIL;
+        }
+
+        if (base instanceof IComplex) {
+          if (exponent instanceof IFraction) {
+            return complexFraction((IComplex) base, (IFraction) exponent);
+          }
+          if (exponent instanceof IComplex) {
+            return complexComplex((IComplex) base, (IComplex) exponent);
+          }
+        }
+      } catch (BackingStorageException | LossOfPrecisionException lpe) {
+        // Complete loss of accurate digits (apfloat).
+        return IOFunctions.printMessage(S.General, "zzapfloatcld", F.List(), EvalEngine.get());
+      } catch (OverflowException | InfiniteExpansionException | ArithmeticException aex) {
+        // Overflow occurred in computation.
+        return IOFunctions.printMessage(S.General, "ovfl", F.List(), EvalEngine.get());
+      }
+      return F.NIL;
+    }
+
+    public static IExpr powerSurd(final IExpr surdAST, final IExpr exponent) {
+      IExpr surdArg1 = surdAST.first();
+      IExpr surdArg2 = surdAST.second();
+      if (surdArg2.isInteger() && exponent.isInteger()) {
+        IInteger surdExponent = (IInteger) surdArg2;
+        IInteger powExponent = (IInteger) exponent;
+        boolean negativeExponent = false;
+        if (surdExponent.isPositive() && surdExponent.isOdd()) {
+          if (powExponent.isNegative()) {
+            powExponent = powExponent.negate();
+            negativeExponent = true;
+          }
+          if (powExponent.isGT(surdExponent)) {
+            IInteger iquo = powExponent.iquo(surdExponent);
+            IInteger irem = powExponent.irem(surdExponent);
+            if (negativeExponent) {
+              return F.Times(F.Power(surdArg1, iquo.negate()), F.Power(surdAST, irem.negate()));
+            }
+            return F.Times(F.Power(surdArg1, iquo), F.Power(surdAST, irem));
           }
         }
       }
-
-      IExpr result = e2ObjArg(ast, base, exponent);
-      if (result.isPresent()) {
-        return result;
-      }
-
-      if (base instanceof IInteger) {
-        if (exponent instanceof IFraction) {
-          return fractionFraction(F.fraction((IInteger) base, F.C1), (IFraction) exponent);
-        }
-        if (exponent instanceof IComplex) {
-          return complexComplex(F.complex((IInteger) base, F.C0), (IComplex) exponent);
-        }
-        return F.NIL;
-      }
-
-      if (base instanceof IFraction) {
-        if (exponent instanceof IFraction) {
-          return fractionFraction((IFraction) base, (IFraction) exponent);
-        }
-        if (exponent instanceof IComplex) {
-          return complexComplex(F.complex((IFraction) base), (IComplex) exponent);
-        }
-        return F.NIL;
-      }
-
-      if (base instanceof IComplex) {
-        if (exponent instanceof IFraction) {
-          return complexFraction((IComplex) base, (IFraction) exponent);
-        }
-        if (exponent instanceof IComplex) {
-          return complexComplex((IComplex) base, (IComplex) exponent);
-        }
-      }
-
       return F.NIL;
     }
 
@@ -3485,7 +3624,7 @@ public final class Arithmetic {
      * factor&quot;
      *
      * @return <code>{nth-root, rest factor}</code> or <code>null</code> if the root is not
-     * available
+     *     available
      */
 //		private static IInteger[] calculateRoot(IInteger a, IInteger root) {
 //			if (a.isOne() || a.isMinusOne()) {
@@ -3511,19 +3650,25 @@ public final class Arithmetic {
         if (exponent.isNegative()) {
           // Infinite expression `1` encountered.
           IOFunctions.printMessage(
-              F.Power, "infy", F.List(F.Power(F.C0, exponent)), EvalEngine.get());
+              S.Power, "infy", F.List(F.Power(F.C0, exponent)), EvalEngine.get());
           return F.CComplexInfinity;
         }
         if (exponent.isZero()) {
           // 0^0
           // Indeterminate expression `1` encountered.
-          IOFunctions.printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
-          return F.Indeterminate;
+          IOFunctions.printMessage(S.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+          return S.Indeterminate;
         }
       }
-      // Android changed: disable implementation
+      if (exponent.isMinusOne()) {
+        return base.inverse();
+      }
+      if (exponent.isNumIntValue()) {
+        return base.pow(exponent);
+      }
+      // Android changed: use different implementation
       // https://github.com/axkr/symja_android_library/issues/207
-      if (exponent.sign() < 0) {
+      if (exponent.complexSign() < 0) {
         ApcomplexNum b = base.apcomplexNumValue(base.precision());
         ApcomplexNum e = exponent.apcomplexNumValue(base.precision());
         IComplexNum res = b.pow(e);
@@ -3555,17 +3700,16 @@ public final class Arithmetic {
     private static IExpr e2DblArg(final INum base, final INum exponent) {
       if (base.isZero()) {
         if (exponent.isNegative()) {
-          IOFunctions
-              .printMessage(F.Power, "infy", F.List(F.Power(F.C0, exponent)), EvalEngine.get());
+          IOFunctions.printMessage(
+              S.Power, "infy", F.List(F.Power(F.C0, exponent)), EvalEngine.get());
           // EvalEngine.get().printMessage("Infinite expression 0^(negative number)");
           return F.CComplexInfinity;
         }
         if (exponent.isZero()) {
           // 0^0
-          IOFunctions
-              .printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+          IOFunctions.printMessage(S.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
           // EvalEngine.get().printMessage("Infinite expression 0^0");
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
       }
       if (exponent.isMinusOne()) {
@@ -3595,7 +3739,7 @@ public final class Arithmetic {
       IInteger exp = exponent.numerator();
       final int expInt = exp.toIntDefault();
       if (expInt != Integer.MIN_VALUE) {
-        return base.pow(expInt);
+        return base.powerRational(expInt);
       }
       if (exp.isNegative()) {
         IInteger negExponent = exp.negate();
@@ -3649,9 +3793,10 @@ public final class Arithmetic {
       return F.NIL;
     }
 
-    private static IExpr integerInteger(final IInteger base, final IInteger exponent) {
+    private static IExpr integerInteger(final IInteger base, final IInteger exponent)
+        throws ArithmeticException {
       if (base.isMinusOne()) {
-        return (((IInteger) exponent).isEven()) ? F.C1 : F.CN1;
+        return (exponent.isEven()) ? F.C1 : F.CN1;
       }
 
       if (base.isZero()) {
@@ -3659,13 +3804,9 @@ public final class Arithmetic {
         return F.NIL;
       }
 
-      try {
-        long n = exponent.toLong();
-        return base.power(n);
-      } catch (ArithmeticException ae) {
-
-      }
-      return F.NIL;
+      // may throw ArithmeticException
+      long n = exponent.toLong();
+      return base.power(n);
     }
 
     /**
@@ -3712,6 +3853,9 @@ public final class Arithmetic {
 
     private static IExpr e2ObjArg(IAST ast, final IExpr base, final IExpr exponent) {
 
+      if (base.isAST(S.Surd, 3)) {
+        return powerSurd(base, exponent);
+      }
       if (base.isReal() || exponent.isReal()) {
 
         if (exponent.isReal()) {
@@ -3823,21 +3967,21 @@ public final class Arithmetic {
         }
         if (expandedFunction.isTimes()) {
           IAST times = (IAST) expandedFunction;
-          IExpr i = Times.of(times, F.CNI, F.Power(F.Pi, F.CN1));
+          IExpr i = Times.of(times, F.CNI, F.Power(S.Pi, F.CN1));
           if (i.isRational()) {
             IRational rat = (IRational) i;
             if (rat.isGT(F.C1) || rat.isLE(F.CN1)) {
               IInteger t = rat.trunc();
               t = t.add(t.irem(F.C2));
               // exp(I*(i - t)*Pi)
-              return F.Exp.of(F.Times(F.CI, F.Pi, F.Subtract(i, t)));
+              return S.Exp.of(F.Times(F.CI, S.Pi, F.Subtract(i, t)));
             } else {
               IRational t1 = rat.multiply(F.C6).normalize();
               IRational t2 = rat.multiply(F.C4).normalize();
               if (t1.isInteger() || t2.isInteger()) {
                 // Cos(- I*times) + I*Sin(- I*times)
-                return F.Plus.of(F.Cos(F.Times(F.CNI, times)),
-                    F.Times(F.CI, F.Sin(F.Times(F.CNI, times))));
+                return S.Plus.of(
+                    F.Cos(F.Times(F.CNI, times)), F.Times(F.CI, F.Sin(F.Times(F.CNI, times))));
               }
             }
           }
@@ -3981,6 +4125,9 @@ public final class Arithmetic {
       if (exponentArg1.isReal() && baseArg1.isNonNegativeResult()) {
         return true;
       }
+      if (exponent.isRational() && exponentArg1.isFraction() && exponentArg1.isRational()) {
+        return true;
+      }
       if (exponent.isNumIntValue() && exponent.isPositive()) {
         if (exponentArg1.isNumIntValue() && exponentArg1.isPositive()) {
           return true;
@@ -3999,7 +4146,7 @@ public final class Arithmetic {
     private static IExpr evalDirectedInfinityArg1(final IAST directedInfinity,
         final IExpr exponent) {
       if (exponent.isZero()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (directedInfinity.isComplexInfinity()) {
         if (exponent.isReal()) {
@@ -4008,7 +4155,7 @@ public final class Arithmetic {
           }
           return F.CComplexInfinity;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (exponent.isOne()) {
         return directedInfinity;
@@ -4028,12 +4175,14 @@ public final class Arithmetic {
      */
     private static IExpr evalDirectedInfinityArg2(final IExpr base, final IAST directedInfinity) {
       if (directedInfinity.isComplexInfinity()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
 
-      if (base.isOne() || base.isMinusOne() || base.isImaginaryUnit() || base
-          .isNegativeImaginaryUnit()) {
-        return F.Indeterminate;
+      if (base.isOne()
+          || base.isMinusOne()
+          || base.isImaginaryUnit()
+          || base.isNegativeImaginaryUnit()) {
+        return S.Indeterminate;
       }
       if (base.isZero()) {
         if (directedInfinity.isInfinity()) {
@@ -4044,7 +4193,7 @@ public final class Arithmetic {
           // 0 ^ (-Inf)
           return F.CComplexInfinity;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (base.isInfinity()) {
         if (directedInfinity.isInfinity()) {
@@ -4055,7 +4204,7 @@ public final class Arithmetic {
           // Inf ^ (-Inf)
           return F.C0;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (base.isNegativeInfinity()) {
         if (directedInfinity.isInfinity()) {
@@ -4066,7 +4215,7 @@ public final class Arithmetic {
           // (-Inf) ^ (-Inf)
           return F.C0;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (base.isComplexInfinity()) {
         if (directedInfinity.isInfinity()) {
@@ -4077,7 +4226,7 @@ public final class Arithmetic {
           // ComplexInfinity ^ (-Inf)
           return F.C0;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (base.isDirectedInfinity()) {
         if (directedInfinity.isInfinity()) {
@@ -4086,7 +4235,7 @@ public final class Arithmetic {
         if (directedInfinity.isNegativeInfinity()) {
           return F.C0;
         }
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
 
       if (base.isNumber()) {
@@ -4111,14 +4260,14 @@ public final class Arithmetic {
      * Times(a^(-1.0),b^(-1.0),c^(-1.0),d,....)</code>
      *
      * @param timesAST a <code>Times(...)</code> expression
-     * @param arg2 equals <code>-1</code> or <code>-1.0</code>
+     * @param arg2     equals <code>-1</code> or <code>-1.0</code>
      * @return <code>F.NIL</code> if the transformation isn't possible.
      */
     private static IExpr powerTimesInverse(final IAST timesAST, final ISignedNumber arg2) {
       IASTAppendable resultAST = F.NIL;
       for (int i = 1; i < timesAST.size(); i++) {
-        IExpr temp = timesAST.get(i);
-        if (temp.isPower() && temp.exponent().isReal()) {
+        final IExpr arg = timesAST.get(i);
+        if (arg.isPower() && arg.exponent().isReal()) {
           if (!resultAST.isPresent()) {
             resultAST = timesAST.copyAppendable();
             resultAST.map(resultAST, new Function<IExpr, IExpr>() {
@@ -4128,10 +4277,10 @@ public final class Arithmetic {
               }
             });
           }
-          if (temp.exponent().isMinusOne()) {
-            resultAST.set(i, temp.base());
+          if (arg.exponent().isMinusOne()) {
+            resultAST.set(i, arg.base());
           } else {
-            resultAST.set(i, F.Power(temp.base(), temp.exponent().times(arg2)));
+            resultAST.set(i, F.Power(arg.base(), arg.exponent().times(arg2)));
           }
         }
       }
@@ -4150,21 +4299,20 @@ public final class Arithmetic {
         // 0^0
         // engine.printMessage("Infinite expression 0^0");
         IOFunctions.printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
 
       IExpr a = exponent.re();
       if (a.isReal()) {
         if (a.isNegative()) {
           // engine.printMessage("Infinite expression 0^(negative number)");
-          IOFunctions.printMessage(F.Power, "infy", F.List(F.Power(F.C0, a)), EvalEngine.get());
+          IOFunctions.printMessage(S.Power, "infy", F.List(F.Power(F.C0, a)), EvalEngine.get());
           return F.CComplexInfinity;
         }
         if (a.isZero()) {
           // engine.printMessage("Infinite expression 0^0.");
-          IOFunctions
-              .printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
-          return F.Indeterminate;
+          IOFunctions.printMessage(S.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+          return S.Indeterminate;
         }
         return F.C0;
       }
@@ -4172,24 +4320,23 @@ public final class Arithmetic {
         IExpr temp = engine.evalN(a);
         if (temp.isReal()) {
           if (temp.isNegative()) {
-            IOFunctions
-                .printMessage(F.Power, "infy", F.List(F.Power(F.C0, temp)), EvalEngine.get());
+            IOFunctions.printMessage(
+                S.Power, "infy", F.List(F.Power(F.C0, temp)), EvalEngine.get());
             // engine.printMessage("Infinite expression 0^(negative number)");
             return F.CComplexInfinity;
           }
           if (temp.isZero()) {
-            IOFunctions
-                .printMessage(F.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
+            IOFunctions.printMessage(
+                S.Power, "indet", F.List(F.Power(F.C0, F.C0)), EvalEngine.get());
             // engine.printMessage("Infinite expression 0^0.");
-            return F.Indeterminate;
+            return S.Indeterminate;
           }
           return F.C0;
         }
         if (temp.isComplex() || temp.isComplexNumeric()) {
-          IOFunctions
-              .printMessage(F.Power, "indet", F.List(F.Power(F.C0, temp)), EvalEngine.get());
+          IOFunctions.printMessage(S.Power, "indet", F.List(F.Power(F.C0, temp)), EvalEngine.get());
           // engine.printMessage("Indeterminate expression 0 ^ (complex number) encountered.");
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
       }
 
@@ -4206,17 +4353,19 @@ public final class Arithmetic {
       IASTAppendable multiplicationFactors = F.NIL;
       IASTAppendable plusClone = F.NIL;
       for (int i = plus.argSize(); i > 0; i--) {
-        IExpr temp = plus.get(i);
-        if (temp.isLog()) {
+        final IExpr arg = plus.get(i);
+        if (arg.isLog()) {
           if (!multiplicationFactors.isPresent()) {
             multiplicationFactors = F.TimesAlloc(8);
             plusClone = plus.copyAppendable();
           }
-          multiplicationFactors.append(temp.first());
+          multiplicationFactors.append(arg.first());
           plusClone.remove(i);
-        } else if (temp.isTimes() && temp.size() == 3 && temp.second().isLog() && temp.first()
-            .isReal()) {
-          IAST times = (IAST) temp;
+        } else if (arg.isTimes()
+            && arg.size() == 3
+            && arg.second().isLog()
+            && arg.first().isReal()) {
+          IAST times = (IAST) arg;
           IExpr logArgument = times.arg2().first();
           if (!multiplicationFactors.isPresent()) {
             multiplicationFactors = F.TimesAlloc(8);
@@ -4320,7 +4469,7 @@ public final class Arithmetic {
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       final int size = ast.size();
-      if (ast.head() == F.Power) {
+      if (ast.head() == S.Power) {
         switch (size) {
           case 0:
             break;
@@ -4331,11 +4480,36 @@ public final class Arithmetic {
           case 3:
             return binaryOperator(ast, ast.arg1(), ast.arg2());
           default:
-            // Power(a,b,c,d) ==> Power(a, b, Power(c, d)))
-            return ast.splice(size - 2, 2, F.Power(ast.get(size - 2), ast.get(size - 1)));
+            return powerFoldRight(ast, engine);
         }
       }
       return F.NIL;
+    }
+
+    /**
+     * <code>Power(a,b,c,d)</code> ==> <code>Power(a, b, Power(c, d)))</code>
+     *
+     * @param ast
+     * @param engine
+     * @return
+     */
+    private static IExpr powerFoldRight(final IAST ast, EvalEngine engine) {
+      IExpr last = ast.last();
+      for (int i = ast.size() - 2; i >= 0; i--) {
+        final IExpr arg = ast.get(i);
+        IExpr temp = Power.ofNIL(engine, arg, last);
+        if (temp.isPresent()) {
+          last = temp;
+        } else {
+          if (i <= 1) {
+            return F.Power(arg, last);
+          }
+          IASTAppendable result = ast.copyUntil(i);
+          result.append(F.Power(arg, last));
+          return result;
+        }
+      }
+      return last;
     }
 
     /** {@inheritDoc} */
@@ -4360,6 +4534,7 @@ public final class Arithmetic {
       return engine.printMessage("Precision: Numeric expression expected");
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -4405,7 +4580,7 @@ public final class Arithmetic {
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.PreDecrement;
+      return S.PreDecrement;
     }
   }
 
@@ -4444,7 +4619,7 @@ public final class Arithmetic {
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.PreIncrement;
+      return S.PreIncrement;
     }
 
   }
@@ -4455,9 +4630,9 @@ public final class Arithmetic {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * is the head of rational numbers.
-   * </p>
+   *
+   * <p>is the head of rational numbers.
+   *
    * </blockquote>
    *
    * <pre>
@@ -4515,7 +4690,7 @@ public final class Arithmetic {
                     .toString());
             if (numerator.isZero()) {
               // 0^0
-              return F.Indeterminate;
+              return S.Indeterminate;
             }
             return F.CComplexInfinity;
           }
@@ -4532,7 +4707,7 @@ public final class Arithmetic {
           // "Division by zero expression: " + numerator.toString() + "/" + denominator.toString());
           // if (numerator.isZero()) {
           // // 0^0
-          // return F.Indeterminate;
+          // return S.Indeterminate;
           // }
           // return F.CComplexInfinity;
           // }
@@ -4550,6 +4725,7 @@ public final class Arithmetic {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
@@ -4582,7 +4758,7 @@ public final class Arithmetic {
       if (expr.isDirectedInfinity()) {
         IAST directedInfininty = (IAST) expr;
         if (directedInfininty.isComplexInfinity()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (directedInfininty.isAST1()) {
           if (directedInfininty.isInfinity()) {
@@ -4646,7 +4822,7 @@ public final class Arithmetic {
         }
       }
       if (expr.isInterval()) {
-        return IntervalSym.mapSymbol(F.Re, (IAST) expr);
+        return IntervalSym.mapSymbol(S.Re, (IAST) expr);
       }
       return F.NIL;
     }
@@ -4658,6 +4834,7 @@ public final class Arithmetic {
       return evalRe(arg1, engine);
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -4675,7 +4852,7 @@ public final class Arithmetic {
           (b.isNumber() || b.isRealResult())) {
         if (x.isE()) {
           // Re(E^(a+I*b)) -> E^a*Cos[b]
-          return Times(Power(F.E, a), Cos(b));
+          return Times(Power(S.E, a), Cos(b));
         }
         return Times(
             Times(Power(Power(x, C2), Times(C1D2, a)), Power(E, Times(Negate(b), Arg(x)))),
@@ -4720,7 +4897,7 @@ public final class Arithmetic {
           return numberSign((INumber) expr);
         }
         IExpr temp = F.eval(F.Sign(expr));
-        if (!temp.topHead().equals(F.Sign)) {
+        if (!temp.topHead().equals(S.Sign)) {
           return temp;
         }
         return F.NIL;
@@ -4734,7 +4911,7 @@ public final class Arithmetic {
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       IExpr result = F.NIL;
-      IExpr arg1 = engine.evaluateNull(ast.arg1());
+      IExpr arg1 = engine.evaluateNIL(ast.arg1());
       if (arg1.isPresent()) {
         result = F.Sign(arg1);
       } else {
@@ -4752,12 +4929,12 @@ public final class Arithmetic {
         return numberSign((INumber) arg1);
       }
       if (arg1.isIndeterminate()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (arg1.isDirectedInfinity()) {
         IAST directedInfininty = (IAST) arg1;
         if (directedInfininty.isComplexInfinity()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (directedInfininty.isAST1()) {
           return F.Sign(directedInfininty.arg1());
@@ -4776,9 +4953,9 @@ public final class Arithmetic {
         }
         if (arg1.base().isE()) {
           // E^z == > E^(I*Im(z))
-          return F.Power(F.E, F.Times(F.CI, F.Im(arg1.exponent())));
+          return F.Power(S.E, F.Times(F.CI, F.Im(arg1.exponent())));
         }
-      } else if (arg1.isAST(F.Sign, 2)) {
+      } else if (arg1.isAST(S.Sign, 2)) {
         return arg1;
       }
       if (AbstractAssumptions.assumeNegative(arg1)) {
@@ -4822,7 +4999,7 @@ public final class Arithmetic {
             return F.C0;
           }
         }
-        return IntervalSym.mapSymbol(F.Sign, (IAST) arg1);
+        return IntervalSym.mapSymbol(S.Sign, (IAST) arg1);
       }
       return result;
     }
@@ -4834,7 +5011,7 @@ public final class Arithmetic {
 
     public static IExpr numberSign(INumber arg1) {
       if (arg1.isReal()) {
-        final int signum = ((ISignedNumber) arg1).sign();
+        final int signum = ((ISignedNumber) arg1).complexSign();
         return F.ZZ(signum);
       } else if (arg1.isComplex()) {
         IComplex c = (IComplex) arg1;
@@ -4908,9 +5085,8 @@ public final class Arithmetic {
    * &gt;&gt; Sqrt(a)^2
    * a
    * </pre>
-   * <p>
-   * Complex numbers:
-   * </p>
+   *
+   * <p>Complex numbers:
    *
    * <pre>
    * &gt;&gt; Sqrt(-4)
@@ -4971,7 +5147,7 @@ public final class Arithmetic {
       if (af1.isZero()) {
         EvalEngine ee = EvalEngine.get();
         ee.printMessage("Surd(a,b) division by zero");
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (af0.isNegative()) {
         return af0.abs().pow(af1.inverse()).negate();
@@ -4985,7 +5161,7 @@ public final class Arithmetic {
       double r = d1.doubleValue();
       double result = doubleSurd(val, r);
       if (Double.isNaN(result)) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       return F.num(result);
     }
@@ -5000,13 +5176,13 @@ public final class Arithmetic {
 
         if (root.isZero()) {
           engine.printMessage("Surd(a,b) division by zero");
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (base.isNegative()) {
           if (((IInteger) root).isEven()) {
             // Surd is not defined for even roots of negative values.
             IOFunctions.printMessage(ast.topHead(), "nonegs", F.CEmptyList, engine);
-            return F.Indeterminate;
+            return S.Indeterminate;
           }
           return F.Times(F.CN1, Power(base.negate(), ((IInteger) root).inverse()));
         }
@@ -5060,7 +5236,15 @@ public final class Arithmetic {
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       IExpr base = ast.arg1();
+      if (base.isComplex() || base.isComplexNumeric()) {
+        return IOFunctions.printMessage(ast.topHead(), "preal", F.List(base), engine);
+      }
       IExpr arg2 = engine.evaluateNonNumeric(ast.arg2());
+      if (arg2.isZero()) {
+        // Indeterminate expression `1` encountered.
+        IOFunctions.printMessage(ast.topHead(), "indet", F.List(ast), engine);
+        return S.Indeterminate;
+      }
       if (arg2.isNumber()) {
         if (arg2.isInteger()) {
           IInteger root = (IInteger) arg2;
@@ -5068,8 +5252,27 @@ public final class Arithmetic {
             if (root.isEven()) {
               // Surd is not defined for even roots of negative values.
               IOFunctions.printMessage(ast.topHead(), "nonegs", F.CEmptyList, engine);
-              return F.Indeterminate;
+              return S.Indeterminate;
             }
+          }
+          if (base.isInfinity()) {
+            if (root.isNegative()) {
+              return F.C0;
+            } else {
+              return F.CInfinity;
+            }
+          } else if (base.isNegativeInfinity()) {
+            if (root.isNegative()) {
+              return F.C0;
+            } else {
+              return F.CNInfinity;
+            }
+          }
+          if (root.isNegative()) {
+            if (root.isMinusOne()) {
+              return F.Power(base, F.CN1);
+            }
+            return F.Power(F.Surd(base, root.negative()), F.CN1);
           }
         }
         // Android changed: check numeric value is integer or not
@@ -5080,7 +5283,7 @@ public final class Arithmetic {
             if (root.isEven()) {
               // necessary for two double args etc
               IOFunctions.printMessage(ast.topHead(), "nonegs", F.CEmptyList, engine);
-              return F.Indeterminate;
+              return S.Indeterminate;
             }
           }
         } else {
@@ -5093,6 +5296,7 @@ public final class Arithmetic {
       return binaryOperator(ast, ast.arg1(), ast.arg2(), engine);
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -5131,11 +5335,12 @@ public final class Arithmetic {
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.SubtractFrom;
+      return S.SubtractFrom;
     }
 
+    @Override
     protected ISymbol getArithmeticSymbol() {
-      return F.Subtract;
+      return S.Subtract;
     }
   }
 
@@ -5176,6 +5381,7 @@ public final class Arithmetic {
       return F.Subtract(ast.arg1(), ast.arg2());
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -5292,7 +5498,7 @@ public final class Arithmetic {
     private static IExpr eInfinity(IAST inf, IExpr o1) {
       if (inf.isComplexInfinity()) {
         if (o1.isZero()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         return F.CComplexInfinity;
       }
@@ -5356,8 +5562,8 @@ public final class Arithmetic {
      * Distribute a leading integer factor.
      *
      * @param noEvalExpression return this expression if no evaluation step was done
-     * @param originalExpr the original expression which is used, if <code>
-     * !noEvalExpression.isPresent()</code>
+     * @param originalExpr     the original expression which is used, if <code>
+     *                         !noEvalExpression.isPresent()</code>
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
      * integer factor isn't possible
      */
@@ -5386,8 +5592,8 @@ public final class Arithmetic {
      * <code>2^(2+x)*3^(1+y)</code>
      *
      * @param noEvalExpression return this expression if no evaluation step was done
-     * @param times the <code>Times(...)</code> AST
-     * @param leadingFactor the first factor in <code>Times(...)</code>
+     * @param times            the <code>Times(...)</code> AST
+     * @param leadingFactor    the first factor in <code>Times(...)</code>
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
      * integer factor isn't possible
      */
@@ -5400,9 +5606,9 @@ public final class Arithmetic {
       }
       IASTAppendable result = F.NIL;
       for (int i = 2; i < times.size(); i++) {
-        IExpr temp = times.get(i);
-        if (temp.isPower() && temp.base().isInteger() && !temp.exponent().isNumber()) {
-          IInteger powArg1 = (IInteger) temp.base();
+        final IExpr arg = times.get(i);
+        if (arg.isPower() && arg.base().isInteger() && !arg.exponent().isNumber()) {
+          IInteger powArg1 = (IInteger) arg.base();
           if (powArg1.isPositive()) {
             IInteger mod = F.C0;
             int count = 0;
@@ -5419,7 +5625,7 @@ public final class Arithmetic {
               if (!result.isPresent()) {
                 result = times.copyAppendable();
               }
-              result.set(i, F.Power(temp.base(), F.Plus(F.ZZ(count), temp.exponent())));
+              result.set(i, F.Power(arg.base(), F.Plus(F.ZZ(count), arg.exponent())));
             }
           }
         }
@@ -5444,19 +5650,19 @@ public final class Arithmetic {
      * <code>a*(-2+x)</code>
      *
      * @param noEvalExpr return this expression if no evaluation step was done
-     * @param times the <code>Times(...)</code> AST
+     * @param times      the <code>Times(...)</code> AST
      * @return the evaluated object or <code>noEvalExpression</code>, if the distribution of an
      * integer factor isn't possible
      */
     private static IExpr distributeLeadingFactorCN1(IExpr noEvalExpr, IAST times) {
       IASTAppendable result = F.NIL;
       for (int i = 2; i < times.size(); i++) {
-        IExpr temp = times.get(i);
-        if (temp.isPlus()) {
-          IAST plus = (IAST) temp;
+        final IExpr arg = times.get(i);
+        if (arg.isPlus()) {
+          IAST plus = (IAST) arg;
           if (AbstractFunctionEvaluator.isNegativeWeighted(plus, true)) {
-            temp = EvalEngine.get()
-                .evaluate(plus.mapThread(F.binaryAST2(Times, CN1, F.Slot1), 2));
+            IExpr temp =
+                EvalEngine.get().evaluate(plus.mapThread(F.binaryAST2(Times, CN1, F.Slot1), 2));
             result = times.copyAppendable();
             result.set(i, temp);
             result.remove(1);
@@ -5505,7 +5711,10 @@ public final class Arithmetic {
             return ((IQuantity) arg2).ofUnit(F.C0);
           }
           if (arg2.isDirectedInfinity()) {
-            return F.Indeterminate;
+            // Indeterminate expression `1` encountered.
+            IOFunctions.printMessage(
+                S.Infinity, "indet", F.List(F.Times(arg1, arg2)), EvalEngine.get());
+            return S.Indeterminate;
           }
           return F.C0;
         }
@@ -5515,7 +5724,10 @@ public final class Arithmetic {
             return ((IQuantity) arg1).ofUnit(F.C0);
           }
           if (arg1.isDirectedInfinity()) {
-            return F.Indeterminate;
+            // Indeterminate expression `1` encountered.
+            IOFunctions.printMessage(
+                S.Infinity, "indet", F.List(F.Times(arg1, arg2)), EvalEngine.get());
+            return S.Indeterminate;
           }
           return F.C0;
         }
@@ -5567,11 +5779,11 @@ public final class Arithmetic {
       }
       if (arg1.isQuantity()) {
         IQuantity q = (IQuantity) arg1;
-        return q.times(arg2);
+        return q.times(arg2, true);
 
       } else if (arg2.isQuantity()) {
         IQuantity q = (IQuantity) arg2;
-        return q.times(arg1);
+        return q.times(arg1, true);
       } else if (arg1.isAST() || arg2.isAST()) {
         final int arg1Ordinal = arg1.headID();
         final int arg2Ordinal = arg2.headID();
@@ -5598,8 +5810,8 @@ public final class Arithmetic {
               IExpr power0Exponent = arg1.exponent();
               if (arg1.equalsAt(1, arg2)) {
                 // (x^a) * x
-                if ((power0Exponent.isNumber() && !arg2.isRational()) || //
-                    !power0Exponent.isNumber()) {
+                if ((power0Exponent.isNumber() && !arg2.isRational())
+                    || !power0Exponent.isNumber()) {
                   // avoid re-evaluation of a root of a rational number (example: 2*Sqrt(2) )
                   return F.Power(arg2, power0Exponent.inc());
                 }
@@ -5687,18 +5899,18 @@ public final class Arithmetic {
       INum number = F.CD1;
       int start = -1;
       for (int i = 1; i < ast.size(); i++) {
-        IExpr temp = ast.get(i);
-        if (temp instanceof INum) {
-          if (temp instanceof ApfloatNum) {
-            number = number.multiply((INum) temp);
+        final IExpr arg = ast.get(i);
+        if (arg instanceof INum) {
+          if (arg instanceof ApfloatNum) {
+            number = number.multiply((INum) arg);
           } else {
             if (number instanceof ApfloatNum) {
-              number = number.multiply(((INum) temp).apfloatNumValue(number.precision()));
+              number = number.multiply(((INum) arg).apfloatNumValue(number.precision()));
             } else {
-              number = number.multiply((INum) temp);
+              number = number.multiply((INum) arg);
             }
           }
-        } else if (temp instanceof IComplexNum) {
+        } else if (arg instanceof IComplexNum) {
           start = i;
           break;
         } else {
@@ -5715,21 +5927,22 @@ public final class Arithmetic {
         complexNumber = F.complexNum(number.apfloatValue(number.precision()));
       }
       for (int i = start; i < ast.size(); i++) {
-        IExpr temp = ast.get(i);
-        if (temp instanceof INum) {
-          number = (INum) temp;
+        final IExpr arg = ast.get(i);
+        if (arg instanceof INum) {
+          number = (INum) arg;
           if (number instanceof Num) {
             complexNumber = complexNumber.multiply(F.complexNum(((Num) number).doubleValue()));
           } else {
             complexNumber = complexNumber
                 .multiply(F.complexNum(number.apfloatValue(number.precision())));
           }
-        } else if (temp instanceof IComplexNum) {
+        } else if (arg instanceof IComplexNum) {
           if (complexNumber instanceof ApcomplexNum) {
-            complexNumber = complexNumber
-                .multiply(((IComplexNum) temp).apcomplexNumValue(complexNumber.precision()));
+            complexNumber =
+                complexNumber.multiply(
+                    ((IComplexNum) arg).apcomplexNumValue(complexNumber.precision()));
           } else {
-            complexNumber = complexNumber.multiply((IComplexNum) temp);
+            complexNumber = complexNumber.multiply((IComplexNum) arg);
           }
         } else {
           return F.NIL;
@@ -5753,7 +5966,7 @@ public final class Arithmetic {
       if (size == 1) {
         return F.C1;
       }
-      if (size == 2 && ast1.head() == F.Times) {
+      if (size == 2 && ast1.head() == S.Times) {
         // OneIdentity
         return ast1.arg1();
       }
@@ -5782,13 +5995,12 @@ public final class Arithmetic {
           final IAST arg2 = (IAST) ast1.arg2();
           return arg2.mapThread(F.Times(ast1.arg1(), F.Slot1), 2);
         }
-        IExpr temp = distributeLeadingFactor(
-            binaryOperator(ast1, ast1.arg1(), ast1.arg2(), engine),
-            ast1);
-        if (!temp.isPresent()) {
-          ast1.addEvalFlags(IAST.BUILT_IN_EVALED);
+        IExpr temp =
+            distributeLeadingFactor(binaryOperator(ast1, ast1.arg1(), ast1.arg2(), engine), ast1);
+        if (temp.isPresent()) {
+          return temp;
         }
-        return temp;
+        return binaryOperator(ast1, ast1.arg1(), ast1.arg2(), engine);
       }
 
       if (size > 3) {
@@ -5929,34 +6141,41 @@ public final class Arithmetic {
       TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
           F.Power(F.Csc(x_), F.m_), //
           F.Power(F.Cot(x_), F.n_DEFAULT), //
-          F.Condition(F.Times(F.Power(F.Csc(F.x), F.Plus(F.m, F.n)), F.Power(F.Cos(F.x), F.n)),
-              F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
-      TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
-          F.Power(F.Sec(x_), F.m_), //
-          F.Power(F.Tan(x_), F.n_DEFAULT), //
-          F.Condition(F.Times(F.Power(F.Sec(F.x), F.Plus(F.m, F.n)), F.Power(F.Sin(F.x), F.n)),
-              F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
-      TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
-          F.Power(F.Csch(x_), F.m_), //
-          F.Power(F.Coth(x_), F.n_DEFAULT), //
-          F.Condition(F.Times(F.Power(F.Csch(F.x), F.Plus(F.m, F.n)), F.Power(F.Cosh(F.x), F.n)),
-              F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
-      TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
-          F.Power(F.Sech(x_), F.m_), //
-          F.Power(F.Tanh(x_), F.n_DEFAULT), //
-          F.Condition(F.Times(F.Power(F.Sech(F.x), F.Plus(F.m, F.n)), F.Power(F.Sinh(F.x), F.n)),
-              F.And(F.Not(F.NumberQ(F.m)), F.IntegerQ(F.n), F.Greater(F.n, F.C0)))));
+          F.Condition(
+              F.Times(F.Power(F.Csc(S.x), F.Plus(S.m, S.n)), F.Power(F.Cos(S.x), S.n)),
+              F.And(F.Not(F.NumberQ(S.m)), F.IntegerQ(S.n), F.Greater(S.n, F.C0)))));
+      TIMES_ORDERLESS_MATCHER.defineHashRule(
+          new HashedPatternRulesTimesPower( //
+              F.Power(F.Sec(x_), F.m_), //
+              F.Power(F.Tan(x_), F.n_DEFAULT), //
+              F.Condition(
+                  F.Times(F.Power(F.Sec(S.x), F.Plus(S.m, S.n)), F.Power(F.Sin(S.x), S.n)),
+                  F.And(F.Not(F.NumberQ(S.m)), F.IntegerQ(S.n), F.Greater(S.n, F.C0)))));
+      TIMES_ORDERLESS_MATCHER.defineHashRule(
+          new HashedPatternRulesTimesPower( //
+              F.Power(F.Csch(x_), F.m_), //
+              F.Power(F.Coth(x_), F.n_DEFAULT), //
+              F.Condition(
+                  F.Times(F.Power(F.Csch(S.x), F.Plus(S.m, S.n)), F.Power(F.Cosh(S.x), S.n)),
+                  F.And(F.Not(F.NumberQ(S.m)), F.IntegerQ(S.n), F.Greater(S.n, F.C0)))));
+      TIMES_ORDERLESS_MATCHER.defineHashRule(
+          new HashedPatternRulesTimesPower( //
+              F.Power(F.Sech(x_), F.m_), //
+              F.Power(F.Tanh(x_), F.n_DEFAULT), //
+              F.Condition(
+                  F.Times(F.Power(F.Sech(S.x), F.Plus(S.m, S.n)), F.Power(F.Sinh(S.x), S.n)),
+                  F.And(F.Not(F.NumberQ(S.m)), F.IntegerQ(S.n), F.Greater(S.n, F.C0)))));
       // ProductLog(x_)*E^ProductLog(x_) = x
       TIMES_ORDERLESS_MATCHER.defineHashRule(
           new HashedPatternRulesTimesPower( //
               F.ProductLog(x_), //
-              F.Power(F.E, F.ProductLog(x_)), //
+              F.Power(S.E, F.ProductLog(x_)), //
               x));
       TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimes(//
           F.Gamma(x_), //
           F.Gamma(F.Plus(F.C1, F.Times(F.CN1, x_))), //
           // Pi*Csc(x*Pi)
-          F.Times(F.Pi, F.Csc(F.Times(x, F.Pi)))));
+          F.Times(S.Pi, F.Csc(F.Times(x, S.Pi)))));
 
       // Sin(x_)^2/(1-Cos(x_)^2) = 1
       TIMES_ORDERLESS_MATCHER.defineHashRule(new HashedPatternRulesTimesPower(//
@@ -6198,19 +6417,28 @@ public final class Arithmetic {
      */
     private IExpr timesRationalPower(final IRational rationalArg1, IExpr base2, IExpr exponent2) {
       if (exponent2.isNegative()) {
-        IExpr temp = timesPowerPower(((IRational) rationalArg1).numerator(),
-            ((IRational) rationalArg1).denominator(), F.C1, //
-            ((IRational) base2).denominator(), ((IRational) base2).numerator(),
-            (IFraction) exponent2.negate(), false);
+        IExpr temp =
+            timesPowerPower(
+                rationalArg1.numerator(),
+                rationalArg1.denominator(),
+                F.C1, //
+                ((IRational) base2).denominator(),
+                ((IRational) base2).numerator(),
+                exponent2.negate(),
+                false);
         if (temp.isPresent()) {
           return temp;
         }
       } else {
-        IExpr temp = timesPowerPower(((IRational) rationalArg1).numerator(),
-            ((IRational) rationalArg1).denominator(), F.C1, //
-            ((IRational) base2).numerator(), ((IRational) base2).denominator(),
-            (IFraction) exponent2,
-            false);
+        IExpr temp =
+            timesPowerPower(
+                rationalArg1.numerator(),
+                rationalArg1.denominator(),
+                F.C1, //
+                ((IRational) base2).numerator(),
+                ((IRational) base2).denominator(),
+                exponent2,
+                false);
         if (temp.isPresent()) {
           return temp;
         }
@@ -6242,6 +6470,7 @@ public final class Arithmetic {
    * <p>is equivalent to <code>x = x * dx</code>.
    *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -6257,16 +6486,17 @@ public final class Arithmetic {
 
     @Override
     protected IASTMutable getAST(final IExpr value) {
-      return (IASTMutable) F.Times(null, value);
+      return F.Times(null, value);
     }
 
     @Override
     protected ISymbol getFunctionSymbol() {
-      return F.TimesBy;
+      return S.TimesBy;
     }
 
+    @Override
     protected ISymbol getArithmeticSymbol() {
-      return F.Times;
+      return S.Times;
     }
   }
 
@@ -6424,51 +6654,119 @@ public final class Arithmetic {
    * <code>Abs, Clip, If, Ramp, UnitStep</code>
    *
    * @param function
-   * @param domain if set to <code>F.Reals</code> a function like <code>Abs(x)</code> can be
-   * rewritten.
+   * @param domain   if set to <code>S.Reals</code> a function like <code>Abs(x)</code> can be
+   *                 rewritten.
    * @return
    */
   public static IAST piecewiseExpand(final IAST function, IBuiltInSymbol domain) {
-    if (function.isAST(F.Abs, 2) && (domain.equals(F.Reals) || function.arg1().isRealResult())) {
+    if (function.size() == 2) {
       IExpr x = function.arg1();
-      return F.Piecewise(F.List(F.List(F.Negate(x), F.Less(x, F.C0)), x));
+      if ((domain.equals(S.Reals) || function.arg1().isRealResult())) {
+        if (function.isAST(S.Abs)) {
+          return F.Piecewise(F.List(F.List(F.Negate(x), F.Less(x, F.C0))), x);
+        }
+        if (function.isAST(S.Arg)) {
+          return F.Piecewise(F.List(F.List(S.Pi, F.Less(x, F.C0))), F.C0);
+        }
+        if (function.isAST(S.Sign)) {
+          return F.Piecewise(
+              F.List(
+                  F.List(F.CN1, F.Less(x, F.C0)), //
+                  F.List(F.C1, F.Greater(x, F.C0))),
+              F.C0);
+        }
+      }
     }
-    if (function.isAST(F.Clip, 2)) {
+    if (function.isAST(S.BernsteinBasis, 4)) {
+      IExpr d = function.arg1();
+      IExpr n = function.arg2();
+      IExpr x = function.arg3();
+      return F.Piecewise(
+          F.List(
+              F.List(
+                  F.C1,
+                  F.Or(
+                      F.And(F.Equal(d, F.C0), F.Equal(n, F.C0)),
+                      F.And(F.GreaterEqual(d, F.C0), F.Equal(n, F.C0), F.Equal(x, F.C0)),
+                      F.And(
+                          F.Greater(d, F.C0), F.Equal(x, F.C1), F.Equal(F.Subtract(d, n), F.C0)))),
+              F.List(
+                  F.Times(
+                      F.Power(F.Subtract(F.C1, x), F.Subtract(d, n)),
+                      F.Power(x, n),
+                      F.Binomial(d, n)),
+                  F.And(
+                      F.Greater(d, F.C0),
+                      F.GreaterEqual(n, F.C0),
+                      F.GreaterEqual(F.Subtract(d, n), F.C0),
+                      F.Less(F.C0, x, F.C1)))),
+          F.C0);
+    }
+    if (function.isAST(S.Clip, 2)) {
       IExpr x = function.arg1();
       return F
           .Piecewise(F.List(F.List(F.CN1, F.Less(x, F.CN1)), F.List(F.C1, F.Greater(x, F.C1))),
               x);
     }
-    if (function.isAST(F.Clip, 3) && function.second().isAST(F.List, 3)) {
+    if (function.isAST(S.Clip, 3) && function.second().isList2()) {
       IExpr x = function.arg1();
       IExpr low = function.second().first();
       IExpr high = function.second().second();
       return F
           .Piecewise(F.List(F.List(low, F.Less(x, low)), F.List(high, F.Greater(x, high))), x);
     }
-    if (function.isAST(F.If, 3)) {
+    if (function.isAST(S.If, 3)) {
       IExpr a1 = function.arg1();
       IExpr a2 = function.arg2();
       return F.Piecewise(F.List(F.List(a2, a1), F.C0));
     }
-    if (function.isAST(F.If, 4)) {
+    if (function.isAST(S.If, 4)) {
       IExpr a1 = function.arg1();
       IExpr a2 = function.arg2();
       IExpr a3 = function.arg3();
-      return F.Piecewise(F.List(F.List(a2, a1), a3));
+      return F.Piecewise(F.List(F.List(a2, a1)), a3);
     }
-    if (function.isAST(F.Ramp, 2)) {
+    if (function.isAST(S.Ramp, 2)) {
       IExpr x = function.arg1();
-      return F.Piecewise(F.List(F.List(x, F.GreaterEqual(x, F.C0)), F.C0));
+      return F.Piecewise(F.List(F.List(x, F.GreaterEqual(x, F.C0))), F.C0);
     }
-    if (function.isAST(F.UnitStep) && function.size() > 1) {
+    if (function.isAST(S.UnitStep) && function.size() > 1) {
       // Piecewise[{{1, x >= 0 && y >= 0 && z >= 0}}, 0]
       final int size = function.size();
-      IASTAppendable andAST = F.ast(F.And, size, false);
+      IASTAppendable andAST = F.ast(S.And, size, false);
       for (int i = 1; i < size; i++) {
         andAST.append(F.GreaterEqual(function.get(i), F.C0));
       }
-      return F.Piecewise(F.List(F.List(F.C1, andAST), F.C0));
+      return F.Piecewise(F.List(F.List(F.C1, andAST)), F.C0);
+    }
+
+    if (function.size() > 1) {
+      if (function.isAST(S.DiscreteDelta)) {
+        if (function.size() == 2) {
+          return F.Piecewise(F.List(F.List(F.C1, F.Equal(function.arg1(), F.C0))), F.C0);
+        }
+        final IASTAppendable andAST = F.ast(S.And, function.argSize(), false);
+        function.forEach(new Consumer<IExpr>() {
+          @Override
+          public void accept(IExpr x) {
+            andAST.append(F.Equal(x, F.C0));
+          }
+        });
+        return F.Piecewise(F.List(F.List(F.C1, andAST)), F.C0);
+      }
+      if (function.isAST(S.KroneckerDelta)) {
+        if (function.size() == 2) {
+          return F.Piecewise(F.List(F.List(F.C1, F.Equal(function.arg1(), F.C0))), F.C0);
+        }
+        IASTAppendable andAST = F.ast(S.And, function.argSize() - 1, false);
+        IExpr last = function.arg1();
+        for (int i = 2; i < function.size(); i++) {
+          final IExpr arg = function.get(i);
+          andAST.append(F.Equal(F.Subtract(last, arg), F.C0));
+          last = arg;
+        }
+        return F.Piecewise(F.List(F.List(F.C1, andAST)), F.C0);
+      }
     }
     return F.NIL;
   }

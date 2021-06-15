@@ -16,11 +16,9 @@
 package org.matheclipse.parser.client.ast;
 
 /**
- * A sequence-pattern node for zero or n expressions (i.e. <code>___</code> or
- * <code>x___</code>)
- * 
+ * A sequence-pattern node for zero or n expressions (i.e. <code>___</code> or <code>x___</code>)
  */
-final public class Pattern3Node extends PatternNode {
+public final class Pattern3Node extends PatternNode {
 
 	public Pattern3Node(final SymbolNode symbol, final ASTNode constraint) {
 		this(symbol, constraint, false);

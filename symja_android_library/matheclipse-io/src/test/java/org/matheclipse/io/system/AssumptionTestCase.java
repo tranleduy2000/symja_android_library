@@ -1,128 +1,150 @@
 package org.matheclipse.io.system;
 
-import junit.framework.TestCase;
-
-import org.matheclipse.core.basic.Config;
-import org.matheclipse.core.eval.EvalUtilities;
-import org.matheclipse.core.eval.util.AbstractAssumptions;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IExpr;
-import org.matheclipse.core.interfaces.ISymbol;
-import org.matheclipse.parser.client.FEConfig;
-
 import static org.matheclipse.core.expression.F.Abs;
 import static org.matheclipse.core.expression.F.Floor;
 import static org.matheclipse.core.expression.F.x;
 import static org.matheclipse.core.expression.F.y;
 
-/**
- * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- *
- */
+import junit.framework.TestCase;
+import org.matheclipse.core.eval.EvalUtilities;
+import org.matheclipse.core.eval.util.AbstractAssumptions;
+import org.matheclipse.core.eval.util.IAssumptions;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
+import org.matheclipse.core.interfaces.IAST;
+import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
+import org.matheclipse.parser.client.FEConfig;
+
 public class AssumptionTestCase extends TestCase {
-	@Override
-	protected void tearDown() throws Exception {
-		// System.out.println(EvalEngine.STATISTICS.toString());
-		super.tearDown();
-	}
-	/**
-	 * Assumption which implements <code>x > 0</code> or <code>y is integer number</code>
-	 *
-	 */
-	public class XGreaterZeroOrYInteger extends AbstractAssumptions {
 
-		@Override
-		public boolean isNegative(IExpr expr) {
-			return false;
-		}
+  @Override
+  protected void tearDown() throws Exception {
+    // System.out.println(EvalEngine.STATISTICS.toString());
+    super.tearDown();
+  }
 
-		@Override
-		public boolean isPositive(IExpr expr) {
-			if (expr.equals(x)) {
-				return true;
-			}
-			return false;
-		}
+  /** Assumption which implements <code>x > 0</code> or <code>y is integer number</code> */
+  public class XGreaterZeroOrYInteger extends AbstractAssumptions {
 
-		@Override
-		public boolean isNonNegative(IExpr expr) {
-			if (expr.equals(x)) {
-				return true;
-			}
-			return false;
-		}
+    public IAssumptions copy() {
+      XGreaterZeroOrYInteger assumptions = new XGreaterZeroOrYInteger();
+      return assumptions;
+    }
 
-		@Override
-		public boolean isInteger(IExpr expr) {
-			if (expr.equals(y)) {
-				return true;
-			}
-			return false;
-		}
+    @Override
+    public boolean isNegative(IExpr expr) {
+      return false;
+    }
 
-		@Override
-		public int[] reduceRange(IExpr x, int[] range) {
-			return range;
-		}
-	}
+    @Override
+    public boolean isPositive(IExpr expr) {
+      if (expr.equals(x)) {
+        return true;
+      }
+      return false;
+    }
 
-	public AssumptionTestCase(String name) {
-		super(name);
-	}
+    @Override
+    public boolean isNonNegative(IExpr expr) {
+      if (expr.equals(x)) {
+        return true;
+      }
+      return false;
+    }
 
-	public void testGreaterZeroOrInteger001() {
-		// don't distinguish between lower- and uppercase identifiers
-		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
+    @Override
+    public boolean isInteger(IExpr expr) {
+      if (expr.equals(y)) {
+        return true;
+      }
+      return false;
+    }
 
-		EvalUtilities util = new EvalUtilities(false, true);
-		util.getEvalEngine().setAssumptions(new XGreaterZeroOrYInteger());
-		IAST function = Abs(x);
-		IExpr result = util.evaluate(function);
-		assertEquals(result.toString(), "x");
+    @Override
+    public int[] reduceRange(IExpr x, int[] range) {
+      return range;
+    }
 
-		function = Abs(y);
-		result = util.evaluate(function);
-		assertEquals(result.toString(), "Abs(y)");
+    @Override
+    public IExpr get$Assumptions() {
+      return F.NIL;
+    }
 
-		function = Floor(x);
-		result = util.evaluate(function);
-		assertEquals(result.toString(), "Floor(x)");
+    @Override
+    public void set$Assumptions(IExpr expr) {}
+  }
 
-		function = Floor(y);
-		result = util.evaluate(function);
-		assertEquals(result.toString(), "y");
-	}
+  public AssumptionTestCase(String name) {
+    super(name);
+  }
 
-	public void testSqrt001() {
-		// don't distinguish between lower- and uppercase identifiers
-		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
+  public void testGreaterZeroOrInteger001() {
+    // don't distinguish between lower- and uppercase identifiers
+    FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
-		EvalUtilities util = new EvalUtilities(false, true);
+    EvalUtilities util = new EvalUtilities(false, true);
+    util.getEvalEngine().setAssumptions(new XGreaterZeroOrYInteger());
+    IAST function = Abs(x);
+    IExpr result = util.evaluate(function);
+    assertEquals(result.toString(), "x");
 
-		// define "t" with "t" assumed greater than 0
-		// use #1 (Slot1) as placeholder for a new symbol!
-		ISymbol t = F.symbol("t", F.Greater(F.Slot1, F.C10));
+    function = Abs(y);
+    result = util.evaluate(function);
+    assertEquals(result.toString(), "Abs(y)");
 
-		// (t^2) ^ (1/2)
-		IAST function = F.Sqrt(F.Sqr(t));
-		IExpr result = util.evaluate(function);
-		assertEquals(result.toString(), "t");
-	}
+    function = Floor(x);
+    result = util.evaluate(function);
+    assertEquals(result.toString(), "Floor(x)");
 
-	public void testFloor001() {
-		// don't distinguish between lower- and uppercase identifiers
-		FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
+    function = Floor(y);
+    result = util.evaluate(function);
+    assertEquals(result.toString(), "y");
+  }
 
-		EvalUtilities util = new EvalUtilities(false, true);
+  public void testSqrt001() {
+    // don't distinguish between lower- and uppercase identifiers
+    FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
 
-		// define "t" with "t" assumed to be an element of the integers
-		// use #1 (Slot1) as placeholder for a new symbol!
-		ISymbol t = F.symbol("t", F.Element(F.Slot1, F.Integers));
+    EvalUtilities util = new EvalUtilities(false, true);
 
-		IAST function = F.Floor(t);
-		IExpr result = util.evaluate(function);
-		assertEquals(result.toString(), "t");
-	}
+    // define "t" with "t" assumed greater than 0
+    // use #1 (Slot1) as placeholder for a new symbol!
+    ISymbol t = F.symbol("t", F.Greater(F.Slot1, F.C10));
 
+    // (t^2) ^ (1/2)
+    IAST function = F.Sqrt(F.Sqr(t));
+    IExpr result = util.evaluate(function);
+    assertEquals(result.toString(), "t");
+  }
+
+  public void testFloor001() {
+    // don't distinguish between lower- and uppercase identifiers
+    FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
+
+    EvalUtilities util = new EvalUtilities(false, true);
+
+    // define "t" with "t" assumed to be an element of the integers
+    // use #1 (Slot1) as placeholder for a new symbol!
+    ISymbol t = F.symbol("t", F.Element(F.Slot1, F.Integers));
+
+    IAST function = F.Floor(t);
+    IExpr result = util.evaluate(function);
+    assertEquals(result.toString(), "t");
+  }
+
+  public void testTensorDimensions001() {
+    // don't distinguish between lower- and uppercase identifiers
+    FEConfig.PARSER_USE_LOWERCASE_SYMBOLS = true;
+
+    EvalUtilities util = new EvalUtilities(false, true);
+    //  Element(M, Matrices({3, 3}, Reals))
+    // define "m" with "m" assumed to be a  3x3 matrix
+    // use #1 (Slot1) as placeholder for a new symbol!
+    ISymbol t = F.symbol("m", F.Element(F.Slot1, F.Matrices(F.List(3, 3), S.Reals)));
+		S.$Assumptions.clearValue();
+    IAST function = F.TensorDimensions(t);
+    IExpr result = util.evaluate(function);
+    assertEquals(result.toString(), "{3,3}");
+  }
 }

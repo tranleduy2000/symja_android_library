@@ -43,6 +43,7 @@ public class Context implements Serializable {
   private transient Context parentContext;
   private Map<String, ISymbol> symbolTable;
 
+  private transient Class<?> javaClass = null;;
   public static final String GLOBAL_CONTEXT_NAME = "Global`";
 
   public Context(String contextName) {
@@ -95,6 +96,15 @@ public class Context implements Serializable {
     return contextName;
   }
 
+  /**
+   * Get the java class if this is a {@link JavaFunctions} class context. <code>null</code>
+   * otherwise.
+   *
+   * @return <code>null</code> if this is not a context for Java classes
+   */
+  public Class<?> getJavaClass() {
+    return javaClass;
+  }
   /**
    * If the current parent context isn't <code>null</code> or <code>Global`</code> get the complete
    * context name prepended with the parent context name.
@@ -154,6 +164,14 @@ public class Context implements Serializable {
     return symbolTable.remove(key);
   }
 
+  /**
+   * If this is a {@link JavaFunctions} class context the class to this context.
+   *
+   * @param javaClass
+   */
+  public void setJavaClass(Class<?> javaClass) {
+    this.javaClass = javaClass;
+  }
   public int size() {
     return symbolTable.size();
   }

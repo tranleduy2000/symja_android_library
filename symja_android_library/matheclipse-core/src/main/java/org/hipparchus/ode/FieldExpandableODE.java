@@ -16,7 +16,7 @@
  */
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.util.MathArrays;
@@ -47,7 +47,7 @@ import java.util.List;
  * @see FieldSecondaryODE
  */
 
-public class FieldExpandableODE<T extends RealFieldElement<T>> {
+public class FieldExpandableODE<T extends CalculusFieldElement<T>> {
 
     /**
      * Primary differential equation.

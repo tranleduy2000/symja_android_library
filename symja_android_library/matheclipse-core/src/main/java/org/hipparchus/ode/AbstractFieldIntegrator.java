@@ -25,7 +25,7 @@ package org.hipparchus.ode;
 import com.duy.util.PriorityQueue;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver;
 import org.hipparchus.analysis.solvers.FieldBracketingNthOrderBrentSolver;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -51,7 +51,7 @@ import java.util.Queue;
  *
  * @param <T> the type of the field elements
  */
-public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> implements FieldODEIntegrator<T> {
+public abstract class AbstractFieldIntegrator<T extends CalculusFieldElement<T>> implements FieldODEIntegrator<T> {
 
     /**
      * Default relative accuracy.
@@ -334,7 +334,7 @@ public abstract class AbstractFieldIntegrator<T extends RealFieldElement<T>> imp
      * @throws MathIllegalStateException    if the number of functions evaluations is exceeded
      * @throws NullPointerException         if the ODE equations have not been set (i.e. if this method
      *                                      is called outside of a call to {@link #integrate(FieldExpandableODE, FieldODEState,
-     *                                      RealFieldElement) integrate}
+     *                                      CalculusFieldElement) integrate}
      */
     public T[] computeDerivatives(final T t, final T[] y)
             throws MathIllegalArgumentException, MathIllegalStateException, NullPointerException {

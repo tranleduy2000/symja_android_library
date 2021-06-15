@@ -4,6 +4,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.IPatternMap;
+import org.matheclipse.parser.client.FEConfig;
 
 public class OptionsPattern extends PatternSequence {
 
@@ -16,7 +17,7 @@ public class OptionsPattern extends PatternSequence {
   public static OptionsPattern valueOf(final ISymbol symbol, IExpr defaultOptions) {
     OptionsPattern p = new OptionsPattern();
     p.fSymbol = symbol;
-    p.fCondition = null;
+    p.fHeadTest = null;
     p.fDefault = false;
     p.fZeroArgsAllowed = true;
     p.fDefaultOptions = defaultOptions;
@@ -94,11 +95,13 @@ public class OptionsPattern extends PatternSequence {
     StringBuilder buf = new StringBuilder();
 
     if (fSymbol != null) {
-      buf.append("Pattern[");
+      buf.append("Pattern");
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? '(' : '[');
       buf.append(fSymbol.fullFormString());
-      buf.append(",OptionsPattern[]]");
+      buf.append(
+          FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? ",OptionsPattern())" : ",OptionsPattern[]]");
     } else {
-      buf.append("OptionsPattern[]");
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? "OptionsPattern()" : "OptionsPattern[]");
     }
     return buf.toString();
   }

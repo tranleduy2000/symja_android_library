@@ -21,22 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Basic common parser factory methods.
- * 
- */
+/** Basic common parser factory methods. */
 public interface IParserFactory {
 	
-	/**
-	 * The default set of characters, which could form an operator
-	 * 
-	 */
-	public final static String BASIC_OPERATOR_CHARACTERS = ".-:=<>*+;!^|&/@?~";
+  /** The default set of characters, which could form an operator */
+  public static final String BASIC_OPERATOR_CHARACTERS = ".-:=<>*+;!^|&/@?~";
 
-	/**
-	 * Check if the ch is in the set of operator characters.
-	 * 
-	 */
+  /** Check if the ch is in the set of operator characters. */
 	public boolean isOperatorChar(char ch);
 
 	/**
@@ -72,11 +63,9 @@ public interface IParserFactory {
 	/**
 	 * Check if the identifier name is valid.
 	 * 
-	 * @param identifier
-	 *            the currently parsed identifier
-	 * @return <code>false</code> if the identifier is not valid (in this case the parser creates a SyntaxError
-	 *         exception); otherwise return <code>true</code>
+   * @param identifier the currently parsed identifier
+   * @return <code>false</code> if the identifier is not valid (in this case the parser creates a
+   *     SyntaxError exception); otherwise return <code>true</code>
 	 */
 	public boolean isValidIdentifier(String identifier);
-
 }

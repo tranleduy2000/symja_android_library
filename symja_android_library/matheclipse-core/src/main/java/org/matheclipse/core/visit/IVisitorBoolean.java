@@ -12,9 +12,8 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 
 /**
- * A visitor which could be used in the
- * <code>org.matheclipse.core.interfaces.IExpr#accept()</code> method.
- * 
+ * A visitor which could be used in the <code>org.matheclipse.core.interfaces.IExpr#accept()</code>
+ * method.
  */
 public interface IVisitorBoolean {
 

@@ -2,43 +2,45 @@ package org.matheclipse.core.integrate.rubi;
 
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Pattern;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IPattern;
 import org.matheclipse.core.interfaces.ISymbol;
 
 /**
  * UtilityFunctions from the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based integrator</a>.
- * <p>
+ *
  * TODO a lot of functions are only placeholders at the moment.
+ *
  */
 public class UtilityFunctions {
 
 
-    public final static ISymbol pa = F.initFinalHiddenSymbol("§a");
-    public final static ISymbol pb = F.initFinalHiddenSymbol("§b");
-    public final static ISymbol pc = F.initFinalHiddenSymbol("§c");
-    public final static ISymbol pd = F.initFinalHiddenSymbol("§dv");
-    public final static ISymbol pe = F.initFinalHiddenSymbol("§ev");
-    public final static ISymbol pf = F.initFinalHiddenSymbol("§f");
-    public final static ISymbol pg = F.initFinalHiddenSymbol("§g");
-    public final static ISymbol ph = F.initFinalHiddenSymbol("§h");
-    public final static ISymbol pi = F.initFinalHiddenSymbol("§i");
-    public final static ISymbol pj = F.initFinalHiddenSymbol("§j");
-    public final static ISymbol pk = F.initFinalHiddenSymbol("§k");
-    public final static ISymbol pl = F.initFinalHiddenSymbol("§l");
-    public final static ISymbol pm = F.initFinalHiddenSymbol("§m");
-    public final static ISymbol pn = F.initFinalHiddenSymbol("§n");
-    public final static ISymbol po = F.initFinalHiddenSymbol("§o");
-    public final static ISymbol pp = F.initFinalHiddenSymbol("§p");
-    public final static ISymbol pq = F.initFinalHiddenSymbol("§q");
-    public final static ISymbol pr = F.initFinalHiddenSymbol("§r");
-    public final static ISymbol ps = F.initFinalHiddenSymbol("§s");
-    public final static ISymbol pt = F.initFinalHiddenSymbol("§t");
-    public final static ISymbol pu = F.initFinalHiddenSymbol("§u");
-    public final static ISymbol pv = F.initFinalHiddenSymbol("§v");
-    public final static ISymbol pw = F.initFinalHiddenSymbol("§w");
-    public final static ISymbol px = F.initFinalHiddenSymbol("§x");
-    public final static ISymbol py = F.initFinalHiddenSymbol("§y");
-    public final static ISymbol pz = F.initFinalHiddenSymbol("§z");
+	public final static ISymbol pa = S.initFinalHiddenSymbol("§a");
+	public final static ISymbol pb = S.initFinalHiddenSymbol("§b");
+	public final static ISymbol pc = S.initFinalHiddenSymbol("§c");
+	public final static ISymbol pd = S.initFinalHiddenSymbol("§dv");
+	public final static ISymbol pe = S.initFinalHiddenSymbol("§ev");
+	public final static ISymbol pf = S.initFinalHiddenSymbol("§f");
+	public final static ISymbol pg = S.initFinalHiddenSymbol("§g");
+	public final static ISymbol ph = S.initFinalHiddenSymbol("§h");
+	public final static ISymbol pi = S.initFinalHiddenSymbol("§i");
+	public final static ISymbol pj = S.initFinalHiddenSymbol("§j");
+	public final static ISymbol pk = S.initFinalHiddenSymbol("§k");
+	public final static ISymbol pl = S.initFinalHiddenSymbol("§l");
+	public final static ISymbol pm = S.initFinalHiddenSymbol("§m");
+	public final static ISymbol pn = S.initFinalHiddenSymbol("§n");
+	public final static ISymbol po = S.initFinalHiddenSymbol("§o");
+	public final static ISymbol pp = S.initFinalHiddenSymbol("§p");
+	public final static ISymbol pq = S.initFinalHiddenSymbol("§q");
+	public final static ISymbol pr = S.initFinalHiddenSymbol("§r");
+	public final static ISymbol ps = S.initFinalHiddenSymbol("§s");
+	public final static ISymbol pt = S.initFinalHiddenSymbol("§t");
+	public final static ISymbol pu = S.initFinalHiddenSymbol("§u");
+	public final static ISymbol pv = S.initFinalHiddenSymbol("§v");
+	public final static ISymbol pw = S.initFinalHiddenSymbol("§w");
+	public final static ISymbol px = S.initFinalHiddenSymbol("§x");
+	public final static ISymbol py = S.initFinalHiddenSymbol("§y");
+	public final static ISymbol pz = S.initFinalHiddenSymbol("§z");
     public final static IPattern pa_ = F.initPredefinedPattern(pa);
     public final static IPattern pb_ = F.initPredefinedPattern(pb);
     public final static IPattern pc_ = F.initPredefinedPattern(pc);

@@ -52,8 +52,8 @@ import org.matheclipse.parser.client.operator.InfixOperator;
 import org.matheclipse.parser.client.operator.Operator;
 
 /**
- * Create an expression of the <code>ASTNode</code> class-hierarchy from a math formulas string
- * representation
+ * Create an expression of the {@link IExpr} class-hierarchy from a math formula's string
+ * representation.
  *
  * <p>See <a href="http://en.wikipedia.org/wiki/Operator-precedence_parser">Operator -precedence
  * parser</a> for the idea, how to parse the operators depending on their precedence.
@@ -71,7 +71,7 @@ public class ExprParser extends Scanner {
 
     @Override
     public IExpr visit(INum element) {
-      if (element instanceof NumStr && element.determinePrecision() < fPrecision) {
+      if (element instanceof NumStr/* && element.determinePrecision() < fPrecision*/) {
         Apfloat apfloatValue = new Apfloat(((NumStr) element).getFloatStr(), fPrecision);
         int exponent = ((NumStr) element).getExponent();
         if (exponent != 1) {
@@ -193,7 +193,7 @@ public class ExprParser extends Scanner {
         case ID.Exp:
           if (ast.isAST1()) {
             // rewrite from input: Exp(x) => E^x
-            return F.Power(F.E, ast.getUnevaluated(1));
+            return F.Power(S.E, ast.getUnevaluated(1));
           }
           break;
 
@@ -474,13 +474,13 @@ public class ExprParser extends Scanner {
         return parseArguments(str);
 
       case TT_PERCENT:
-        final IASTAppendable out = F.ast(F.Out);
+        final IASTAppendable out = F.ast(S.Out);
 
         int countPercent = 1;
         getNextToken();
         if (fToken == TT_DIGIT) {
           countPercent = getJavaInt();
-          out.append(F.ZZ(countPercent));
+          out.append(countPercent);
           return out;
         }
 
@@ -489,7 +489,7 @@ public class ExprParser extends Scanner {
           getNextToken();
         }
 
-        out.append(F.ZZ(-countPercent));
+        out.append(-countPercent);
         return parseArguments(out);
 
       case TT_SLOT:
@@ -501,17 +501,17 @@ public class ExprParser extends Scanner {
           } else if (slotNumber == 2) {
             return parseArguments(F.Slot2);
           }
-          final IASTAppendable slot = F.ast(F.Slot);
-          slot.append(F.ZZ(slotNumber));
+          final IASTAppendable slot = F.ast(S.Slot);
+          slot.append(slotNumber);
           return parseArguments(slot);
         } else if (fToken == TT_IDENTIFIER) {
           String[] identifierContext = getIdentifier();
-          final IASTAppendable slot = F.ast(F.Slot);
-          slot.append(F.stringx(identifierContext[0]));
+          final IASTAppendable slot = F.ast(S.Slot);
+          slot.append(identifierContext[0]);
           getNextToken();
           return parseArguments(slot);
         } else if (fToken == TT_STRING) {
-          final IASTAppendable slot = F.ast(F.Slot);
+          final IASTAppendable slot = F.ast(S.Slot);
           slot.append(getString());
           return parseArguments(slot);
         }
@@ -520,7 +520,7 @@ public class ExprParser extends Scanner {
       case TT_SLOTSEQUENCE:
 
         getNextToken();
-        final IASTAppendable slotSequencce = F.ast(F.SlotSequence);
+        final IASTAppendable slotSequencce = F.ast(S.SlotSequence);
         if (fToken == TT_DIGIT) {
           slotSequencce.append(getNumber(false));
         } else {
@@ -528,7 +528,7 @@ public class ExprParser extends Scanner {
         }
         return parseArguments(slotSequencce);
       case TT_ASSOCIATION_OPEN:
-        final IASTAppendable function = F.ast(F.List);
+        final IASTAppendable function = F.ListAlloc(31);
         fRecursionDepth++;
         try {
           getNextToken();
@@ -546,13 +546,13 @@ public class ExprParser extends Scanner {
               throwSyntaxError("\'|>\' expected.");
             }
           }
-          try {
-            temp = F.assoc(function);
-          } catch (MathException mex) {
-            // fallback if no rules were parsed
-            function.set(0, F.Association);
+          //          try {
+          //            temp = F.assoc(function);
+          //          } catch (MathException mex) {
+          //            // fallback if no rules were parsed
+          function.set(0, S.Association);
             temp = function;
-          }
+          //          }
           getNextToken();
           if (fToken == TT_PRECEDENCE_OPEN) {
             if (!fExplicitTimes) {
@@ -905,7 +905,7 @@ public class ExprParser extends Scanner {
         getNextToken();
         return F.CEmptyList;
       }
-      function = F.ListAlloc(16);
+      function = F.ListAlloc(31);
       getArguments(function);
     } finally {
       fRecursionDepth--;
@@ -929,11 +929,12 @@ public class ExprParser extends Scanner {
   private IExpr getNumber(final boolean negative) throws SyntaxError {
     IExpr temp = null;
     final Object[] result = getNumberString();
-    String number = (String) result[0];
+    String numberStr = (String) result[0];
     int numFormat = ((Integer) result[1]).intValue();
+    String exponentStr = (String) result[2];
     try {
       if (negative) {
-        number = '-' + number;
+        numberStr = '-' + numberStr;
       }
       if (numFormat == 10 && fCurrentChar == '`') {
         numFormat = -1;
@@ -941,49 +942,88 @@ public class ExprParser extends Scanner {
       if (numFormat < 0) {
         if (fCurrentChar == '`' && isValidPosition()) {
           fCurrentPosition++;
-          if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
+          if (isValidPosition() && fInputString[fCurrentPosition] == '*') {
+            fCurrentPosition++;
+            if (isValidPosition() && fInputString[fCurrentPosition] == '^') {
+              fCurrentPosition += 2;
+              long exponent = getJavaLong();
+              Double d = Double.valueOf(numberStr + "E" + exponent);
+              return F.num(d);
+            }
+          } else if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
             fCurrentPosition += 2;
             long precision = getJavaLong();
             if (precision < FEConfig.MACHINE_PRECISION) {
               precision = FEConfig.MACHINE_PRECISION;
             }
-            return F.num(new Apfloat(number, precision));
+            return F.num(new Apfloat(numberStr, precision));
           } else {
-            fCurrentPosition++;
-            long precision = FEConfig.MACHINE_PRECISION;
             if (isValidPosition() && Character.isDigit(fInputString[fCurrentPosition])) {
-              precision = getJavaLong();
+            fCurrentPosition++;
+              long precision = getJavaLong();
               if (precision < FEConfig.MACHINE_PRECISION) {
                 precision = FEConfig.MACHINE_PRECISION;
               }
-              return F.num(new Apfloat(number, precision));
+              return F.num(new Apfloat(numberStr, precision));
             } else {
               getNextToken();
-              return F.num(number);
+              return F.num(numberStr);
             }
           }
+          throwSyntaxError("Number format error: " + numberStr, numberStr.length());
         }
-        temp = new NumStr(number);
-        // temp = fFactory.createDouble(number);
+        temp = new NumStr(numberStr);
       } else {
-        temp = F.ZZ(number, numFormat);
-        // temp = fFactory.createInteger(number, numFormat);
+        if (exponentStr == null || exponentStr.equals("1")) {
+          temp = F.ZZ(numberStr, numFormat);
+        } else {
+          if (numFormat == 10) {
+            try {
+              int exponent = Integer.parseInt(exponentStr, numFormat);
+              if (exponent < 0) {
+                exponent = -exponent;
+                StringBuilder buf = new StringBuilder(numberStr.length() + exponent);
+                buf.append(numberStr);
+                for (int i = 0; i < exponent; i++) {
+                  buf.append('0');
+            }
+                temp = F.Power(F.ZZ(buf.toString(), numFormat), F.CN1);
+      } else {
+                StringBuilder buf = new StringBuilder(numberStr.length() + exponent);
+                buf.append(numberStr);
+                for (int i = 0; i < exponent; i++) {
+                  buf.append('0');
+                }
+                temp = F.ZZ(buf.toString(), numFormat);
+              }
+
+            } catch (final NumberFormatException e) {
+              throwSyntaxError(
+                  "Number format error (not an int type): " + exponentStr, exponentStr.length());
+            }
+          } else {
+            throwSyntaxError("Number format error: " + numberStr, numberStr.length());
+          }
+        }
       }
     } catch (final RuntimeException rex) {
-      throwSyntaxError("Number format error: " + number, number.length());
+      throwSyntaxError("Number format error: " + numberStr, numberStr.length());
     }
     getNextToken();
     return temp;
   }
 
+  @Override
   protected boolean isOperatorCharacters() {
     return fFactory.isOperatorChar(fCurrentChar);
   }
 
+  @Override
   protected boolean isOperatorCharacters(char ch) {
     return fFactory.isOperatorChar(ch);
   }
 
+  @Override
   protected final List<Operator> getOperator() {
     char lastChar = fCurrentChar;
     final int startPosition = fCurrentPosition - 1;
@@ -1235,11 +1275,11 @@ public class ExprParser extends Scanner {
 
   protected IExpr parseExpression() {
     if (fToken == TT_SPAN) {
-      IASTAppendable span = F.ast(F.Span);
+      IASTAppendable span = F.ast(S.Span);
       span.append(F.C1);
       getNextToken();
       if (fToken == TT_SPAN) {
-        span.append(F.All);
+        span.append(S.All);
         getNextToken();
         if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
             || fToken == TT_PRECEDENCE_CLOSE) {
@@ -1247,13 +1287,13 @@ public class ExprParser extends Scanner {
         }
       } else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
           || fToken == TT_PRECEDENCE_CLOSE) {
-        span.append(F.All);
+        span.append(S.All);
         return span;
       } else if (fToken == TT_OPERATOR) {
         InfixExprOperator infixOperator = determineBinaryOperator();
         if (infixOperator != null && //
             infixOperator.getOperatorString().equals(";")) {
-          span.append(F.All);
+          span.append(S.All);
           getNextToken();
           IExpr compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
           if (compoundExpressionNull != null) {
@@ -1271,11 +1311,11 @@ public class ExprParser extends Scanner {
     IExpr temp = parseExpression(parsePrimary(0), 0);
 
     if (fToken == TT_SPAN) {
-      IASTAppendable span = F.ast(F.Span);
+      IASTAppendable span = F.ast(S.Span);
       span.append(temp);
       getNextToken();
       if (fToken == TT_SPAN) {
-        span.append(F.All);
+        span.append(S.All);
         getNextToken();
         if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
             || fToken == TT_PRECEDENCE_CLOSE) {
@@ -1285,13 +1325,13 @@ public class ExprParser extends Scanner {
         }
       } else if (fToken == TT_COMMA || fToken == TT_PARTCLOSE || fToken == TT_ARGUMENTS_CLOSE
           || fToken == TT_PRECEDENCE_CLOSE) {
-        span.append(F.All);
+        span.append(S.All);
         return span;
       } else if (fToken == TT_OPERATOR) {
         InfixExprOperator infixOperator = determineBinaryOperator();
         if (infixOperator != null && //
             infixOperator.getOperatorString().equals(";")) {
-          span.append(F.All);
+          span.append(S.All);
           getNextToken();
           IExpr compoundExpressionNull = parseCompoundExpressionNull(infixOperator, span);
           if (compoundExpressionNull != null) {
@@ -1352,7 +1392,7 @@ public class ExprParser extends Scanner {
           oper = fFactory.get("Times");
           if (FEConfig.DOMINANT_IMPLICIT_TIMES || oper.getPrecedence() >= min_precedence) {
             rhs = parseLookaheadOperator(oper.getPrecedence());
-            lhs = F.$(F.Times, lhs, rhs);
+            lhs = F.$(S.Times, lhs, rhs);
             ((IAST) lhs).addEvalFlags(IAST.TIMES_PARSED_IMPLICIT);
             continue;
           }
@@ -1383,15 +1423,10 @@ public class ExprParser extends Scanner {
         } else {
           postfixOperator = determinePostfixOperator();
 
-          if (postfixOperator != null) {
-            if (postfixOperator.getPrecedence() >= min_precedence) {
+          if (postfixOperator != null && postfixOperator.getPrecedence() >= min_precedence) {
               lhs = parsePostfixOperator(lhs, postfixOperator);
               continue;
             }
-            // } else {
-            // throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix
-            // operator.");
-          }
         }
       }
       break;
@@ -1445,7 +1480,7 @@ public class ExprParser extends Scanner {
         rhs = parseLookaheadOperator(infixOperator.getPrecedence());
         ast.append(rhs);
       }
-      return ast;
+      return infixOperator.endFunction(fFactory, ast, this);
     } else {
       if (fToken == TT_OPERATOR && infixOperator.getGrouping() == InfixOperator.NONE
           && infixOperator.isOperator(fOperatorString)) {
@@ -1468,7 +1503,7 @@ public class ExprParser extends Scanner {
   private IExpr parseInequality(final IAST ast, final InfixExprOperator infixOperator) {
     // rewrite to Inequality
     final IBuiltInSymbol head = (IBuiltInSymbol) ast.head();
-    final IASTAppendable result = F.ast(F.Inequality, ast.size() + 2, false);
+    final IASTAppendable result = F.ast(F.Inequality, ast.size() + 8, false);
     ast.forEach(new Consumer<IExpr>() {
       @Override
       public void accept(IExpr x) {
@@ -1501,6 +1536,9 @@ public class ExprParser extends Scanner {
     getNextToken();
     lhs = convert(postfixOperator.createFunction(fFactory, lhs));
     lhs = parseArguments(lhs);
+    if (fToken == TT_ARGUMENTS_OPEN) {
+      return getFunctionArguments(lhs);
+    }
     return lhs;
   }
 

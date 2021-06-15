@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode.events;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver;
 import org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver.Interval;
@@ -47,7 +47,7 @@ import org.hipparchus.util.FastMath;
  *
  * @param <T> the type of the field elements
  */
-public class FieldEventState<T extends RealFieldElement<T>> {
+public class FieldEventState<T extends CalculusFieldElement<T>> {
 
     /**
      * Event handler.
@@ -617,7 +617,7 @@ public class FieldEventState<T extends RealFieldElement<T>> {
      *
      * @param <T> the type of the field elements
      */
-    public static class EventOccurrence<T extends RealFieldElement<T>> {
+    public static class EventOccurrence<T extends CalculusFieldElement<T>> {
 
         /**
          * User requested action.

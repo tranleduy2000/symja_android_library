@@ -15,16 +15,13 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * A node for a parsed symbol string (i.e. Sin, Cos, Pi, $x,...)
- * 
- */
-final public class SymbolNode extends ASTNode {
+/** A node for a parsed symbol string (i.e. Sin, Cos, Pi, $x,...) */
+public final class SymbolNode extends ASTNode {
 	final String context;
 
 	/**
-	 * Create symbol in context <code>System`</code>. If <code>context == &quot;&quot;</code> the current context from context
-	 * path is used.
+   * Create symbol in context <code>System`</code>. If <code>context == &quot;&quot;</code> the
+   * current context from context path is used.
 	 *
 	 * @param value
 	 */
@@ -33,8 +30,8 @@ final public class SymbolNode extends ASTNode {
 	}
 
 	/**
-	 * Create symbol in context <code>System`</code>. If <code>context == &quot;&quot;</code> the current context from context
-	 * path is used.
+   * Create symbol in context <code>System`</code>. If <code>context == &quot;&quot;</code> the
+   * current context from context path is used.
 	 *
 	 * @param value
 	 * @param context

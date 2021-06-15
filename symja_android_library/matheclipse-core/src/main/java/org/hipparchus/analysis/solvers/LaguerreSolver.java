@@ -154,7 +154,7 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
      * @return the point at which the function value is zero.
      */
     private double laguerre(double lo, double hi) {
-        final Complex[] c = ComplexUtils.convertToComplex(getCoefficients());
+        final Complex c[] = ComplexUtils.convertToComplex(getCoefficients());
 
         final Complex initial = new Complex(0.5 * (lo + hi), 0);
         final Complex z = complexSolver.solve(c, initial);
@@ -243,9 +243,11 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
          */
         public boolean isRoot(double min, double max, Complex z) {
             if (isSequence(min, z.getReal(), max)) {
-                double tolerance = FastMath.max(getRelativeAccuracy() * z.abs(), getAbsoluteAccuracy());
+                final double zAbs = z.norm();
+                double tolerance = FastMath
+                    .max(getRelativeAccuracy() * zAbs, getAbsoluteAccuracy());
                 return (FastMath.abs(z.getImaginary()) <= tolerance) ||
-                        (z.abs() <= getFunctionValueAccuracy());
+                    (zAbs <= getFunctionValueAccuracy());
             }
             return false;
         }
@@ -262,7 +264,7 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
          *                                                            {@code null}.
          * @throws MathIllegalArgumentException                       if the {@code coefficients} array is empty.
          */
-        public Complex[] solveAll(Complex[] coefficients, Complex initial)
+        public Complex[] solveAll(Complex coefficients[], Complex initial)
                 throws MathIllegalArgumentException, NullArgumentException,
                 MathIllegalStateException {
             if (coefficients == null) {
@@ -273,15 +275,15 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
                 throw new MathIllegalArgumentException(LocalizedCoreFormats.POLYNOMIAL);
             }
             // Coefficients for deflated polynomial.
-            final Complex[] c = new Complex[n + 1];
+            final Complex c[] = new Complex[n + 1];
             for (int i = 0; i <= n; i++) {
                 c[i] = coefficients[i];
             }
 
             // Solve individual roots successively.
-            final Complex[] root = new Complex[n];
+            final Complex root[] = new Complex[n];
             for (int i = 0; i < n; i++) {
-                final Complex[] subarray = new Complex[n - i + 1];
+                final Complex subarray[] = new Complex[n - i + 1];
                 System.arraycopy(c, 0, subarray, 0, subarray.length);
                 root[i] = solve(subarray, initial);
                 // Polynomial deflation using synthetic division.
@@ -309,7 +311,7 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
          *                                                            {@code null}.
          * @throws MathIllegalArgumentException                       if the {@code coefficients} array is empty.
          */
-        public Complex solve(Complex[] coefficients, Complex initial)
+        public Complex solve(Complex coefficients[], Complex initial)
                 throws MathIllegalArgumentException, NullArgumentException,
                 MathIllegalStateException {
             if (coefficients == null) {
@@ -345,12 +347,12 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
                 d2v = d2v.multiply(new Complex(2.0, 0.0));
 
                 // Check for convergence.
-                final double tolerance = FastMath.max(relativeAccuracy * z.abs(),
+                final double tolerance = FastMath.max(relativeAccuracy * z.norm(),
                         absoluteAccuracy);
-                if ((z.subtract(oldz)).abs() <= tolerance) {
+                if ((z.subtract(oldz)).norm() <= tolerance) {
                     return z;
                 }
-                if (pv.abs() <= functionValueAccuracy) {
+                if (pv.norm() <= functionValueAccuracy) {
                     return z;
                 }
 
@@ -363,7 +365,7 @@ public class LaguerreSolver extends AbstractPolynomialSolver {
                 final Complex deltaSqrt = delta.sqrt();
                 final Complex dplus = G.add(deltaSqrt);
                 final Complex dminus = G.subtract(deltaSqrt);
-                final Complex denominator = dplus.abs() > dminus.abs() ? dplus : dminus;
+                final Complex denominator = dplus.norm() > dminus.norm() ? dplus : dminus;
                 // Perturb z if denominator is zero, for instance,
                 // p(x) = x^3 + 1, z = 0.
                 if (denominator.equals(new Complex(0.0, 0.0))) {

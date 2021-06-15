@@ -19,8 +19,7 @@ package org.hipparchus.special.elliptic.jacobi;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalStateException;
-import org.hipparchus.special.elliptic.legendre
-    .LegendreEllipticIntegral;
+import org.hipparchus.special.elliptic.legendre.LegendreEllipticIntegral;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.FieldSinCos;
 import org.hipparchus.util.Precision;

@@ -3,6 +3,7 @@ package org.matheclipse.core.visit;
 import com.duy.lambda.Function;
 
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -11,19 +12,15 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.math.MathException;
 
 /**
- * A level specification visitor for levels in abstract syntax trees (AST), which removes elements from a (cloned) AST
- * in the <code>visit(IAST clonedAST)</code> method.
+ * A level specification visitor for levels in abstract syntax trees (AST), which removes elements
+ * from a (cloned) AST in the <code>visit(IAST clonedAST)</code> method.
  * 
- * Example: the nested list <code>{x,{y}}</code> has depth <code>3</code>
- * 
+ * <p>Example: the nested list <code>{x,{y}}</code> has depth <code>3</code>
  */
 public class VisitorRemoveLevelSpecification extends VisitorLevelSpecification {
-	/**
-	 * StopException will be thrown, if maximum number of Cases results are reached
-	 *
-	 */
+  /** StopException will be thrown, if maximum number of Cases results are reached */
 	@SuppressWarnings("serial")
-	public static class StopException extends MathException {
+	public static class StopException extends SymjaMathException {
 		public StopException() {
 			super("Stop VisitorDeleteLevelSpecification evaluation");
 		}
@@ -35,22 +32,18 @@ public class VisitorRemoveLevelSpecification extends VisitorLevelSpecification {
 	/**
 	 * Create a LevelSpecification from an IInteger or IAST list-object.<br>
 	 * <br>
-	 * 
-	 * An <code>expr</code> is interpreted as a <i>level specification</i> for the allowed levels in an AST.<br>
+   * An <code>expr</code> is interpreted as a <i>level specification</i> for the allowed levels in
+   * an AST.<br>
 	 * If <code>expr</code> is a non-negative IInteger iValue set Level {1,iValue};<br>
 	 * If <code>expr</code> is a negative IInteger iValue set Level {iValue, 0}; <br>
 	 * If <code>expr</code> is a List {i0Value, i1Value} set Level {i0Value, i1Value};<br>
 	 * 
-	 * @param function
-	 *            the function which should be applied for an element
-	 * @param expr
-	 *            the given <i>level specification</i>
-	 * @param maximumRemoved
-	 *            maximum number of elements, which are allowed to remove
-	 * @param includeHeads
-	 *            set to <code>true</code>, if the header of an AST expression should be included
-	 * @throws MathException
-	 *             if the <code>expr</code> is not a <i>level specification</i>
+   * @param function the function which should be applied for an element
+   * @param expr the given <i>level specification</i>
+   * @param maximumRemoved maximum number of elements, which are allowed to remove
+   * @param includeHeads set to <code>true</code>, if the header of an AST expression should be
+   *     included
+   * @throws SymjaMathException if the <code>expr</code> is not a <i>level specification</i>
 	 * @see
 	 */
 	public VisitorRemoveLevelSpecification(final Function<IExpr, IExpr> function, final IExpr expr, int maximumRemoved,
@@ -91,14 +84,12 @@ public class VisitorRemoveLevelSpecification extends VisitorLevelSpecification {
 	 * <code>fromDepth = Integer.MIN_VALUE;</code><br>
 	 * <code>toDepth = -1;</code><br>
 	 * 
-	 * @param function
-	 *            the function which should be applied for an element
+   * @param function the function which should be applied for an element
 	 * @param fromLevel
 	 * @param toLevel
 	 * @param fromDepth
 	 * @param toDepth
-	 * @param maximumRemoved
-	 *            maximum number of elements, which are allowed to remove
+   * @param maximumRemoved maximum number of elements, which are allowed to remove
 	 * @param includeHeads
 	 */
 	public VisitorRemoveLevelSpecification(final Function<IExpr, IExpr> function, final int fromLevel,
@@ -121,8 +112,7 @@ public class VisitorRemoveLevelSpecification extends VisitorLevelSpecification {
 	/**
 	 * <b>Note:</b> the given AST will be modified, i.e. some elements may be removed!
 	 * 
-	 * @param astCopy
-	 *            a mutable copy of an AST where arguments could be removed.
+   * @param astCopy a mutable copy of an AST where arguments could be removed.
 	 */
 	@Override
 	public IExpr visit(IASTMutable astCopy) {

@@ -5,7 +5,13 @@ import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
-
+import edu.jas.structure.ElemFactory;
+import edu.jas.structure.GcdRingElem;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
 import org.hipparchus.FieldElement;
 import org.hipparchus.complex.Complex;
@@ -15,21 +21,14 @@ import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
-import org.matheclipse.core.expression.S;
+import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
 import org.matheclipse.core.visit.VisitorReplaceAll;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import edu.jas.structure.ElemFactory;
-import edu.jas.structure.GcdRingElem;
 
 /**
  * (I)nterface for a mathematical (Expr)ession<br>
@@ -82,6 +81,20 @@ import edu.jas.structure.GcdRingElem;
 @SuppressWarnings({"UnnecessaryInterfaceModifier", "JavaDoc", "JavadocReference"})
 public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializable,
     FieldElement<IExpr> {
+
+  // objc-changed: move to separated class
+//  /**
+//   * A three-state &quot;boolean&quot; value. If a comparison can not be evaluated to <code>S.True
+//   * </code> (&quot;state&quot; <code>TRUE</code>) or <code>S.False</code> (&quot;state&quot; <code>
+//   * FALSE</code>) it can get the &quot;state&quot; <code>UNDECIDABLE</code>.
+//   *
+//   * <p>See: <a href"https://en.wikipedia.org/wiki/Three-valued_logic">Three-valued logic</a>
+//   */
+//  public static enum COMPARE_TERNARY {
+//    TRUE,
+//    FALSE,
+//    UNDECIDABLE
+//  }
 
   public static final int ASTID = 1024;
 
@@ -139,6 +152,17 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
   public static final int TESTRESULTOBJECT = DATAID + 13;
 
+  public static final int FILEEXPRID = DATAID + 15;
+
+  public static final int OUTPUTSTREAMEXPRID = DATAID + 16;
+
+  public static final int INPUTSTREAMEXPRID = DATAID + 17;
+
+  public static final int JAVACLASSEXPRID = DATAID + 18;
+
+  public static final int JAVAOBJECTEXPRID = DATAID + 19;
+
+  public static final int LINEARSOLVEUNCTONID = DATAID + 20;
 
   /**
    * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
@@ -150,65 +174,87 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
 
   /**
    * Operator overloading for Scala operator <code>/</code>. Calls <code>divide(that)</code>.
+   *
+   * @param that
+   * @return
    */
   IExpr $minus(final IExpr that);
 
   /**
    * Operator overloading for Scala operator <code>+</code>. Calls <code>plus(that)</code>.
+   *
+   * @param that
+   * @return
    */
   IExpr $plus(final IExpr that);
 
   /**
    * Operator overloading for Scala operator <code>*</code>. Calls <code>times(that)</code>.
+   *
+   * @param that
+   * @return
    */
   IExpr $times(final IExpr that);
 
   /**
    * Operator overloading for Scala operator <code>^</code>. Calls <code>power(that)</code>.
+   *
+   * @param that
+   * @return
    */
   IExpr $up(final IExpr that);
 
   /**
+   * Evaluate the absolute value of this.
+   *
+   * @return
+   */
+  @Override
+  IExpr abs(); /* {
+    return F.eval(F.Abs(this));
+  }*/
+
+  /**
    * Accept a visitor with return type T
+   *
+   * @param visitor
+   * @return <code>F.NIL</code> if no evaluation was necessary
    */
   IExpr accept(IVisitor visitor);
 
   /**
    * Accept a visitor with return type <code>boolean</code>
+   *
+   * @param visitor
+   * @return
    */
   boolean accept(IVisitorBoolean visitor);
 
   /**
    * Accept a visitor with return type <code>int</code>
+   *
+   * @param visitor
+   * @return
    */
   int accept(IVisitorInt visitor);
 
   /**
    * Accept a visitor with return type <code>long</code>
+   *
+   * @param visitor
+   * @return
    */
   long accept(IVisitorLong visitor);
 
   @Override
-  IExpr add(IExpr that);
-
-  @Override
-  IExpr multiply(int n);
-
-  @Override
-  IExpr reciprocal() throws MathRuntimeException;
-
-  @Override
-  Field<IExpr> getField();
-
-  IExpr and(final IExpr that);
+  IExpr add(IExpr that); /* {
+    return plus(that);
+  }*/
 
   /**
-   * <p>
-   * Set an evaluation flag.
-   * </p>
-   * <b>Note</b> only certain data structures like <code>IAST</code> and <code>ISparseArray</code>
-   * support evaluation flags, otherwise the <code>this</code> object will be returned without
-   * modification.
+   * Set an evaluation flag. <b>Note</b> only certain data structures like <code>IAST</code> and
+   * <code>ISparseArray</code> support evaluation flags, otherwise the <code>this</code> object will
+   * be returned without modification.
    *
    * @param evalFlags
    * @return
@@ -216,16 +262,36 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   IExpr addEvalFlags(final int evalFlags);
 
   /**
-   * @param leaves
-   * @return an IExpr instance with the current expression as head(), and leaves as leaves().
+   * Apply the <code>And</code> operator
+   *
+   * @param that
+   * @return
+   * @deprecated use {@link F#And(IExpr, IExpr)}
    */
-  IExpr apply(IExpr... leaves);
+  IExpr and(final IExpr that);/*{
+    return F.And(this, that);
+  }*/
 
   /**
    * @param leaves
    * @return an IExpr instance with the current expression as head(), and leaves as leaves().
    */
-  IExpr apply(List<? extends IExpr> leaves);
+  IExpr apply(IExpr... leaves);/*{
+    return F.ast(leaves, head());
+  }*/
+
+  /**
+   * @param leaves
+   * @return an IExpr instance with the current expression as head(), and leaves as leaves().
+   */
+  IExpr apply(List<? extends IExpr> leaves); /*{
+    return F.ast(leaves.toArray(new IExpr[leaves.size()]), head());
+    // final IASTMutable ast = F.ast(head() );
+    // for (int i = 0; i < leaves.size(); i++) {
+    // ast.append(leaves.get(i));
+    // }
+    // return ast;
+  }*/
 
   /**
    * Returns the <b>number of arguments</b> in this {@code IAST}. The <b>number of arguments</b>
@@ -235,20 +301,51 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @return the number of arguments in this {@code IAST}.
    * @see #size()
    */
-  int argSize();
+  int argSize(); /*{
+    return -1;
+  }*/
 
-  Object asType(Class<?> clazz);
+  Object asType(Class<?> clazz);/* {
+    if (clazz.equals(Boolean.class)) {
+      if (isTrue()) {
+        return Boolean.TRUE;
+      }
+      if (isFalse()) {
+        return Boolean.FALSE;
+      }
+    } else if (clazz.equals(Integer.class)) {
+      if (isReal()) {
+        try {
+          return Integer.valueOf(((ISignedNumber) this).toInt());
+        } catch (final ArithmeticException e) {
+        }
+      }
+    } else if (clazz.equals(java.math.BigInteger.class)) {
+      if (this instanceof IInteger) {
+        return new java.math.BigInteger(((IInteger) this).toByteArray());
+      }
+    } else if (clazz.equals(String.class)) {
+      return toString();
+    }
+    throw new UnsupportedOperationException("ExprImpl.asType() - cast not supported.");
+  }*/
 
   /**
    * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if
    * this object isn't an <code>AST</code>. Use this method if the AST gives <code>true</code> for
    * the <code>isPower()</code> method.
    *
-   * @return the first argument of the function represented by this <code>AST</code> or
-   * <code>F.NIL</code> if this
-   * object isn't an AST.
+   * @return the first argument of the function represented by this <code>AST</code> or <code>F.NIL
+   * </code> if this object isn't an AST.
    */
-  IExpr base();
+  IExpr base();/*{
+    if (Config.FUZZ_TESTING) {
+      if (!isPower() && !isAST(S.Surd)) {
+        throw new NullPointerException();
+      }
+    }
+    return first();
+  }*/
 
   /**
    * Compares this expression with the specified expression for order. Returns a negative integer,
@@ -256,35 +353,65 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * than the specified expression.
    */
   @Override
-  int compareTo(IExpr expr);
+  int compareTo(IExpr expr);/*{
+    if (expr.isAST()) {
+      // if (!expr.isDirectedInfinity()) {
+      return -1 * expr.compareTo(this);
+      // }
+    }
+    final int x = hierarchy();
+    final int y = expr.hierarchy();
+    return (x < y) ? -1 : ((x == y) ? 0 : 1);
+  }*/
 
   /**
    * Return the argument of a complex number.
    *
    * @return the argument of a complex number
    */
-  IExpr complexArg();
+  IExpr complexArg();/*{
+    return F.eval(F.Arg(this));
+  }*/
 
   /**
    * Conjugate this (complex-) number.
    *
    * @return the conjugate complex number
    */
-  IExpr conjugate();
+  IExpr conjugate(); /*{
+    return F.eval(F.Conjugate(this));
+  }*/
 
   /**
    * Get a nested list with <code>this</code> expression set as a value.
-   * <p>
+   *
    * <pre>
    * v.constantArray(2, 3) -> {{v, v, v}, {v, v, v}}
    * </pre>
    *
+   * @param head          the head for the new <code>IASTAppendable</code> objects.
    * @param startPosition the position from there to create the constant array recusively.
-   * @param arr the nested lists dimensions. <code>arr.length</code> must be greater
-   * <code>0</code>
+   * @param arr           the nested lists dimensions. <code>arr.length</code> must be greater <code>0</code>
    * @return <code>F.NIL</code> if <code>arr</code> has length 0.
    */
-  IASTAppendable constantArray(IExpr head, final int startPosition, int... arr);
+  IASTAppendable constantArray(IExpr head, final int startPosition, int... arr); /* {
+    final int size = arr[startPosition];
+    if (Config.MAX_AST_SIZE < size) {
+      ASTElementLimitExceeded.throwIt(size);
+    }
+    if (arr.length - 1 == startPosition) {
+      IExpr[] exprArr = new IExpr[size];
+      for (int i = 0; i < size; i++) {
+        exprArr[i] = this;
+      }
+      return F.ast(exprArr, head);
+    }
+    IExpr[] exprArr = new IExpr[size];
+    for (int i = 0; i < size; i++) {
+      exprArr[i] = constantArray(head, startPosition + 1, arr);
+    }
+    return F.ast(exprArr, head);
+  }*/
 
   /**
    * Return <code>negate()</code> if <code>number.sign() < 0</code>, otherwise return
@@ -292,14 +419,21 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @param number
    */
-  IExpr copySign(ISignedNumber number);
+  IExpr copySign(ISignedNumber number); /*{
+    return number.sign() < 0 ? negate() : this;
+  }
+*/
 
   /**
-   * Returns an <code>IExpr</code> whose value is <code>(this - 1)</code>. Calculates
-   * <code>F.eval(F.Subtract(this, C1))</code> in the common case and uses a specialized
-   * implementation for derived number classes.
+   * Returns an <code>IExpr</code> whose value is <code>(this - 1)</code>. Calculates <code>
+   * F.eval(F.Subtract(this, C1))</code> in the common case and uses a specialized implementation
+   * for derived number classes.
+   *
+   * @return
    */
-  IExpr dec();
+  IExpr dec(); /*{
+    return plus(F.CN1);
+  }*/
 
   /**
    * Calculates the depth of an expression. Atomic expressions (no sublists) have depth <code>1
@@ -317,12 +451,38 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   long determinePrecision();
 
   /**
+   * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
+   * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a
+   * specialized implementation for derived number classes.
+   */
+  @Override
+  IExpr divide(IExpr that); /*{
+    if (that.isOne()) {
+      return this;
+    }
+    if (that.isMinusOne()) {
+      return negate();
+    }
+    EvalEngine engine = EvalEngine.get();
+    if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
+      return engine.evaluate(F.Together(F.Times(this, that.inverse())));
+    }
+    return engine.evaluate(F.Times(this, that.inverse()));
+  }
+*/
+
+  @Override
+    /*default*/ IExpr[] egcd(IExpr b); /* {
+    throw new UnsupportedOperationException(toString());
+  }*/
+
+  /**
    * Calls <code>get(position).equals(expr)</code> if <code>this</code> is an <code>IAST</code>.
-   * Returns
-   * <code>false</code> otherwise.
+   * Returns <code>false</code> otherwise.
    *
    * @param position the position in the <code>IAST</code> which should be tested for equality
-   * @param expr the expression which should be tested for equality
+   * @param expr     the expression which should be tested for equality
+   * @return
    */
   boolean equalsAt(int position, final IExpr expr);
 
@@ -336,36 +496,133 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return <code>F.True, F.False or F.NIL</code
    */
-  IExpr equalTo(IExpr that);
+  IExpr equalTo(IExpr that); /* {
+    COMPARE_TERNARY temp = this.equalTernary(that, EvalEngine.get());
+    return convertToExpr(temp);
+  }*/
+
+
+  IExpr_COMPARE_TERNARY equalTernary(IExpr that, EvalEngine engine); /*{
+    if (isIndeterminate() || that.isIndeterminate()) {
+      return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+    }
+    if (this == that) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    }
+
+    IExpr arg1 = this;
+    IExpr arg2 = that;
+    if (!arg1.isReal() && arg1.isNumericFunction(x -> x.isDirectedInfinity() ? "" : null)) {
+      arg1 = engine.evalN(arg1);
+    }
+    if (!arg2.isReal() && arg2.isNumericFunction(x -> x.isDirectedInfinity() ? "" : null)) {
+      arg2 = engine.evalN(arg2);
+    }
+    if (arg2.isInexactNumber() && arg1.isExactNumber()) {
+      arg1 = engine.evalN(arg1);
+    }
+    if (arg1.isInexactNumber() && arg2.isExactNumber()) {
+      arg2 = engine.evalN(arg2);
+    }
+
+    if (isSame(that)) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    } else {
+      if (isConstantAttribute() && that.isConstantAttribute()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (isString() && that.isString()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+    if (arg2.isDirectedInfinity()) {
+      if (arg1.isNumber()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (arg1.isDirectedInfinity()) {
+        return arg1.equals(arg2) ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+    if (arg1.isDirectedInfinity()) {
+      if (arg2.isNumber()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (arg2.isDirectedInfinity()) {
+        return arg1.equals(arg2) ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+
+    IExpr difference = engine.evaluate(F.Subtract(arg1, arg2));
+    if (difference.isNumber()) {
+      if (difference.isZero()) {
+        return IExpr_COMPARE_TERNARY.TRUE;
+      }
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+    if (difference.isConstantAttribute()) {
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+
+    if (arg1.isNumber() && arg2.isNumber()) {
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+
+    return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+  }*/
 
   /**
-   * Evaluate the expression to a <code>INumber</code> value.
+   * Evaluate the expression to a <code>Complex</code> value.
    *
-   * @return <code>null</code> if the conversion is not possible.
+   * @return
+   * @throws ArgumentTypeException
    */
-  Complex evalComplex();
+  Complex evalComplex() throws ArgumentTypeException; /*{
+    return EvalEngine.get().evalComplex(this);
+  }*/
+
+
+  double evalDouble() throws ArgumentTypeException; /*{
+    return EvalEngine.get().evalDouble(this);
+  }*/
+
 
   /**
    * Evaluate the expression to a Java <code>double</code> value. If the conversion to a double
-   * value is not possible, the method throws a <code>WrongArgumentType</code> exception.
+   * value is not possible, the method throws an exception.
    *
    * @return this expression converted to a Java <code>double</code> value.
    */
-  double evalDouble();
+  double getReal() throws ArgumentTypeException; /*{
+    return evalDouble();
+  }*/
+
 
   /**
    * Evaluate the expression to a <code>INumber</code> value.
    *
    * @return <code>null</code> if the conversion is not possible.
    */
-  INumber evalNumber();
+  INumber evalNumber(); /*{
+    if (isNumber()) {
+      IExpr result = EvalEngine.get().evalN(this);
+      if (result.isNumber()) {
+        return (INumber) result;
+      }
+    }
+    return null;
+  }*/
 
   /**
    * Evaluate the expression to a <code>ISignedNumber</code> value.
    *
    * @return <code>null</code> if the conversion is not possible.
    */
-  ISignedNumber evalReal();
+  ISignedNumber evalReal(); /*{
+    if (isReal()) {
+      return (ISignedNumber) this;
+    }
+    return null;
+  }*/
 
   /**
    * Evaluate the expression to a <code>ISignedNumber</code> value.
@@ -383,21 +640,42 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @param engine the evaluation engine
    * @return the evaluated Object or <code>F.NIL</code> if the evaluation is not possible (i.e. the
-   *     evaluation doesn't change the object).
+   * evaluation doesn't change the object).
    */
   IExpr evaluate(EvalEngine engine); /*{
     return F.NIL;
   }*/
 
-  IExpr evaluateHead(IAST ast, EvalEngine engine);
+  IExpr evaluateHead(IAST ast, EvalEngine engine); /*
+    IExpr result = engine.evaluateNIL(this);
+    if (result.isPresent()) {
+      // set the new evaluated header !
+      return ast.apply(result);
+    }
+    return F.NIL;
+  }*/
 
   /**
-   * Get the second element of this <code>Power(base, exponent)</code> expression.
+   * Get the second element of this <code>AST</code> list (i.e. get(2)). Return <code>F.NIL</code>
+   * if this object isn't an <code>AST</code>. Use this method if the AST gives <code>true</code>
+   * for the <code>isPower()</code> method.
+   *
+   * @return the second argument of the function represented by this <code>AST</code> or <code>F.NIL
+   * </code> if this object isn't an AST.
    */
-  IExpr exponent();
+  IExpr exponent(); /*{
+    if (Config.FUZZ_TESTING) {
+      if (!isPower() && !isAST(S.Surd)) {
+        throw new NullPointerException();
+      }
+    }
+    return second();
+  }*/
 
   @Override
-  ElemFactory<IExpr> factory();
+  ElemFactory<IExpr> factory(); /*{
+    return ExprRingFactory.CONST;
+  }*/
 
   /**
    * Get the first element of this <code>AST</code> list (i.e. get(1)). Return <code>F.NIL</code> if
@@ -407,16 +685,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>F.NIL</code> if this
    * object isn't an AST.
    */
-  IExpr first();
-
-  /**
-   * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return
-   * <code>F.NIL</code> if this object isn't an <code>AST</code>.
-   *
-   * @return the last argument of the function represented by this <code>AST</code>.
-   * @see IExpr#head()
-   */
-  IExpr last();
+  IExpr first(); /*{
+    return F.NIL;
+  }*/
 
   /**
    * Return the <code>FullForm()</code> of this expression
@@ -432,9 +703,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    */
   IInteger[] gaussianIntegers();
 
-  IExpr gcd(IExpr that);
-
-  IExpr[] egcd(IExpr b);
+  IExpr gcd(IExpr that); /* {
+    return S.GCD.of(this, that);
+  }*/
 
   /**
    * Get the element at the specified <code>index</code> if this object is of type
@@ -443,6 +714,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @param index
    */
   IExpr getAt(final int index);
+
+
+  @Override
+    /*public default*/ Field<IExpr> getField(); /*{
+    return F.EXPR_FIELD;
+  }*/
 
   IExpr getOptionalValue();
 
@@ -491,7 +768,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @param pattern a pattern-matching expression
    * @return
    */
-  boolean has(IExpr pattern);
+  boolean has(IExpr pattern); /* {
+    return isFree(pattern, true);
+  }*/
 
   /**
    * Returns <code>false</code>, if <b>all of the elements</b> in the subexpressions or the
@@ -508,9 +787,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * expression itself, match the given pattern.
    *
    * @param pattern a pattern-matching expression
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested and
-   * not the
-   * <code>Head[]</code> element.
+   * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                not the
+   *                <code>Head[]</code> element.
    * @return
    */
   boolean has(IExpr pattern, boolean heads);
@@ -520,9 +799,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * expression itself, satisfy the given unary predicate.
    *
    * @param predicate a unary predicate
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested
-   * and not the
-   * <code>Head[]</code> element.
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested
+   *                  and not the
+   *                  <code>Head[]</code> element.
    * @return
    */
   boolean has(Predicate<IExpr> predicate, boolean heads);
@@ -566,7 +845,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * If a value is present, performs the given <code>consumer</code> with the value, otherwise
    * performs the given empty-based action.
    *
-   * @param consumer the action to be performed, if a value is present
+   * @param consumer    the action to be performed, if a value is present
    * @param emptyAction the empty-based action to be performed, if no value is present
    */
   void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction);
@@ -624,9 +903,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Return the internal Java form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
    * @return the internal Java form of this expression
    */
   String internalFormString(boolean symbolsAsFactoryMethod, int depth);
@@ -635,12 +914,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Return the internal Java form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
-   * @param useOperators use operators instead of function names for representation of
-   * Plus, Times, Power,...
-   * @param usePrefix use the <code>F....</code> class prefix for genrating Java code.
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
+   * @param useOperators           use operators instead of function names for representation of
+   *                               Plus, Times, Power,...
+   * @param usePrefix              use the <code>F....</code> class prefix for genrating Java code.
    * @return the internal Java form of this expression
    */
   String internalJavaString(
@@ -658,9 +937,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Return the internal Scala form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
    * @return the internal Scala form of this expression
    */
   String internalScalaString(boolean symbolsAsFactoryMethod, int depth);
@@ -779,8 +1058,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @param header the header element at position 0, which should be tested
    * @param length the size the AST expression must have
-   * @param args the arguments of this AST which should be tested, if they are equal, a
-   * <code>null</code> value argument skips the equals check.
+   * @param args   the arguments of this AST which should be tested, if they are equal, a
+   *               <code>null</code> value argument skips the equals check.
    * @see #isAtom()
    */
   boolean isAST(IExpr header, int length, IExpr... args);
@@ -792,7 +1071,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>1..(length-1)</code>. If this
    * test gives <code>true</code> this expression is not an <b>atomic expression</b>.
    *
-   * @param header the header element at position 0, which should be tested
+   * @param header    the header element at position 0, which should be tested
    * @param minLength the minimum size the AST expression must have
    * @param maxLength the maximum size the AST expression must have
    * @see #isAtom()
@@ -816,7 +1095,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * </p>
    *
    * @param headerStr string representation of the <b>header element</b> at index position
-   * <code>0</code>
+   *                  <code>0</code>
    * @see #isAtom()
    */
   boolean isAST(String headerStr);
@@ -831,8 +1110,8 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * </p>
    *
    * @param headerStr string representation of the <b>header element</b> at index position
-   * <code>0</code>
-   * @param length the size the AST expression must have
+   *                  <code>0</code>
+   * @param length    the size the AST expression must have
    * @return
    * @see #isAtom()
    */
@@ -1054,7 +1333,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return
    */
-  boolean isDataset();
+  boolean isDataset(); /* {
+    return this instanceof IASTDataset;
+  }*/
 
   /**
    * Test if this expression is the function <code>Defer[&lt;arg&gt;]</code>
@@ -1062,61 +1343,63 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isDefer();
 
   /**
-   * <p>
-   * Test if this expression is a <code>Derivative[number, ...][symbol][arg,...]</code> or
-   * <code>Derivative[number][symbol]</code> expression and return the corresponding
-   * <code>IAST</code> structures.
-   * <ul>
-   * <li>The expression at index <code>[0]</code> contains the <code>Derivative[number, ...]</code> AST part.</li>
-   * <li>The expression at index <code>[1]</code> contains the <code>Derivative[...][symbol]</code> AST part.</li>
-   * <li>The expression at index <code>[2]</code> contains the <code>Derivative[...][...][arg, ...]</code> AST part,
-   * if available.</li>
-   * </ul>
-   * </p>
-   * <p>
-   * <b>Note:</b> the result at index <code>[2]</code> maybe <code>null</code> , if no argument is available.
-   * </p>
+   * Test if this expression is a <code>Derivative[number, ...][symbol][arg,...]</code> or <code>
+   * Derivative[number][symbol]</code> expression and return the corresponding <code>IAST</code>
+   * structures.
    *
-   * @return <code>null</code> if the expression is not a <code>Derivative[number, ...][symbol][arg,
-   * ...]</code> or
-   * <code>Derivative[number, ...][symbol]</code> expression.
+   * <ul>
+   *   <li>The expression at index <code>[0]</code> contains the <code>Derivative[number, ...]
+   *       </code> AST part.
+   *   <li>The expression at index <code>[1]</code> contains the <code>Derivative[...][symbol]
+   *       </code> AST part.
+   *   <li>The expression at index <code>[2]</code> contains the <code>
+   *       Derivative[...][...][arg, ...]</code> AST part, if available.
+   * </ul>
+   *
+   * <p><b>Note:</b> the result at index <code>[2]</code> maybe <code>null</code> , if no argument
+   * is available.
+   *
+   * @return <code>null</code> if the expression is not a <code>
+   * Derivative[number, ...][symbol][arg, ...]</code> or <code>Derivative[number, ...][symbol]
+   * </code> expression.
    */
   IAST[] isDerivative();
 
   /**
-   * <p>
-   * Test if this expression is a <code>Derivative[number][symbol][arg]</code> or
-   * <code>Derivative[number][symbol]</code> expression with one argument and return the
-   * corresponding
+   * Test if this expression is a <code>Derivative[number][symbol][arg]</code> or <code>
+   * Derivative[number][symbol]</code> expression with one argument and return the corresponding
    * <code>IAST</code> structures.
-   * <ul>
-   * <li>The expression at index <code>[0]</code> contains the <code>Derivative[number,...]</code> AST part.</li>
-   * <li>The expression at index <code>[1]</code> contains the <code>Derivative[...][symbol]</code> AST part.</li>
-   * <li>The expression at index <code>[2]</code> contains the <code>Derivative[...][...][arg]</code> AST part, if
-   * available.</li>
-   * </ul>
-   * </p>
-   * <p>
-   * <b>Note:</b> the result at index <code>[2]</code> maybe <code>null</code> , if no argument is available.
-   * </p>
    *
-   * @return <code>null</code> if the expression is not a <code>Derivative[number][symbol][arg]</code>
-   * or
-   * <code>Derivative[number][symbol]</code> expression.
+   * <ul>
+   *   <li>The expression at index <code>[0]</code> contains the <code>Derivative[number,...]</code>
+   *       AST part.
+   *   <li>The expression at index <code>[1]</code> contains the <code>Derivative[...][symbol]
+   *       </code> AST part.
+   *   <li>The expression at index <code>[2]</code> contains the <code>Derivative[...][...][arg]
+   *       </code> AST part, if available.
+   * </ul>
+   *
+   * <p><b>Note:</b> the result at index <code>[2]</code> maybe <code>null</code> , if no argument
+   * is available.
+   *
+   * @return <code>null</code> if the expression is not a <code>Derivative[number][symbol][arg]
+   * </code> or <code>Derivative[number][symbol]</code> expression.
    */
   IAST[] isDerivativeAST1();
 
   /**
-   * Test if this expression is representing a DirectedInfinity (i.e.
-   * <code>Infinity->DirectedInfinity[1]</code>,
-   * <code>-Infinity->DirectedInfinity[-1]</code>, <code>ComplexInfinity->DirectedInfinity[]</code>)
+   * Test if this expression is representing a DirectedInfinity (i.e. <code>
+   * Infinity->DirectedInfinity[1]</code>, <code>-Infinity->DirectedInfinity[-1]</code>, <code>
+   * ComplexInfinity->DirectedInfinity[]</code>)
+   *
+   * @return
    */
   boolean isDirectedInfinity();
 
   /**
-   * Test if this expression is representing a DirectedInfinity (i.e.
-   * <code>Infinity->DirectedInfinity[1]</code>,
-   * <code>-Infinity->DirectedInfinity[-1]</code>, <code>ComplexInfinity->DirectedInfinity[]</code>)
+   * Test if this expression is representing a DirectedInfinity (i.e. <code>
+   * Infinity->DirectedInfinity[1]</code>, <code>-Infinity->DirectedInfinity[-1]</code>, <code>
+   * ComplexInfinity->DirectedInfinity[]</code>)
    *
    * @param x
    */
@@ -1145,8 +1428,25 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <br>
    * See <a href="http://en.wikipedia.org/wiki/E_%28mathematical_constant%29">e (mathematical
    * constant)</a>
+   *
+   * @return
    */
   boolean isE();
+
+  /**
+   * Test if this expression is an DirectedEdge, UndirectedEdge, Rule, TwoWayRule.
+   *
+   * @return
+   */
+  boolean isEdge();
+
+  /**
+   * Test if this expression is an empty list (i.e. a list <code>{}</code>)
+   *
+   * @return
+   */
+  boolean isEmptyList();
+
 
   /**
    * Test if this expression is the function <code>Equal[&lt;arg1&gt;, &lt;arg2&gt;]</code>
@@ -1224,42 +1524,80 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @see #isAtom()
    */
-  boolean isFlatAST();
+  boolean isFlatAST();/* {
+    return false;
+  }*/
 
   /**
    * Test if this expression is a fractional number, but no integer number.
    */
-  boolean isFraction();
+  boolean isFraction(); /* {
+    return this instanceof IFraction;
+  }*/
 
   /**
-   * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
-   * expression itself, did not match the given pattern. Calls <code>isFree(pattern, true)</code>.
+   * Returns <code>true</code>, if <b>all of the elements</b> (including the head expression) in the
+   * subexpressions or the expression itself, did not match the given pattern. Calls <code>
+   * isFree(pattern, true)</code>.
    *
    * @param pattern a pattern-matching expression
+   * @return
    */
-  boolean isFree(IExpr pattern);
+  boolean isFree(IExpr pattern); /*{
+    return isFree(pattern, true);
+  }*/
 
   /**
    * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
    * expression itself, did not match the given pattern.
    *
    * @param pattern a pattern-matching expression
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested and
-   * not the
-   * <code>Head[]</code> element.
+   * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                not the <code>Head[]</code> element.
+   * @return
    */
-  boolean isFree(IExpr pattern, boolean heads);
+  boolean isFree(IExpr pattern, boolean heads); /*{
+    if (pattern.isSymbol() || pattern.isNumber() || pattern.isString()) {
+      return isFree(x -> x.equals(pattern), heads);
+    }
+    final IPatternMatcher matcher;
+    if (pattern.isOrderlessAST() && pattern.isFreeOfPatterns()) {
+      // append a BlankNullSequence[] to match the parts of an Orderless expression
+      IPatternSequence blankNullRest = F.$ps(null, true);
+      IASTAppendable newPattern = ((IAST) pattern).copyAppendable();
+      newPattern.append(blankNullRest);
+      matcher = new PatternMatcher(newPattern);
+    } else {
+      matcher = new PatternMatcher(pattern);
+    }
+    return !has(matcher, heads);
+  }*/
 
   /**
    * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
    * expression itself, did not satisfy the given unary predicate.
    *
    * @param predicate a unary predicate
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested
-   * and not the
-   * <code>Head[]</code> element.
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                  not the <code>Head[]</code> element.
+   * @return
    */
-  boolean isFree(Predicate<IExpr> predicate, boolean heads);
+  /*default*/ boolean isFree(IPatternMatcher predicate, boolean heads); /*{
+    return !predicate.test(this);
+  }*/
+
+  /**
+   * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
+   * expression itself, did not satisfy the given unary predicate.
+   *
+   * @param predicate a unary predicate
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested
+   *                  and not the
+   *                  <code>Head[]</code> element.
+   */
+  boolean isFree(Predicate<IExpr> predicate, boolean heads); /*{
+    return !predicate.test(this);
+  }*/
 
   /**
    * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
@@ -1267,7 +1605,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @param pattern a pattern-matching expression
    */
-  boolean isFreeAST(IExpr pattern);
+  boolean isFreeAST(IExpr pattern); /*{
+    return true;
+  }*/
 
   /**
    * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
@@ -1275,7 +1615,10 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @param predicate a unary predicate
    */
-  boolean isFreeAST(Predicate<IExpr> predicate);
+  boolean isFreeAST(Predicate<IExpr> predicate);/*
+  {
+    return true;
+  }*/
 
   /**
    * Returns <code>true</code>, if <b>all of the elements</b> in the subexpressions or the
@@ -1286,10 +1629,15 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isFreeOfPatterns();
 
   /**
-   * Test if this expression is a <code>Function( arg1 )</code> expression with at least 1
-   * argument.
+   * Test if this expression is a <code>Function( arg1 )</code> or <code>Function( arg1, arg2 )
+   * </code> expression with at least 1 argument.
+   *
+   * @return
+   * @see #isPureFunction()
    */
-  boolean isFunction();
+  boolean isFunction(); /* {
+    return false;
+  }*/
 
   /**
    * Compares this expression with the specified expression for order. Returns true if this
@@ -1298,7 +1646,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @param expr an expression to compare with
    * @return true if this expression is canonical greater than or equal to the specified expression.
    */
-  boolean isGEOrdered(IExpr expr);
+  boolean isGEOrdered(IExpr expr); /*{
+    return compareTo(expr) >= 0;
+  }*/
 
   /**
    * Compares this expression with the specified expression for order. Returns true if this
@@ -1307,21 +1657,44 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @param expr an expression to compare with
    * @return true if this expression is canonical greater than the specified expression.
    */
-  boolean isGTOrdered(IExpr expr);
+  boolean isGTOrdered(IExpr expr); /* {
+    return compareTo(expr) > 0;
+  }*/
+
+  /**
+   * Test if this expression is an AST list, which contains a <b>header element</b> with attribute
+   * {@link ISymbol#HOLDALLCOMPLETE} at index position <code>0</code>.
+   *
+   * @return
+   */
+  /*default*/ boolean isHoldAllCompleteAST();/*{
+    return false;
+  }*/
 
   /**
    * Test if this expression is th symbol <code>Hold</code> or <code>HoldForm</code>
+   *
+   * @return
    */
   boolean isHoldOrHoldFormOrDefer();
 
   /**
-   * Test if this expression is the <code>HoldPattern</code> function
-   * <code>HoldPattern[&lt;expression&gt;]</code> or the deprecated <code>Literal[&lt;expression&gt;]</code>
-   * form.
+   * Test if this expression is the <code>HoldPattern</code> function <code>
+   * HoldPattern[&lt;expression&gt;]</code> or the deprecated <code>Literal[&lt;expression&gt;]
+   * </code> form.
    *
    * @return
    */
   boolean isHoldPatternOrLiteral();
+
+  /**
+   * Test if this expression is a hyperbolic function.
+   *
+   * <p><b> Note</b>: All detected function types have 1 argument.
+   *
+   * @return
+   */
+  boolean isHyperbolicFunction();
 
   /**
    * Test if this expression is representing <code>I</code>.
@@ -1338,18 +1711,28 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Test if this expression is an inexact number. I.e. an instance of type <code>INum</code> or
    * <code>IComplexNum</code>.
    */
-  boolean isInexactNumber();
+  boolean isInexactNumber(); /*{
+    return this instanceof INum || this instanceof IComplexNum;
+  }*/
 
   /**
-   * Test if this expression is representing <code>Infinity</code> (i.e.
-   * <code>Infinity->DirectedInfinity[1]</code>)
+   * Test if this expression is representing <code>Infinity</code> (i.e. <code>
+   * Infinity->DirectedInfinity[1]</code>)
+   *
+   * @return
    */
-  boolean isInfinity();
+  boolean isInfinity(); /*{
+    return false;
+  }*/
 
   /**
-   * Test if this expression is a integer number
+   * Test if this expression is a integer number (i.e. instance of type <code>IInteger</code>):
+   *
+   * @return
    */
-  boolean isInteger();
+  boolean isInteger(); /*{
+    return this instanceof IInteger;
+  }*/
 
 
   /**
@@ -1359,22 +1742,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @return <code>true</code>, if the given expression is a integer function or value.
    * @see #isRealResult()
    */
-  boolean isIntegerResult();
+  boolean isIntegerResult(); /* {
+    if (S.True.equals(AbstractAssumptions.assumeInteger(this))) {
+      return true;
+    }
+    return this instanceof IInteger;
+  }*/
 
   /**
    * Test if this expression is an interval expression with one or more <code>List[min, max]</code>
-   * arguments
-   * <code>Interval[{min1, max1}, {min2, max2}, ...]</code> which represent the union of the
-   * interval ranges.
+   * arguments <code>Interval[{min1, max1}, {min2, max2}, ...]</code> which represent the union of
+   * the interval ranges.
+   *
+   * @return
    */
-  boolean isInterval();
+  boolean isInterval(); /*{
+    return false;
+  }*/
 
   /**
-   * Test if this expression is an interval expression with one <code>List[min, max]</code>
-   * argument
+   * Test if this expression is an interval expression with one <code>List[min, max]</code> argument
    * <code>Interval[{min, max}]</code>
+   *
+   * @return
    */
-  boolean isInterval1();
+  boolean isInterval1(); /*{
+    return false;
+  }*/
 
   /**
    * Compares this expression with the specified expression for order. Returns true if this
@@ -1383,16 +1777,27 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @param expr an expression to compare with
    * @return true if this expression is canonical less than or equal to the specified expression.
    */
-  boolean isLEOrdered(IExpr expr);
+  boolean isLEOrdered(IExpr expr); /*{
+    return compareTo(expr) <= 0;
+  }*/
 
   /**
    * Test if this expression is a list (i.e. an AST with head List)
+   *
+   * @return
    */
   boolean isList();/*{
     return false;
   }*/
 
-  boolean isList(Predicate<IExpr> pred); /*{
+  /**
+   * Test if this expression is a list (i.e. an AST with head List) with all arguments fulfill the
+   * predicate.
+   *
+   * @param predicate
+   * @return
+   */
+  boolean isList(Predicate<IExpr> predicate); /*{
     return false;
   }*/
 
@@ -1411,75 +1816,89 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return
    */
-  boolean isList2();
+  boolean isList2(); /* {
+    return isList() && size() == 3;
+  }*/
 
   /**
    * Test if this expression is a list (i.e. an AST with head List) with exactly 2 arguments
    *
    * @return
    */
-  boolean isList3();
+  boolean isList3(); /*{
+    return isList() && size() == 4;
+  }*/
 
   /**
    * Test if this expression is a list of DirectedEdge or UndirectedEdge
    *
    * @return
    */
-  GraphType isListOfEdges();
+  GraphType isListOfEdges(); /*{
+    return null;
+  }*/
 
   /**
-   * Test if this expression is a list of lists
+   * Test if this expression is a list of lists <code>{{...},{...},...}</code> and contains at least
+   * 1 sublist. The sublists are allowed to be empty lists.
    *
+   * @return
    * @see #isList()
    * @see #isMatrix(boolean)
    * @see #isVector()
    */
-  boolean isListOfLists();
+  boolean isListOfLists(); /*{
+    return false;
+  }*/
 
 
   /**
-   * Test if this expression is an DirectedEdge, UndirectedEdge, Rule, TwoWayRule.
+   * Test if this expression is a list of matrices and contains at least 1 matrix.
    *
    * @return
    */
-  boolean isEdge();
-
-  /**
-   * Test if this expression is an empty list (i.e. a list <code>{}</code>)
-   *
-   * @return
-   */
-  boolean isEmptyList();
-
-  /**
-   * Test if this expression is a list of matrices
-   *
-   * @return
-   */
-  boolean isListOfMatrices();
+  boolean isListOfMatrices(); /*{
+    return false;
+  }*/
 
   /**
    * Test if this expression is a list of rules (head Rule or RuleDelayed)
    *
-   * @see #isList()
-   * @see #isMatrix(boolean)
-   * @see #isVector()
-   */
-  boolean isListOfRules();
-
-  /**
-   * Test if this expression is a list of rules (head Rule or RuleDelayed)
-   *
-   * @param ignoreEmptyList if <code>true</code>, ignore elements which equals an empty list <code>{
-   * }</code>
    * @return
    * @see #isList()
    * @see #isMatrix(boolean)
    * @see #isVector()
    */
-  boolean isListOfRules(boolean ignoreEmptyList);
+  boolean isListOfRules(); /*{
+    return isListOfRules(false);
+  }*/
 
-  boolean isListOfRulesOrAssociation(boolean ignoreEmptyList);
+  /**
+   * Test if this expression is a list of rules (head Rule or RuleDelayed)
+   *
+   * @param ignoreEmptySublists if <code>true</code>, ignore elements which equals an empty list
+   *                            <code>
+   *                            { }</code>
+   * @return
+   * @see #isList()
+   * @see #isMatrix(boolean)
+   * @see #isVector()
+   */
+  boolean isListOfRules(boolean ignoreEmptySublists); /* {
+    return false;
+  }*/
+
+  /**
+   * Test if this expression is a list of rules (head Rule or RuleDelayed) or an Association.
+   *
+   * @param ignoreEmptySublists if <code>true</code>, ignore elements which equals an empty list
+   *                            <code>
+   *                            { }</code> but only in lists.
+   * @return
+   */
+  boolean isListOfRulesOrAssociation(boolean ignoreEmptyList); /*{
+    return false;
+  }*/
 
 
   /**
@@ -1566,9 +1985,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * expression itself, satisfy the given unary predicate.
    *
    * @param predicate a unary predicate
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested
-   * and not the
-   * <code>Head[]</code> element.
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested
+   *                  and not the
+   *                  <code>Head[]</code> element.
    * @return
    */
   boolean isMember(Predicate<IExpr> predicate, boolean heads);
@@ -1579,11 +1998,11 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * operates at level 1.
    *
    * @param pattern a pattern-matching expression
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested and
-   * not the
-   * <code>Head[]</code> element.
+   * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                not the
+   *                <code>Head[]</code> element.
    * @param visitor if <code>null</code> use <code>VisitorBooleanLevelSpecification(predicate, 1,
-   * heads)</code>
+   *                heads)</code>
    * @return
    */
   boolean isMember(IExpr pattern, boolean heads, IVisitorBoolean visitor);
@@ -1672,7 +2091,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   /**
    * Test if this expression is a number. I.e. an instance of type <code>INumber</code>.
    */
-  boolean isNumber();
+  boolean isNumber(); /*{
+    return false;
+  }*/
 
   /**
    * Check if this expression equals an <code>IInteger</code> value. The value of an
@@ -1730,12 +2151,12 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * (with attribute NumericFunction) where all arguments are also &quot;numeric functions&quot;)
    *
    * @param allowList if <code>true</code> a <code>List(...)</code> AST is seen, as if it has
-   * attribute {@link ISymbol#NUMERICFUNCTION}
+   *                  attribute {@link ISymbol#NUMERICFUNCTION}
    * @return <code>true</code>, if the given expression is a numeric function or value.
    * @see #isRealResult()
    */
   boolean isNumericFunction(boolean allowList);/*{
-    return isNumber() || isConstantAttribute();
+    return false;
   }*/
 
   /**
@@ -1746,7 +2167,9 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * @return <code>true</code>, if the given expression is a numeric function or value, assuming all
    * variables contained in <code>varSet</code> are also numeric.
    */
-  boolean isNumericFunction(VariablesSet varSet);
+  boolean isNumericFunction(VariablesSet varSet); /*{
+    return isNumericFunction(true) || varSet.contains(this);
+  }*/
 
   /**
    * Test if this expression is a numeric function (i.e. a number, a symbolic constant or a function
@@ -1803,25 +2226,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   @Override
   boolean isONE();
 
-
-  /**
-   * Additional multiply method which works like <code>times()</code> to fulfill groovy's method
-   * signature
-   *
-   * @see IExpr#times(IExpr)
-   */
-  @Override
-  IExpr multiply(final IExpr that);
-
-  /**
-   * Returns an <code>IExpr</code> whose value is <code>(this / that)</code>. Calculates
-   * <code>F.eval(F.Times(this, F.Power(that, F.CN1)))</code> in the common case and uses a
-   * specialized implementation for derived number classes.
-   */
-  @Override
-  IExpr divide(IExpr that);
-
-  IExpr remainder(IExpr that);
 
   /**
    * Returns the multiplicative inverse of this object. It is the object such as
@@ -2014,7 +2418,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Test if this expression is a polynomial of <code>maxDegree</code> (i.e. the maximum exponent <=
    * maxDegree) for the given <code>variable</code>.
    *
-   * @param variable the variable of the polynomial
+   * @param variable  the variable of the polynomial
    * @param maxDegree the maximum degree of the polynomial; maxDegree must be greater 0
    */
   boolean isPolynomialOfMaxDegree(ISymbol variable, long maxDegree);
@@ -2083,6 +2487,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isPureFunction(); /*{
     return false;
   }*/
+
   /**
    * Test if this expression is a Quantity(a,unit) expression.
    *
@@ -2279,7 +2684,22 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   /**
    * Test if this expression is a string (instanceof IStringX)
    */
-  boolean isString();
+  boolean isString(); /*{
+    return this instanceof IStringX;
+  }*/
+
+  /**
+   * Test if this expression is a string (instanceof IStringX) and equals <code>str</code>
+   *
+   * @return
+   */
+  boolean isString(String str);/*{
+    return this instanceof IStringX && toString().equals(str);
+  }*/
+
+  boolean isStringIgnoreCase(String str); /*{
+    return this instanceof IStringX && toString().equalsIgnoreCase(str);
+  }*/
 
   /**
    * Test if this expression is the function <code>Subscript[var, &lt;integer-value&gt;]</code>.
@@ -2290,13 +2710,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isSubscript(); /*{
     return false;
   }*/
-
-  /**
-   * Test if this expression is a symbol (instanceof ISymbol)
-   *
-   * @return
-   */
-  boolean isString(String str);
 
   /**
    * Test if this expression is a symbol (instanceof ISymbol)
@@ -2422,12 +2835,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
     return -1;
   }*/
 
-  /**
-   * Test if this expression is a hyperbolic function.
-   *
-   * @return
-   */
-  boolean isHyperbolicFunction();
 
   /**
    * Test if this expression is a special pattern-matching function (i.e. Alternatives, Except,...)
@@ -2460,21 +2867,41 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   boolean isZero();
 
   /**
+   * Test if this expression equals <code>0</code> in symbolic or numeric mode. For the numeric test
+   * multiple random numbers with a <code>Chop()</code> function test are used.
+   *
+   * @param fastTest checks only numerical; no symbolic tests are tried.
+   * @return
+   */
+  /*default*/ boolean isPossibleZero(boolean fastTest); /* {
+    return isZero();
+  }*/
+
+  /**
    * {@inheritDoc}
    *
    * @deprecated use {@link #isZero()} instead.
    */
   @Override
-  boolean isZERO();
+  boolean isZERO(); /*{
+    if (isNumber()) {
+      return isZero();
+    }
+    return isAST() && PredicateQ.isPossibleZeroQ((IAST) this, false, EvalEngine.get());
+    // PredicateQ.isZeroTogether(this, EvalEngine.get());
+  }*/
 
   /**
-   * Signum functionality is used in JAS toString() method, don't use it as math signum function.
+   * Get the last element of the <code>AST</code> list (i.e. get(size()-1). Return <code>F.NIL
+   * </code> if this object isn't an <code>AST</code>or has <code>0</code> arguments (i.e. only a
+   * header element)
    *
-   * @deprecated
+   * @return the last argument of the function represented by this <code>AST</code> or {@link F#NIL}
+   * @see IExpr#head()
    */
-  @Deprecated
-  @Override
-  int signum();
+  IExpr last(); /*{
+    return F.NIL;
+  }*/
 
   @Override
   IExpr sum(final IExpr that);
@@ -2482,8 +2909,6 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   @Override
   IExpr subtract(IExpr that);
 
-  @Override
-  IExpr abs();
 
   /**
    * Count the number of leaves of this expression.
@@ -2564,11 +2989,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   IExpr lower();
 
   /**
-   * Returns an <code>IExpr</code> whose value is <code>(this - that)</code>. Calculates
-   * <code>F.eval(F.Plus(this, F.Times(F.CN1, that)))</code> in the common case and uses a
-   * specialized implementation for derived number classes.
+   * If a value is present (i.e. this unequals F.NIL), apply the provided mapping function to it,
+   * and if the result is non-NIL, return the result. Otherwise return <code>F.NIL</code>
+   *
+   * @param mapper a mapping function to apply to the value, if present
+   * @return an IExpr describing the result of applying a mapping function to the value of this
+   * object, if a value is present, otherwise return <code>F.NIL</code>.
    */
-  IExpr minus(final IExpr that);
+  IExpr mapExpr(Function<? super IExpr, ? extends IExpr> mapper);
 
   /**
    * <p>
@@ -2579,28 +3007,88 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>{f.apply({x1, x2,...}), f.apply({y1, y2, ...}), ...}</code>
    *
    * @param dim the dimension of the matrix
-   * @param f a unary function
+   * @param f   a unary function
    * @return
    */
   IExpr mapMatrixColumns(int[] dim, Function<IExpr, IExpr> f);
 
   /**
-   * If a value is present (i.e. this unequals F.NIL), apply the provided mapping function to it,
-   * and if the result is non-NIL, return the result. Otherwise return <code>F.NIL</code>
+   * Returns an <code>IExpr</code> whose value is <code>(this - that)</code>. Calculates <code>
+   * F.eval(F.Plus(this, F.Times(F.CN1, that)))</code> in the common case and uses a specialized
+   * implementation for derived number classes.
    *
-   * @param mapper a mapping function to apply to the value, if present
-   * @return an IExpr describing the result of applying a mapping function to the value of this
-   * object, if a value is present, otherwise return <code>F.NIL</code>.
+   * @param that
+   * @return
    */
-  IExpr mapExpr(Function<? super IExpr, ? extends IExpr> mapper);
+  IExpr minus(final IExpr that); /*{
+    return subtract(that);
+  }*/
 
   IExpr mod(final IExpr that);
+
+  /**
+   * Get the elements of the <code>AST</code> or <code>ASTAssociation
+   * </code> list with the last element removed. Return <code>F.NIL</code> if this object isn't an
+   * <code>AST</code> or <code>ASTAssociation
+   * </code>.
+   *
+   * @return the argument of the function represented by this <code>AST</code> with the last element
+   * removed or {@link F#NIL}
+   * @see IExpr#head()
+   */
+  /*default*/ IExpr most(); /*{
+    return F.NIL;
+  }*/
+
+  /**
+   * Additional multiply method which works with overriden <code>JAS</code> method.
+   *
+   * @param that
+   * @return
+   * @see IExpr#times(IExpr)
+   */
+  @Override
+  IExpr multiply(final IExpr that); /*{
+    // if (isZero()) {
+    // return this;
+    // }
+    // if (that.isZero()) {
+    // return that;
+    // }
+    // if (isOne()) {
+    // return that;
+    // }
+    // if (that.isOne()) {
+    // return this;
+    // }
+    // if (isPlus() && !that.isPlus()) {
+    // if (that.isAtom() || (that.isPower() && that.base().isAtom())) {
+    // IExpr temp = ((IAST) this).mapThread(F.binaryAST2(F.Times, null, that), 1);
+    // return EvalEngine.get().evaluate(temp);
+    // }
+    // } else if (!isPlus() && that.isPlus()) {
+    // if (isAtom() || (isPower() && base().isAtom())) {
+    // IExpr temp = ((IAST) that).mapThread(F.binaryAST2(F.Times, this, null), 2);
+    // return EvalEngine.get().evaluate(temp);
+    // }
+    // }
+    return times(that);
+  }*/
+
+  @Override
+  IExpr multiply(int n); /* {
+    if (isPlus()) {
+      return F.evalExpand(times(F.ZZ(n)));
+    }
+    return times(F.ZZ(n));
+  }*/
 
   /**
    * Multiply <code>this * that</code>. If oneof the arguments is a <code>Plus</code> expression,
    * distribute the other expression other <code>Plus</code>.
    *
    * @param that
+   * @return
    */
   IExpr multiplyDistributed(IExpr that); /*
   {
@@ -2648,6 +3136,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   }*/
 
   /**
+   * Nest <code>this</code> expression with <code>head</code> applied <code>n</code> times to <code>
+   * this</code>.
+   *
+   * <pre>
+   *   this.nest(h, 4)
+   * </pre>
+   * <p>
+   * gives
+   *
+   * <pre>
+   *   h(h(h(h(this))))
+   * </pre>
+   *
+   * @param head the head which should be applied to this n times
+   * @param n    a value > 0, otherwise <code>this</code> will be returned as default value
+   * @return
+   */
+  IExpr nest(final IExpr head, final int n); /*{
+    IExpr temp = this;
+    final Function<IExpr, IExpr> function = x -> F.unaryAST1(head, x);
+    for (int i = 0; i < n; i++) {
+      temp = function.apply(temp);
+    }
+    return temp;
+  }*/
+
+  /**
    * Converts a <b>special expression</b> (like a series, association, dataset, ...) into a standard
    * <i>normalized</i> expression.
    *
@@ -2657,7 +3172,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * </pre>
    *
    * @param nilIfUnevaluated if <code>true</code> return <code>F.NIL</code>, if no evaluation is
-   * necessary, otherwise <code>this</code>.
+   *                         necessary, otherwise <code>this</code>.
    * @return the standard expression for <b>special expression</b> or <code>F.NIL</code> otherwise
    */
   IExpr normal(boolean nilIfUnevaluated); /*{
@@ -2711,7 +3226,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise throw an
    * exception to be created by the provided supplier.
    *
-   * @param <X> Type of the exception to be thrown
+   * @param <X>               Type of the exception to be thrown
    * @param exceptionSupplier The supplier which will return the exception to be thrown
    * @return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> or throw an
    * exception
@@ -2742,14 +3257,14 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * Partitioning of Algebraic Subexpressions in Computer Algebra Systems</a>
    * </p>
    *
-   * @param operator the if the head of this expression equals <code>operator</code>, otherwise
-   * return <code>F.NIL</code>.
+   * @param operator  the if the head of this expression equals <code>operator</code>, otherwise
+   *                  return <code>F.NIL</code>.
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
-   * @param combiner the 1st and 2md results element head
+   *                  <code>false</code> for any of the arguments in this AST.
+   * @param combiner  the 1st and 2md results element head
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   IAST partition(ISymbol operator, Predicate<? super IExpr> predicate, IExpr initTrue,
@@ -2769,10 +3284,10 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * </p>
    *
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
+   *                  <code>false</code> for any of the arguments in this AST.
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   IAST partitionPlus(Predicate<? super IExpr> predicate, IExpr initTrue, IExpr initFalse,
@@ -2791,10 +3306,10 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * </p>
    *
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
+   *                  <code>false</code> for any of the arguments in this AST.
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   IAST partitionTimes(Predicate<? super IExpr> predicate, IExpr initTrue, IExpr initFalse,
@@ -2821,15 +3336,30 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return real part
    */
-  IExpr re();
+  IExpr re(); /*{
+    return S.Re.of(this);
+  }*/
+
+  @Override
+  IExpr reciprocal() throws MathRuntimeException; /*{
+    return inverse();
+  }*/
+
+  @Override
+  IExpr remainder(IExpr that); /* {
+    if (equals(that)) {
+      return F.C0;
+    }
+    return this;
+  }*/
 
   /**
    * Replace all (sub-) expressions with the given unary function, if the given predicate yields
    * <code>true</code>. If no substitution matches, the method returns <code>this</code>.
    *
    * @param predicate
-   * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
-   * the expression isn't substituted.
+   * @param function  if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
+   *                  the expression isn't substituted.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
   @Nullable
@@ -2841,7 +3371,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>F.NIL</code>.
    *
    * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
-   * the expression isn't substituted.
+   *                 the expression isn't substituted.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
   IExpr replaceAll(final Function<IExpr, IExpr> function);
@@ -2852,7 +3382,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>F.NIL</code>.
    *
    * @param astRules rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the
-   * left-hand-side of the rule can contain pattern objects.
+   *                 left-hand-side of the rule can contain pattern objects.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
   @Nullable
@@ -2864,7 +3394,7 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * matches, the method returns <code>F.NIL</code>.
    *
    * @param map if the unary functions <code>apply()</code> method returns <code>F.NIL</code> the
-   * expression isn't substituted.
+   *            expression isn't substituted.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
 
@@ -2878,21 +3408,26 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * subexpression which should be replaced on the left-hand-side. If no substitution matches, the
    * method returns <code>F.NIL</code>.
    *
-   * @param astRules rules of the form <code>position-&gt;y</code> or <code>{position1-&gt;b,
-   * position2-&gt;d}</code>
+   * @param astRules rules of the form <code>position-&gt;y</code> or <code>
+   *                 {position1-&gt;b, position2-&gt;d}</code>
+   * @param heads    if <code>TRUE</code> also replace the heads of expressions
    * @return <code>F.NIL</code> if no substitution of a subexpression was possible.
    */
-  IExpr replacePart(final IAST astRules);
+  IExpr replacePart(final IAST astRules, IExpr_COMPARE_TERNARY heads); /*{
+    return this.accept(new VisitorReplacePart(astRules, heads));
+  }*/
 
   /**
    * Repeatedly replace all (sub-) expressions with the given unary function. If no substitution
    * matches, the method returns <code>this</code>.
    *
    * @param function if the unary functions <code>apply()</code> method returns <code>null</code>
-   * the expression isn't substituted.
+   *                 the expression isn't substituted.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
-  IExpr replaceRepeated(final Function<IExpr, IExpr> function);
+  IExpr replaceRepeated(final Function<IExpr, IExpr> function);/*{
+    return replaceRepeated(new VisitorReplaceAll(function), -1);
+  }*/
 
   /**
    * Repeatedly replace all (sub-) expressions with the given rule set. If no substitution matches,
@@ -2900,10 +3435,43 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    * <code>this</code>.
    *
    * @param astRules rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the
-   * left-hand-side of the rule can contain pattern objects.
+   *                 left-hand-side of the rule can contain pattern objects.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
-  IExpr replaceRepeated(final IAST astRules);
+  IExpr replaceRepeated(final IAST astRules); /*{
+    return replaceRepeated(new VisitorReplaceAll(astRules), -1);
+  }*/
+
+  /**
+   * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches,
+   * the method returns <code>this</code>.
+   *
+   * @param visitor
+   * @param maxIterations the maximum number of iterations
+   * @return
+   */
+  IExpr replaceRepeated(VisitorReplaceAll visitor, int maxIterations); /*{
+    IExpr result = this;
+    IExpr temp = accept(visitor);
+    final EvalEngine engine = EvalEngine.get();
+    int iterationLimit = engine.getIterationLimit();
+    if (maxIterations > 0 && maxIterations < iterationLimit) {
+      iterationLimit = maxIterations;
+    }
+    int iterationCounter = 0;
+    while (temp.isPresent()) {
+      result = engine.evaluate(temp);
+      if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+        // Exiting after `1` scanned `2` times.
+        IOFunctions.printMessage(
+            S.ReplaceRepeated, "rrlim", F.List(this, F.ZZ(iterationLimit)), engine);
+        return result;
+      }
+
+      temp = result.accept(visitor);
+    }
+    return result;
+  }*/
 
   /**
    * Repeatedly replace all (sub-) expressions with the given visitor. If no substitution matches,
@@ -2966,6 +3534,23 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   IExpr second();
 
   /**
+   * Signum functionality is used in JAS toString() method, don't use it as math signum function.
+   *
+   * @deprecated
+   */
+  @Deprecated
+  @Override
+  int signum(); /*{
+    if (isZero()) {
+      return 0;
+    }
+    if (this instanceof INumber) {
+      return ((INumber) this).complexSign();
+    }
+    return 1;
+  }*/
+
+  /**
    * Returns the <b>number of elements</b> in this {@code IAST}.The <b>number of elements</b>
    * equals
    * <code>argSize() + 1</code> (i.e. the <b>number of arguments</b> plus 1). If this is an atom
@@ -2985,14 +3570,26 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
   IExpr sqrt();
 
   /**
-   * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates
-   * <code>F.eval(F.Times(this, that))</code> in the common case and uses a specialized
-   * implementation for derived number classes.
+   * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates <code>
+   * F.eval(F.Times(this, that))</code> in the common case and uses a specialized implementation for
+   * derived number classes.
    *
    * @param that the multiplier expression
    * @return <code>(this * that)</code>
    */
-  IExpr times(final IExpr that);
+  IExpr times(final IExpr that); /*{
+    if (that.isZero()) {
+      return F.C0;
+    }
+    if (that.isOne()) {
+      return this;
+    }
+    EvalEngine engine = EvalEngine.get();
+    if (engine.isTogetherMode() && (this.isPlusTimesPower() || that.isPlusTimesPower())) {
+      return S.Together.of(engine, F.Times(this, that));
+    }
+    return S.Times.of(engine, this, that);
+  }*/
 
   /**
    * Returns an <code>IExpr</code> whose value is <code>(this * that)</code>. Calculates
@@ -3139,9 +3736,33 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return <code>F.True, F.False or F.NIL</code
    */
-  IExpr unequalTo(IExpr that);
+  IExpr unequalTo(IExpr that); /*{
+    COMPARE_TERNARY temp = this.equalTernary(that, EvalEngine.get());
+    if (temp == COMPARE_TERNARY.TRUE) {
+      return S.False;
+    }
+    if (temp == COMPARE_TERNARY.FALSE) {
+      return S.True;
+    }
+    return F.NIL;
+  }*/
 
-  IExpr unitStep();
+  /**
+   * Return <code>0</code> if this is less than <code>0</code>. Return <code>1</code> if this is
+   * greater equal than <code>0</code>. Return <code>F.UnitStep(this)</code> for all other cases.
+   *
+   * @return
+   */
+  IExpr unitStep(); /*{
+    if (isNegativeResult()) {
+      return F.C0;
+    }
+    if (isNonNegativeResult()) {
+      return F.C1;
+    }
+    return F.UnitStep(this);
+  }
+*/
 
   /**
    * If this is a <code>Interval[{lower, upper}]</code> expression return the <code>upper</code>
@@ -3149,18 +3770,272 @@ public interface IExpr extends Comparable<IExpr>, GcdRingElem<IExpr>, Serializab
    *
    * @return <code>F.NIL</code> if this expression is no interval and no signed number.
    */
-  IExpr upper();
+  IExpr upper(); /*{
+    return F.NIL;
+  }*/
 
   /**
    * Convert the variables (i.e. expressions of type <code>ISymbol</code> which aren't constants) in
    * this expression into Slot[] s.
    *
-   * @param map for every given symbol argument return the associated unique slot from this map
+   * @param map               for every given symbol argument return the associated unique slot from this map
    * @param variableCollector collects the variables which are used in the replacement process
    * @return <code>F.NIL</code> if no variable symbol was found.
    */
-  IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector);
+  IExpr variables2Slots(final Map<IExpr, IExpr> map, final Collection<IExpr> variableCollector); /*{
+    return this;
+  }*/
 
   String toString();
-
+//
+//  @Override
+//  default IExpr sign() {
+//    return S.Sign.of(this);
+//  }
+//
+//  @Override
+//  default IExpr acos() {
+//    return S.ArcCos.of(this);
+//  }
+//
+//  @Override
+//  default IExpr acosh() {
+//    return S.ArcCosh.of(this);
+//  }
+//
+//  @Override
+//  default IExpr add(double that) {
+//    return plus(F.num(that));
+//  }
+//
+//  @Override
+//  default IExpr asin() {
+//    return S.ArcSin.of(this);
+//  }
+//
+//  @Override
+//  default IExpr asinh() {
+//    return S.ArcSinh.of(this);
+//  }
+//
+//  @Override
+//  default IExpr atan() {
+//    return S.ArcTan.of(this);
+//  }
+//
+//  @Override
+//  default IExpr atan2(IExpr that) throws MathIllegalArgumentException {
+//    return S.ArcTan.of(this, that);
+//  }
+//
+//  @Override
+//  default IExpr atanh() {
+//    return S.ArcTanh.of(this);
+//  }
+//
+//  @Override
+//  default IExpr cbrt() {
+//    return S.Power.of(this, F.C1D3);
+//  }
+//
+//  @Override
+//  default IExpr ceil() {
+//    return S.Ceiling.of(this);
+//  }
+//
+//  @Override
+//  default IExpr copySign(double that) {
+//    return copySign(F.num(that));
+//  }
+//
+//  @Override
+//  default IExpr copySign(IExpr that) {
+//    // TODO improve for complex "that"
+//    return abs().times(that.sign());
+//  }
+//
+//  @Override
+//  default IExpr cos() {
+//    return S.Cos.of(this);
+//  }
+//
+//  @Override
+//  default IExpr cosh() {
+//    return S.Cosh.of(this);
+//  }
+//
+//  @Override
+//  default IExpr divide(double arg0) {
+//    return times(F.num(arg0));
+//  }
+//
+//  @Override
+//  default IExpr exp() {
+//    return S.Exp.of(this);
+//  }
+//
+//  @Override
+//  default IExpr expm1() {
+//    return S.Exp.of(this).subtract(F.C1);
+//  }
+//
+//  @Override
+//  default IExpr floor() {
+//    return S.Floor.of(this);
+//  }
+//
+//  @Override
+//  default IExpr hypot(IExpr y) throws MathIllegalArgumentException {
+//    return S.Sqrt.of(F.Plus(F.Sqr(this), F.Sqr(y)));
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(
+//      double a1, IExpr b1, double a2, IExpr b2, double a3, IExpr b3, double a4, IExpr b4) {
+//    return linearCombination(new double[] {a1, a2, a3, a4}, new IExpr[] {b1, b2, b3, b4});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(double a1, IExpr b1, double a2, IExpr b2, double a3, IExpr b3) {
+//    return linearCombination(new double[] {a1, a2, a3}, new IExpr[] {b1, b2, b3});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(double a1, IExpr b1, double a2, IExpr b2) {
+//    return linearCombination(new double[] {a1, a2}, new IExpr[] {b1, b2});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(double[] a, IExpr[] b) throws MathIllegalArgumentException {
+//    IASTAppendable result = F.PlusAlloc(a.length);
+//    for (int i = 0; i < a.length; i++) {
+//      result.append(F.Times(F.num(a[i]), b[i]));
+//    }
+//    return result;
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(
+//      IExpr a1, IExpr b1, IExpr a2, IExpr b2, IExpr a3, IExpr b3, IExpr a4, IExpr b4) {
+//    return linearCombination(new IExpr[] {a1, a2, a3, a4}, new IExpr[] {b1, b2, b3, b4});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(IExpr a1, IExpr b1, IExpr a2, IExpr b2, IExpr a3, IExpr b3) {
+//    return linearCombination(new IExpr[] {a1, a2, a3}, new IExpr[] {b1, b2, b3});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(IExpr a1, IExpr b1, IExpr a2, IExpr b2) {
+//    return linearCombination(new IExpr[] {a1, a2}, new IExpr[] {b1, b2});
+//  }
+//
+//  @Override
+//  default IExpr linearCombination(IExpr[] a, IExpr[] b) throws MathIllegalArgumentException {
+//    IASTAppendable result = F.PlusAlloc(a.length);
+//    for (int i = 0; i < a.length; i++) {
+//      result.append(F.Times(a[i], b[i]));
+//    }
+//    return result;
+//  }
+//
+//  @Override
+//  default IExpr log() {
+//    return S.Log.of(this);
+//  }
+//
+//  @Override
+//  default IExpr log10() {
+//    return S.Log.of(F.C10, this);
+//  }
+//
+//  @Override
+//  default IExpr log1p() {
+//    return S.Log.of(this.inc());
+//  }
+//
+//  @Override
+//  default IExpr multiply(double that) {
+//    return times(F.num(that));
+//  }
+//
+//  @Override
+//  default IExpr newInstance(double arg) {
+//    return F.num(arg);
+//  }
+//
+//  @Override
+//  default IExpr pow(double n) {
+//    return S.Power.of(this, F.num(n));
+//  }
+//
+//  @Override
+//  default IExpr pow(IExpr n) throws MathIllegalArgumentException {
+//    return S.Power.of(this, n);
+//  }
+//
+//  @Override
+//  default IExpr pow(int n) {
+//    return S.Power.of(this, F.ZZ(n));
+//  }
+//
+//  @Override
+//  default IExpr remainder(double arg0) {
+//    return S.Mod.of(this);
+//  }
+//
+//  @Override
+//  default IExpr rint() {
+//    return S.IntegerPart.of(this);
+//  }
+//
+//  @Override
+//  default IExpr rootN(int n) {
+//    return S.Power.of(this, F.QQ(1, n));
+//  }
+//
+//  @Override
+//  default IExpr scalb(int n) {
+//    return times(F.C2.pow(n));
+//  }
+//
+//  @Override
+//  default IExpr sin() {
+//    return S.Sin.of(this);
+//  }
+//
+//  @Override
+//  default FieldSinCos<IExpr> sinCos() {
+//    return new FieldSinCos<IExpr>(sin(), cos());
+//  }
+//
+//  @Override
+//  default IExpr sinh() {
+//    return S.Sinh.of(this);
+//  }
+//
+//  @Override
+//  default FieldSinhCosh<IExpr> sinhCosh() {
+//    return new FieldSinhCosh<IExpr>(sinh(), cosh());
+//  }
+//
+//  @Override
+//  default IExpr subtract(double arg0) {
+//    return subtract(F.num(arg0));
+//  }
+//
+//  @Override
+//  default IExpr tan() {
+//    return S.Tan.of(this);
+//  }
+//
+//  @Override
+//  default IExpr tanh() {
+//    return S.Tanh.of(this);
+//  }
+//
+//  @Override
+//  default IExpr ulp() {
+//    return F.C0;
+//  }
 }

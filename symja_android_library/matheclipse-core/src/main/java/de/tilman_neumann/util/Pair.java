@@ -59,7 +59,7 @@ public class Pair<U,V> implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Pair other = (Pair) obj;
+		@SuppressWarnings("unchecked") Pair<U,V> other = (Pair<U,V>) obj;
 		if (first == null) {
 			if (other.first != null)
 				return false;
@@ -71,5 +71,10 @@ public class Pair<U,V> implements Serializable {
 		} else if (!second.equals(other.second))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + first + ", " + second + ")";
 	}
 }

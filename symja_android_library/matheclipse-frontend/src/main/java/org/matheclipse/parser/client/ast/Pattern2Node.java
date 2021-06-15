@@ -15,12 +15,8 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * A sequence-pattern node for n expressions (i.e. <code>__</code> or
- * <code>x__</code>).
- * 
- */
-final public class Pattern2Node extends PatternNode {
+/** A sequence-pattern node for n expressions (i.e. <code>__</code> or <code>x__</code>). */
+public final class Pattern2Node extends PatternNode {
 
 	public Pattern2Node(final SymbolNode symbol, final ASTNode constraint) {
 		this(symbol, constraint, false);

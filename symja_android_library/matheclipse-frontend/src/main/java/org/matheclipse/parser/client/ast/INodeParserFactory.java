@@ -15,10 +15,7 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * Factory for creating the ASTNodes from the parser
- * 
- */
+/** Factory for creating the ASTNodes from the parser */
 public interface INodeParserFactory extends IParserFactory {
 
 	/**
@@ -73,12 +70,11 @@ public interface INodeParserFactory extends IParserFactory {
 	 * @param arg  the argument of the function
 	 * @return
 	 */
-	public FunctionNode unaryAST(final ASTNode head, final ASTNode arg0);
+  public FunctionNode unaryAST(final ASTNode head, final ASTNode arg);
 	/**
 	 * Create an double node from the given double value string
 	 * 
-	 * @param doubleString
-	 *            the double string
+   * @param doubleString the double string
 	 * @return
 	 */
 	public ASTNode createDouble(String doubleString);
@@ -192,5 +188,4 @@ public interface INodeParserFactory extends IParserFactory {
 	 * @return
 	 */
 	public SymbolNode createSymbol(String symbolName);
-
 }

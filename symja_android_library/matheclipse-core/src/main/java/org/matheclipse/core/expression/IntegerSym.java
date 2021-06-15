@@ -3,15 +3,16 @@ package org.matheclipse.core.expression;
 import com.duy.lambda.Function;
 import com.gx.common.math.IntMath;
 import com.gx.common.math.LongMath;
-
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.fraction.BigFraction;
 import org.hipparchus.util.ArithmeticUtils;
-import org.matheclipse.core.builtin.Combinatoric.Subsets;
-import org.matheclipse.core.builtin.Combinatoric.Subsets.KSubsetsList;
 import org.matheclipse.core.form.output.OutputFormFactory;
-import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
@@ -19,15 +20,6 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.numbertheory.Primality;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * IInteger implementation which uses an internal <code>int</code> value
@@ -37,9 +29,7 @@ import java.util.TreeSet;
  */
 public class IntegerSym extends AbstractIntegerSym implements IInteger {
 
-  /**
-   *
-   */
+  /** */
   private static final long serialVersionUID = 6389228668633533063L;
 
   /* package private */ int fIntValue;
@@ -51,7 +41,6 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
 
   /**
    * do not use directly, needed for serialization/deserialization
-   *
    * @param value
    */
   public IntegerSym(int value) {
@@ -160,10 +149,6 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     return ComplexNum.valueOf(doubleValue());
   }
 
-  @Override
-  public int complexSign() {
-    return sign();
-  }
 
   /** {@inheritDoc} */
   @Override
@@ -222,7 +207,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   }
 
 
-  /** @return */
+  /** @return  */
   @Override
   public double doubleValue() {
     return fIntValue;
@@ -261,7 +246,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   @Override
   public IExpr exponent(IInteger base) {
     IInteger b = this;
-    if (sign() < 0) {
+    if (complexSign() < 0) {
       b = b.negate();
     } else if (b.isZero()) {
       return F.CInfinity;
@@ -275,9 +260,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     return valueOf(rest);
   }
 
-  /**
-   * Returns the greatest common divisor of this large integer and the one specified.
-   */
+  /** Returns the greatest common divisor of this large integer and the one specified. */
   @Override
   public IInteger gcd(final IInteger that) {
     if (that instanceof IntegerSym) {
@@ -404,7 +387,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     return fIntValue;
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public IRational inverse() {
     if (isOne()) {
@@ -689,9 +672,9 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     if (n == 2) {
       return sqrt();
     }
-    if (sign() == 0) {
+    if (complexSign() == 0) {
       return F.C0;
-    } else if (sign() < 0) {
+    } else if (complexSign() < 0) {
       if (n % 2 == 0) {
         // even exponent n
         throw new ArithmeticException();
@@ -704,8 +687,9 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
       IInteger temp = this;
       do {
         result = temp;
-        temp = divideAndRemainder(temp.pow(((long) n) - 1))[0]
-            .add(temp.multiply(AbstractIntegerSym.valueOf(n - 1)))
+        temp =
+            divideAndRemainder(temp.powerRational(((long) n) - 1))[0].add(
+                    temp.multiply(AbstractIntegerSym.valueOf(n - 1)))
             .divideAndRemainder(AbstractIntegerSym.valueOf(n))[0];
       } while (temp.compareTo(result) < 0);
       return result;
@@ -715,11 +699,11 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   @Override
   public IInteger[] nthRootSplit(int n) throws ArithmeticException {
     IInteger[] result = new IInteger[2];
-    if (sign() == 0) {
+    if (complexSign() == 0) {
       result[0] = F.C0;
       result[1] = F.C1;
       return result;
-    } else if (sign() < 0) {
+    } else if (complexSign() < 0) {
       if (n % 2 == 0) {
         // even exponent n
         throw new ArithmeticException();
@@ -809,7 +793,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   }
 
   @Override
-  public IInteger round() {
+  public IInteger roundExpr() {
     return this;
   }
 
@@ -833,7 +817,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   }
 
   @Override
-  public int sign() {
+  public int complexSign() {
     return (fIntValue > 0) ? 1 : (fIntValue == 0) ? 0 : -1;
   }
 
@@ -843,6 +827,7 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
    * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's
    *         impossible to find a square root return <code>F.Sqrt(this)</code>.
    */
+  @Override
   public IExpr sqrt() {
     try {
       return valueOf(IntMath.sqrt(fIntValue, RoundingMode.UNNECESSARY));
@@ -899,6 +884,12 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
   }
 
   /** {@inheritDoc} */
+  //@Override
+  public long toLongDefault(long defaultValue) {
+    return fIntValue;
+  }
+
+  /** {@inheritDoc} */
   @Override
   public long toLong() throws ArithmeticException {
     return fIntValue;
@@ -931,7 +922,6 @@ public class IntegerSym extends AbstractIntegerSym implements IInteger {
     }
     objectOutput.writeByte(4);
     objectOutput.writeInt(fIntValue);
-    return;
   }
 
   private Object writeReplace() throws ObjectStreamException {

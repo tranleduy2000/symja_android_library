@@ -72,10 +72,10 @@ import org.matheclipse.parser.client.FEConfig;
  * </pre>
  *
  * <h3>Related terms</h3>
- * <p>
- * <a href="DSolve.md">DSolve</a>, <a href="Eliminate.md">Eliminate</a>, <a href="GroebnerBasis.md">GroebnerBasis</a>,
- * <a href="FindRoot.md">FindRoot</a>, <a href="NRoots.md">NRoots</a>
- * </p>
+ *
+ * <p><a href="DSolve.md">DSolve</a>, <a href="Eliminate.md">Eliminate</a>, <a
+ * href="GroebnerBasis.md">GroebnerBasis</a>, <a href="FindRoot.md">FindRoot</a>, <a
+ * href="NRoots.md">NRoots</a>
  */
 public class Solve extends AbstractFunctionEvaluator {
 
@@ -84,41 +84,28 @@ public class Solve extends AbstractFunctionEvaluator {
 
     /** A linear expression for the given variables. */
     public static final int LINEAR = 0;
-    /**
-     * A polynomial expression for the given variables.
-     */
+    /** A polynomial expression for the given variables. */
     public static final int POLYNOMIAL = 1;
-    /**
-     * Others type of expression for the given variables.
-     */
+    /** Others type of expression for the given variables. */
     public static final int OTHERS = 2;
 
-    /**
-     * LINEAR, POLYNOMIAL or OTHERS
-     */
+    /** LINEAR, POLYNOMIAL or OTHERS */
     private int fEquationType;
 
-    /**
-     * The expression which should be <code>0</code>.
-     */
+    /** The expression which should be <code>0</code>. */
     private IExpr fExpr;
 
-    /**
-     * The original expression if unequal <code>null</code>.
-     */
+    /** The original expression if unequal <code>null</code>. */
     private IExpr fOriginalExpr = null;
-    /**
-     * The numerator of the expression
-     */
+    /** The numerator of the expression */
     private IExpr fNumerator;
 
-    /**
-     * The denominator of the expression
-     */
+    /** The denominator of the expression */
     private IExpr fDenominator;
 
     /**
-     * The number of leaves in an expression, used as an indicator for the complexity of the expression.
+     * The number of leaves in an expression, used as an indicator for the complexity of the
+     * expression.
      */
     private long fLeafCount;
 
@@ -144,9 +131,7 @@ public class Solve extends AbstractFunctionEvaluator {
       reset();
     }
 
-    /**
-     * Analyze an expression, if it has linear, polynomial or other form.
-     */
+    /** Analyze an expression, if it has linear, polynomial or other form. */
     private void analyze(IExpr eqExpr) {
       if (eqExpr.isFree(Predicates.in(fListOfVariables), true)) {
         fLeafCount++;
@@ -219,9 +204,7 @@ public class Solve extends AbstractFunctionEvaluator {
       return fDenominator;
     }
 
-    /**
-     * @return the expr
-     */
+    /** @return the expr */
     public IExpr getExpr() {
       return fExpr;
     }
@@ -415,8 +398,8 @@ public class Solve extends AbstractFunctionEvaluator {
     }
 
     /**
-     * Check for an applicable inverse function at the given <code>position</code> in the
-     * <code>Plus(..., ,...)</code> expression.
+     * Check for an applicable inverse function at the given <code>position</code> in the <code>
+     * Plus(..., ,...)</code> expression.
      *
      * @param ast
      * @param arg1
@@ -444,8 +427,10 @@ public class Solve extends AbstractFunctionEvaluator {
           return fEngine.evaluate(F.Subtract(ast.base(), inverseFunction));
         }
 
-      } else if (ast.isTimes() && ast.size() == 3 && ast.first().isNumericFunction() && ast.second()
-          .isAST1()) {
+      } else if (ast.isTimes()
+          && ast.size() == 3
+          && ast.first().isNumericFunction(true)
+          && ast.second().isAST1()) {
         IAST timesArg2 = (IAST) ast.second();
         IASTAppendable inverseFunction = InverseFunction.getUnaryInverseFunction(timesArg2);
         if (inverseFunction.isPresent()) {
@@ -459,12 +444,13 @@ public class Solve extends AbstractFunctionEvaluator {
     }
 
     /**
-     * Check for an applicable inverse function at the given <code>position</code> in the
-     * <code>Plus(..., ,...)</code> expression.
+     * Check for an applicable inverse function at the given <code>position</code> in the <code>
+     * Plus(..., ,...)</code> expression.
      *
      * @param plusAST the <code>Plus(..., ,...)</code> expression
      * @param position
-     * @return <code>F.NIL</code> if no inverse function was found, otherwise return the rewritten expression
+     * @return <code>F.NIL</code> if no inverse function was found, otherwise return the rewritten
+     *     expression
      */
     private IExpr rewriteInverseFunction(IAST plusAST, int position) {
       IAST ast = (IAST) plusAST.get(position);
@@ -512,9 +498,9 @@ public class Solve extends AbstractFunctionEvaluator {
             if (function.arg2().isPower()) {
               // function is num*Power(x, fraction)
               IAST power = (IAST) function.arg2();
-              IExpr temp = rewritePowerFractions(plusAST, i, (INumber) function.arg1(),
-                  power.base(),
-                  power.exponent());
+              IExpr temp =
+                  rewritePowerFractions(
+                      plusAST, i, function.arg1(), power.base(), power.exponent());
               if (temp.isPresent()) {
                 return fEngine.evaluate(temp);
               }
@@ -555,8 +541,8 @@ public class Solve extends AbstractFunctionEvaluator {
      * @param exponent
      * @return
      */
-    private IExpr rewritePowerFractions(IAST plusAST, int i, INumber num, IExpr base,
-        IExpr exponent) {
+    private IExpr rewritePowerFractions(
+        IAST plusAST, int i, IExpr num, IExpr base, IExpr exponent) {
       if (exponent.isFraction() || (exponent.isReal() && !exponent.isNumIntValue())) {
         ISignedNumber arg2 = (ISignedNumber) exponent;
         if (arg2.isPositive()) {
@@ -574,8 +560,7 @@ public class Solve extends AbstractFunctionEvaluator {
           return fEngine.evaluate(F.Subtract(base,
               F.Expand(F.Power(F.Times(num.inverse(), F.Negate(plus)), arg2.inverse()))));
         }
-      } else if (base.isSymbol() && //
-          base.equals(exponent)) {
+      } else if (base.isSymbol() && base.equals(exponent)) {
         // rewrite num * x^x as ProductLog() (Lambert W function)
         IExpr plus = plusAST.splice(i).oneIdentity0().negate().divide(num);
         // Log(arg1)/ProductLog(Log(arg1))
@@ -584,6 +569,88 @@ public class Solve extends AbstractFunctionEvaluator {
         return fEngine.evaluate(inverseFunction);
       }
 
+      if (fListOfVariables.size() == 2) {
+        IExpr variable = fListOfVariables.arg1();
+        return rewritePower2ProductLog(plusAST, i, num, base, exponent, variable);
+      }
+      return F.NIL;
+    }
+
+    /**
+     * Rewrite <code>base^variable + a*variable + b</code> as <code>
+     * variable +  ((b)*Log(x) + a * ProductLog(-(Log(x)/(x^(b/a)*a))) ) / (a*Log(x))
+     * </code>. ProductLog is the Lambert W function.
+     *
+     * <p>See: <a
+     * href="https://en.wikipedia.org/wiki/Lambert_W_function#Solving_equations">Wikipedia - Lambert
+     * W function - Solving equations</a>
+     *
+     * @param plusAST a <code>Plus(...)</code> expression
+     * @param i the index in <code>plusAST</code> where the argument equals F<code>base ^ exponent
+     *     </code>
+     * @param num a factor for <code>factor*base^variable</code>
+     * @param base must be free of <code>variable</code>
+     * @param exponent must be equal to <code>variable</code>
+     * @param variable the variable for which <code>plusAST</code> should be solved
+     * @return {@link F#NIL} if no solution was found
+     */
+    private IExpr rewritePower2ProductLog(
+        IAST plusAST, int i, IExpr num, IExpr base, IExpr exponent, final IExpr variable) {
+      if (variable.equals(exponent) && base.isFree(variable)) {
+        IExpr restOfPlus = plusAST.splice(i).oneIdentity0();
+        IExpr a = F.NIL;
+        IExpr b = F.C0;
+        if (restOfPlus.isPlus()) {
+          int indx = restOfPlus.indexOf(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr x) {
+              return !x.isFree(variable);
+            }
+          });
+          if (indx > 0) {
+            IExpr restOfPlus2 = ((IAST) restOfPlus).splice(indx).oneIdentity1();
+            if (restOfPlus2.isFree(variable)) {
+              a = determineFactor(((IAST) restOfPlus).get(i), variable);
+              b = restOfPlus2;
+            }
+          }
+        } else {
+          a = determineFactor(restOfPlus, variable);
+        }
+        if (a.isPresent()) {
+          // variable +  ((b)*Log(x) + a * ProductLog(-(Log(x)/(x^(b/a)*a))) )/(a*Log(x))
+          IAST inverseFunction =
+              F.Plus(
+                  variable,
+                  F.Times(
+                      F.Plus(
+                          F.Times(b, F.Log(base)),
+                          F.Times(
+                              a,
+                              F.ProductLog(
+                                  F.Times(
+                                      num,
+                                      F.Log(base),
+                                      F.Power(F.Times(a, F.Power(base, F.Divide(b, a))), F.CN1))))),
+                      F.Power(F.Times(a, F.Log(base)), F.CN1)));
+          return fEngine.evaluate(inverseFunction);
+        }
+      }
+      return F.NIL;
+    }
+
+    private static IExpr determineFactor(IExpr restOfPlus, IExpr variable) {
+      if (restOfPlus.equals(variable)) {
+        return F.C1;
+      } else if (restOfPlus.isTimes()) {
+        int indx = restOfPlus.indexOf(variable);
+        if (indx > 0) {
+          IExpr restOfTimes = ((IAST) restOfPlus).splice(indx).oneIdentity1();
+          if (restOfTimes.isFree(variable)) {
+            return restOfTimes;
+          }
+        }
+      }
       return F.NIL;
     }
 
@@ -733,7 +800,7 @@ public class Solve extends AbstractFunctionEvaluator {
           if (expr.isNumber() || expr.isInfinity() || expr.isNegativeInfinity()) {
             throw new NoSolution(NoSolution.WRONG_SOLUTION);
           }
-          if (!F.PossibleZeroQ.ofQ(engine, expr)) {
+          if (!S.PossibleZeroQ.ofQ(engine, expr)) {
             throw new NoSolution(NoSolution.NO_SOLUTION_FOUND);
           }
         }
@@ -798,8 +865,8 @@ public class Solve extends AbstractFunctionEvaluator {
    * @param subResultList
    * @param kListOfSolveRules
    * @param maximumNumberOfResults
-   * @return if <code>maximumNumberOfResults</code> is reached return the resultList, otherwiaw return
-   * <code>F#NIL</code>.
+   * @return if <code>maximumNumberOfResults</code> is reached return the resultList, otherwiaw
+   *     return <code>F#NIL</code>.
    */
   private static IASTAppendable addSubResultsToResultsList(IASTAppendable resultList,
       IAST subResultList,
@@ -828,8 +895,8 @@ public class Solve extends AbstractFunctionEvaluator {
   }
 
   /**
-   * For all analyzers in <code>analyzerList</code> from position to the last element substitute the variables by the
-   * rules in <code>kListOfSolveRules</code> and create a new (sub-)analyzer list.
+   * For all analyzers in <code>analyzerList</code> from position to the last element substitute the
+   * variables by the rules in <code>kListOfSolveRules</code> and create a new (sub-)analyzer list.
    *
    * @param kListOfSolveRules
    * @param analyzerList
@@ -880,7 +947,7 @@ public class Solve extends AbstractFunctionEvaluator {
             numerator.isNumericMode(), engine);
       }
       if (temp.isPresent()) {
-        if (temp.isSameHeadSizeGE(F.List, 2)) {
+        if (temp.isSameHeadSizeGE(S.List, 2)) {
           IAST rootsList = (IAST) temp;
           IASTAppendable resultList = F.ListAlloc(rootsList.size());
           for (IExpr root : rootsList) {
@@ -902,7 +969,8 @@ public class Solve extends AbstractFunctionEvaluator {
    *
    * @param expr
    * @param engine
-   * @param evalTogether evaluate <code>Together[expr]</code> before determining numerator and denominator of the expression.
+   * @param evalTogether evaluate <code>Together[expr]</code> before determining numerator and
+   *     denominator of the expression.
    * @return <code>List[numerator, denominator]</code>
    */
   private static IAST splitNumeratorDenominator(IAST expr, EvalEngine engine,
@@ -921,7 +989,7 @@ public class Solve extends AbstractFunctionEvaluator {
     } else {
       numerator = expr;
     }
-    return F.binaryAST2(F.List, numerator, denominator);
+    return F.binaryAST2(S.List, numerator, denominator);
   }
 
   @Override
@@ -929,6 +997,7 @@ public class Solve extends AbstractFunctionEvaluator {
     return of(ast, false, engine);
   }
 
+  @Override
   public int[] expectedArgSize(IAST ast) {
     return IFunctionEvaluator.ARGS_2_3;
   }
@@ -945,24 +1014,25 @@ public class Solve extends AbstractFunctionEvaluator {
       if (ast.arg1().isEmptyList()) {
         return F.List(F.CEmptyList);
       }
-      IAST userDefinedVariables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+      IAST userDefinedVariables =
+          Validate.checkIsVariableOrVariableList(ast, 2, ast.topHead(), engine);
       if (userDefinedVariables.isPresent()) {
         IAST equationVariables = VariablesSet.getVariables(ast.arg1());
         if (userDefinedVariables.isEmpty()) {
           userDefinedVariables = equationVariables;
         }
-        ISymbol domain = F.Complexes;
+        ISymbol domain = S.Complexes;
         if (ast.isAST3()) {
           if (!ast.arg3().isSymbol()) {
             return engine.printMessage(ast.topHead()
                 + ": domain definition expected at position 3 instead of " + ast.arg3().toString());
           }
           domain = (ISymbol) ast.arg3();
-          if (domain.equals(F.Booleans)) {
-            return BooleanFunctions
-                .solveInstances(ast.arg1(), userDefinedVariables, Integer.MAX_VALUE);
+          if (domain.equals(S.Booleans)) {
+            return BooleanFunctions.solveInstances(
+                ast.arg1(), userDefinedVariables, Integer.MAX_VALUE);
           }
-          if (domain.equals(F.Integers)) {
+          if (domain.equals(S.Integers)) {
             if (!userDefinedVariables.isEmpty()) {
               IAST equationsAndInequations = Validate.checkEquationsAndInequations(ast, 1);
               try {
@@ -988,9 +1058,11 @@ public class Solve extends AbstractFunctionEvaluator {
             }
             return F.NIL;
           }
-          if (!domain.equals(F.Reals) && !domain.equals(F.Complexes)) {
-            return engine.printMessage(ast.topHead()
-                + ": domain definition expected at position 3 instead of " + domain.toString());
+          if (!domain.equals(S.Reals) && !domain.equals(S.Complexes)) {
+            return engine.printMessage(
+                ast.topHead()
+                    + ": domain definition expected at position 3 instead of "
+                    + domain.toString());
           }
         }
         IAST termsList = Validate.checkEquationsAndInequations(ast, 1);
@@ -1016,12 +1088,13 @@ public class Solve extends AbstractFunctionEvaluator {
       if (FEConfig.SHOW_STACKTRACE) {
         le.printStackTrace();
       }
-      throw le;
+      return IOFunctions.printMessage(S.Solve, le, engine);
     } catch (ValidateException ve) {
       if (FEConfig.SHOW_STACKTRACE) {
         ve.printStackTrace();
       }
-      return engine.printMessage(F.Solve, ve);
+      return IOFunctions.printMessage(S.Solve, ve, engine);
+      //      return engine.printMessage(S.Solve, ve);
     } catch (RuntimeException rex) {
       if (FEConfig.SHOW_STACKTRACE) {
         rex.printStackTrace();
@@ -1039,7 +1112,7 @@ public class Solve extends AbstractFunctionEvaluator {
    * @return
    */
   private static IExpr checkDomain(IExpr expr, ISymbol domain) {
-    if (expr.isList() && domain.equals(F.Reals)) {
+    if (expr.isList() && domain.equals(S.Reals)) {
       if (expr.isListOfLists()) {
         IASTAppendable result = F.ListAlloc(expr.size());
         IASTAppendable appendable;
@@ -1148,7 +1221,7 @@ public class Solve extends AbstractFunctionEvaluator {
               IAST listOfRules = (IAST) subResult.getAt(i);
               replaced = oneVariableRule.second().replaceAll(listOfRules);
               if (replaced.isPresent()) {
-                replaced = F.Simplify.of(engine, replaced);
+                replaced = S.Simplify.of(engine, replaced);
                 appendable = listOfRules.copyAppendable();
                 appendable.append(F.Rule(firstVariable, replaced));
                 result.append(appendable);
@@ -1220,8 +1293,8 @@ public class Solve extends AbstractFunctionEvaluator {
    * @param variables the variables for which the equations should be solved
    * @param maximumNumberOfResults the maximum number of results which should be returned
    * @param engine the evaluation engine
-   * @return a &quot;list of rules list&quot; which solves the equations, or an empty list if no solution exists, or
-   * <code>F.NIL</code> if the equations are not solvable by this algorithm.
+   * @return a &quot;list of rules list&quot; which solves the equations, or an empty list if no
+   *     solution exists, or <code>F.NIL</code> if the equations are not solvable by this algorithm.
    */
   protected static IASTMutable solveEquations(IASTMutable termsEqualZeroList, IAST inequationsList,
       IAST variables,
@@ -1241,14 +1314,17 @@ public class Solve extends AbstractFunctionEvaluator {
     for (int i = 1; i < termsEqualZeroList.size(); i++) {
       IExpr equationTerm = termsEqualZeroList.get(i);
       if (equationTerm.isPlus()) {
-        IExpr eq = F.Equal.of(equationTerm, F.C0);
+        IExpr eq = S.Equal.of(equationTerm, F.C0);
         if (eq.isEqual()) {
           IExpr arg1 = eq.first();
           if (arg1.isPlus2()) {
             if (arg1.first().isSqrtExpr() && arg1.second().isSqrtExpr()) {
               // Sqrt() + Sqrt() == constant
-              termsEqualZeroList.set(i, F.Subtract.of(F.Expand.of(F.Sqr(arg1.second())),
-                  F.Expand.of(F.Sqr(F.Subtract(eq.second(), arg1.first())))));
+              termsEqualZeroList.set(
+                  i,
+                  S.Subtract.of(
+                      S.Expand.of(F.Sqr(arg1.second())),
+                      S.Expand.of(F.Sqr(F.Subtract(eq.second(), arg1.first())))));
             }
           }
         }
@@ -1358,7 +1434,7 @@ public class Solve extends AbstractFunctionEvaluator {
         } else {
           if (termEQZero.isAST()) {
             // try factoring
-            termEQZero = F.Factor.of(engine, termEQZero);
+            termEQZero = S.Factor.of(engine, termEQZero);
 
             if (termEQZero.isTimes()) {
               solveTimesAST((IAST) termEQZero, termsEqualZeroList, inequationsList, numericFlag,
@@ -1404,8 +1480,9 @@ public class Solve extends AbstractFunctionEvaluator {
             if (zeroCrossCheck.isZero()) {
               subSolutionSet.add(solution);
             } else {
-              if (replaceAll.isPlusTimesPower() && //
-                  F.PossibleZeroQ.ofQ(engine, replaceAll)) {
+              if (replaceAll.isPlusTimesPower()
+                  && //
+                  S.PossibleZeroQ.ofQ(engine, replaceAll)) {
                 subSolutionSet.add(solution);
               }
             }
@@ -1418,11 +1495,13 @@ public class Solve extends AbstractFunctionEvaluator {
             if (!res.isPresent()) {
               if (numericFlag) {
                 // find numerically with start value 0
-                res = F.FindRoot
-                    .ofNIL(engine, clonedEqualZeroList.arg1(), F.List(firstVariable, F.C0));
+                res =
+                    S.FindRoot.ofNIL(
+                        engine, clonedEqualZeroList.arg1(), F.List(firstVariable, F.C0));
               }
             }
-            if (!res.isList() || !res.isFree(new Predicate<IExpr>() {
+            if (!res.isList()
+                || !res.isFree(new Predicate<IExpr>() {
               @Override
               public boolean test(IExpr t) {
                 return t.isIndeterminate() || t.isDirectedInfinity();
@@ -1435,7 +1514,6 @@ public class Solve extends AbstractFunctionEvaluator {
             for (int k = 1; k < subResult.size(); k++) {
               subSolutionSet.add(solveNumeric(subResult.get(i), numericFlag, engine));
             }
-            continue;
           }
         }
       }

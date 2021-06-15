@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.FieldEquationsMapper;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
 import org.hipparchus.ode.sampling.AbstractFieldODEStateInterpolator;
@@ -38,7 +38,7 @@ import org.hipparchus.util.MathArrays;
  * @see EmbeddedRungeKuttaFieldIntegrator
  */
 
-abstract class RungeKuttaFieldStateInterpolator<T extends RealFieldElement<T>>
+abstract class RungeKuttaFieldStateInterpolator<T extends CalculusFieldElement<T>>
         extends AbstractFieldODEStateInterpolator<T> {
 
     /**

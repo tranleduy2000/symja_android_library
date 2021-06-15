@@ -64,7 +64,7 @@ public class OutputFormFactory {
   private final boolean fPlusReversed;
   private boolean fIgnoreNewLine = false;
   /** If <code>true</code> print leading and trailing quotes in Symja strings */
-  protected boolean fQuotes = false;
+  protected boolean fInputForm = false;
   private boolean fEmpty = true;
   private int fColumnCounter;
   private int fExponentFigures;
@@ -157,27 +157,39 @@ public class OutputFormFactory {
 
   private void convertDouble(final Appendable buf, final double doubleValue, final INum d,
       final int precedence,
-      boolean caller) throws IOException {
-    if (d instanceof ApfloatNum) {
+      boolean caller)
+      throws IOException {
       final boolean isNegative = d.isNegative();
+    if (d instanceof ApfloatNum) {
+      Apfloat apfloat = ((ApfloatNum) d).apfloatValue();
       if (!isNegative && caller == PLUS_CALL) {
-        append(buf, "+");
+        append(buf, fInputForm ? " + " : "+");
       }
-      convertDoubleString(buf, convertApfloatToFormattedString(((ApfloatNum) d).apfloatValue()),
-          precedence,
-          isNegative);
+      String str =
+          fInputForm
+              ? ApfloatNum.fullFormString(apfloat)
+              : convertApfloatToFormattedString(apfloat);
+      convertDoubleString(buf, str, precedence, isNegative);
       return;
     }
     if (F.isZero(doubleValue, Config.MACHINE_EPSILON)) {
+      if (fInputForm) {
+        convertDoubleString(buf, d.fullFormString(), precedence, false);
+      } else {
       convertDoubleString(buf, convertDoubleToFormattedString(0.0), precedence, false);
+      }
       return;
     }
-    final boolean isNegative = d.isNegative();
     if (!isNegative && caller == PLUS_CALL) {
-      append(buf, "+");
+      append(buf, fInputForm ? " + " : "+");
     }
     if (d instanceof Num) {
-      convertDoubleString(buf, convertDoubleToFormattedString(doubleValue), precedence, isNegative);
+      if (fInputForm) {
+        convertDoubleString(buf, d.fullFormString(), precedence, isNegative);
+      } else {
+        convertDoubleString(
+            buf, convertDoubleToFormattedString(doubleValue), precedence, isNegative);
+      }
     }
   }
 
@@ -208,7 +220,6 @@ public class OutputFormFactory {
       return buf.toString();
     }
     return Double.toString(dValue);
-    // return fNumberFormat == null ? Double.toString(dValue) : fNumberFormat.format(dValue);
   }
 
   private void convertDoubleString(final Appendable buf, final String d, final int precedence,
@@ -231,7 +242,7 @@ public class OutputFormFactory {
     }
     if (Precedence.PLUS < precedence) {
       if (caller == PLUS_CALL) {
-        append(buf, "+");
+        append(buf, fInputForm ? " + " : "+");
         caller = false;
       }
       append(buf, "(");
@@ -244,22 +255,30 @@ public class OutputFormFactory {
       convertDoubleString(buf, convertDoubleToFormattedString(0.0), Precedence.PLUS, false);
     } else {
       if (!realZero) {
-        append(buf, convertDoubleToFormattedString(realPart));
+        String str =
+            fInputForm ? Num.fullFormString(realPart) : convertDoubleToFormattedString(realPart);
+        append(buf, str);
         if (!imaginaryZero) {
           append(buf, "+I*");
           final boolean isNegative = imaginaryPart < 0;
-          convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart), Precedence.TIMES,
-              isNegative);
+          str =
+              fInputForm
+                  ? Num.fullFormString(imaginaryPart)
+                  : convertDoubleToFormattedString(imaginaryPart);
+          convertDoubleString(buf, str, Precedence.TIMES, isNegative);
         }
       } else {
         if (caller == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
           caller = false;
         }
         append(buf, "I*");
         final boolean isNegative = imaginaryPart < 0;
-        convertDoubleString(buf, convertDoubleToFormattedString(imaginaryPart), Precedence.TIMES,
-            isNegative);
+        String str =
+            fInputForm
+                ? Num.fullFormString(imaginaryPart)
+                : convertDoubleToFormattedString(imaginaryPart);
+        convertDoubleString(buf, str, Precedence.TIMES, isNegative);
       }
     }
     if (Precedence.PLUS < precedence) {
@@ -272,7 +291,7 @@ public class OutputFormFactory {
       throws IOException {
     if (Precedence.PLUS < precedence) {
       if (caller == PLUS_CALL) {
-        append(buf, "+");
+        append(buf, fInputForm ? " + " : "+");
         caller = false;
       }
       append(buf, "(");
@@ -285,22 +304,32 @@ public class OutputFormFactory {
       convertDoubleString(buf, "0.0", Precedence.PLUS, false);
     } else {
       if (!realZero) {
-        append(buf, convertApfloatToFormattedString(realPart));
+        String str =
+            fInputForm
+                ? ApfloatNum.fullFormString(realPart)
+                : convertApfloatToFormattedString(realPart);
+        append(buf, str);
         if (!imaginaryZero) {
           append(buf, "+I*");
           final boolean isNegative = imaginaryPart.compareTo(Apcomplex.ZERO) < 0;
-          convertDoubleString(buf, convertApfloatToFormattedString(imaginaryPart), Precedence.TIMES,
-              isNegative);
+          str =
+              fInputForm
+                  ? ApfloatNum.fullFormString(imaginaryPart)
+                  : convertApfloatToFormattedString(imaginaryPart);
+          convertDoubleString(buf, str, Precedence.TIMES, isNegative);
         }
       } else {
         if (caller == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
           caller = false;
         }
         append(buf, "I*");
         final boolean isNegative = imaginaryPart.compareTo(Apcomplex.ZERO) < 0;
-        convertDoubleString(buf, convertApfloatToFormattedString(imaginaryPart), Precedence.TIMES,
-            isNegative);
+        String str =
+            fInputForm
+                ? ApfloatNum.fullFormString(imaginaryPart)
+                : convertApfloatToFormattedString(imaginaryPart);
+        convertDoubleString(buf, str, Precedence.TIMES, isNegative);
       }
     }
     if (Precedence.PLUS < precedence) {
@@ -335,14 +364,20 @@ public class OutputFormFactory {
       boolean caller)
       throws IOException {
     final boolean isNegative = i.isNegative();
+    BigInteger bigNumerator = i.toBigNumerator();
     if (!isNegative && caller == PLUS_CALL) {
-      append(buf, "+");
+      append(buf, fInputForm ? " + " : "+");
     }
     if (isNegative && (Precedence.PLUS < precedence)) {
       append(buf, "(");
     }
-    final String str = i.toBigNumerator().toString();
-    if ((str.length() + getColumnCounter() > 80)) {
+    if (isNegative) {
+      bigNumerator = bigNumerator.negate();
+      append(buf, fInputForm && (caller == PLUS_CALL) ? " - " : "-");
+    }
+
+    final String str = bigNumerator.toString();
+    if ((str.length() + getColumnCounter() > Config.MAX_OUTPUT_LINE)) {
       if (getColumnCounter() > 40) {
         newLine(buf);
       }
@@ -370,7 +405,9 @@ public class OutputFormFactory {
     convertFraction(buf, f.toBigNumerator(), f.toBigDenominator(), precedence, caller);
   }
 
-  public void convertFraction(final Appendable buf, final BigInteger numerator,
+  public void convertFraction(
+      final Appendable buf,
+      BigInteger numerator,
       BigInteger denominator,
       final int precedence, boolean caller) throws IOException {
     boolean isInteger = denominator.compareTo(BigInteger.ONE) == 0;
@@ -378,7 +415,7 @@ public class OutputFormFactory {
     final int prec = isNegative ? Precedence.PLUS : Precedence.TIMES;
     if (!isNegative) {
       if (caller == PLUS_CALL) {
-        append(buf, "+");
+        append(buf, fInputForm ? " + " : "+");
       }
     }
 
@@ -386,8 +423,12 @@ public class OutputFormFactory {
       append(buf, "(");
     }
 
+    if (isNegative) {
+      numerator = numerator.negate();
+      append(buf, fInputForm && (caller == PLUS_CALL) ? " - " : "-");
+    }
     String str = numerator.toString();
-    if ((str.length() + getColumnCounter() > 80)) {
+    if ((str.length() + getColumnCounter() > Config.MAX_OUTPUT_LINE)) {
       if (getColumnCounter() > 40) {
         newLine(buf);
       }
@@ -407,7 +448,7 @@ public class OutputFormFactory {
     if (!isInteger) {
       append(buf, "/");
       str = denominator.toString();
-      if ((str.length() + getColumnCounter() > 80)) {
+      if ((str.length() + getColumnCounter() > Config.MAX_OUTPUT_LINE)) {
         if (getColumnCounter() > 40) {
           newLine(buf);
         }
@@ -438,7 +479,7 @@ public class OutputFormFactory {
     final boolean isImMinusOne = c.getImaginaryPart().isMinusOne();
     if (!isReZero && (Precedence.PLUS < precedence)) {
       if (caller == PLUS_CALL) {
-        append(buf, "+");
+        append(buf, fInputForm ? " + " : "+");
         caller = false;
       }
       append(buf, "(");
@@ -449,16 +490,16 @@ public class OutputFormFactory {
     if (isImOne) {
       if (isReZero) {
         if (caller == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
           caller = false;
         }
         append(buf, "I");
         return;
       } else {
-        append(buf, "+I");
+        append(buf, fInputForm ? " + I" : "+I");
       }
     } else if (isImMinusOne) {
-      append(buf, "-I");
+      append(buf, fInputForm ? " - I" : "-I");
     } else {
       final IRational im = c.getImaginaryPart();
       int oldColumnCounter = fColumnCounter;
@@ -468,7 +509,7 @@ public class OutputFormFactory {
           if (isReZero && (Precedence.TIMES < precedence)) {
             append(buf, "(");
           }
-          append(buf, "-");
+          append(buf, fInputForm ? " - " : "-");
           oldColumnCounter = fColumnCounter;
           fColumnCounter = 0;
           append(imagBuf, "I*");
@@ -476,7 +517,7 @@ public class OutputFormFactory {
         } else {
           if (isReZero) {
             if (caller == PLUS_CALL) {
-              append(buf, "+");
+              append(buf, fInputForm ? " + " : "+");
             }
             if (Precedence.TIMES < precedence) {
               append(buf, "(");
@@ -485,7 +526,7 @@ public class OutputFormFactory {
             fColumnCounter = 0;
             append(imagBuf, "I*");
           } else {
-            append(buf, "+");
+            append(buf, fInputForm ? " + " : "+");
             oldColumnCounter = fColumnCounter;
             fColumnCounter = 0;
             append(imagBuf, "I*");
@@ -497,7 +538,7 @@ public class OutputFormFactory {
         fColumnCounter = oldColumnCounter;
       }
       String str = imagBuf.toString();
-      if ((str.length() + getColumnCounter() > 80)) {
+      if ((str.length() + getColumnCounter() > Config.MAX_OUTPUT_LINE)) {
         newLine(buf);
       }
       append(buf, str);
@@ -512,7 +553,7 @@ public class OutputFormFactory {
   }
 
   public void convertString(final Appendable buf, final String str) throws IOException {
-    if (fQuotes) {
+    if (fInputForm) {
       append(buf, "\"");
       append(buf, str);
       append(buf, "\"");
@@ -586,7 +627,7 @@ public class OutputFormFactory {
         convert(buf, plusArg, Integer.MIN_VALUE, false);
       } else {
         if (caller == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
         }
         convert(buf, plusArg, Precedence.PLUS, false);
       }
@@ -621,7 +662,7 @@ public class OutputFormFactory {
             showOperator = false;
           } else {
             if (arg1.isMinusOne()) {
-              append(buf, "-");
+              append(buf, fInputForm ? " - " : "-");
               showOperator = false;
             } else {
               convertNumber(buf, (INumber) arg1, operPrecedence, NO_PLUS_CALL);
@@ -695,11 +736,11 @@ public class OutputFormFactory {
         convertNumber(buf, (INumber) numerator, Precedence.DIVIDE, caller);
       } else {
         if (numerator.isTimes() && numerator.isAST2() && numerator.first().isMinusOne()) {
-          append(buf, "-");
+          append(buf, fInputForm ? " - " : "-");
           convert(buf, numerator.second(), Precedence.TIMES, false);
         } else {
           if (caller == PLUS_CALL) {
-            append(buf, "+");
+            append(buf, fInputForm ? " + " : "+");
           }
           // insert numerator in buffer:
           if (numerator.isTimes()) {
@@ -737,7 +778,7 @@ public class OutputFormFactory {
       IExpr arg1 = timesAST.arg1();
       if (arg1.isReal() && timesAST.size() > 2 && !timesAST.arg2().isNumber()) {
         if (arg1.isMinusOne()) {
-          append(buf, "-");
+          append(buf, fInputForm && (caller == PLUS_CALL) ? " - " : "-");
           showOperator = false;
         } else {
           convertNumber(buf, (ISignedNumber) arg1, Precedence.PLUS, caller);
@@ -746,7 +787,7 @@ public class OutputFormFactory {
         convertComplex(buf, (IComplex) arg1, oper.getPrecedence(), caller);
       } else {
         if (caller == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
         }
         convert(buf, arg1, oper.getPrecedence(), false);
       }
@@ -1007,7 +1048,6 @@ public class OutputFormFactory {
     }
     if (o instanceof IComplex) {
       convertComplex(buf, (IComplex) o, precedence, caller);
-      return;
     }
   }
 
@@ -1145,8 +1185,7 @@ public class OutputFormFactory {
                 IExpr normal = list.arg1().normal(false);
 
                 if (normal.isList()) { // && normal.isMatrix() != null) {
-                  ArrayList<Integer> dims =
-                      LinearAlgebra.dimensions((IAST) normal, S.List, Integer.MAX_VALUE);
+                  ArrayList<Integer> dims = LinearAlgebra.dimensions((IAST) normal, S.List);
                   convertList(buf, (IAST) normal, dims.size() >= 2);
                   return;
                 }
@@ -1275,7 +1314,6 @@ public class OutputFormFactory {
       convert(buf, association.getRule(i), Integer.MIN_VALUE, false);
     }
     append(buf, "|>");
-    return;
   }
 
   private boolean convertInequality(final Appendable buf, final IAST inequality,
@@ -1340,20 +1378,20 @@ public class OutputFormFactory {
     }
     if ((operator instanceof InfixOperator) && (list.size() > 2)) {
       InfixOperator infixOperator = (InfixOperator) operator;
-      if (head.equals(F.Plus)) {
+      if (head.equals(S.Plus)) {
         if (fPlusReversed) {
           convertPlusOperatorReversed(buf, list, infixOperator, precedence);
         } else {
           convertPlusOperator(buf, list, infixOperator, precedence);
         }
         return true;
-      } else if (head.equals(F.Times)) {
+      } else if (head.equals(S.Times)) {
         convertTimesFraction(buf, list, infixOperator, precedence, NO_PLUS_CALL);
         return true;
       } else if (list.isPower()) {
         convertPowerOperator(buf, list, infixOperator, precedence);
         return true;
-      } else if (list.isAST(F.Apply)) {
+      } else if (list.isAST(S.Apply)) {
         if (list.size() == 3) {
           convertInfixOperator(buf, list, ASTNodeFactory.APPLY_OPERATOR, precedence);
           return true;
@@ -1612,7 +1650,7 @@ public class OutputFormFactory {
     if (coefficient.isOne()) {
       if (pow.isPlus()) {
         if (call == PLUS_CALL) {
-          append(buf, "+");
+          append(buf, fInputForm ? " + " : "+");
         }
         append(buf, "(");
         convertPlusArgument(buf, pow, call);
@@ -1717,10 +1755,10 @@ public class OutputFormFactory {
   /**
    * If <code>true</code> print leading and trailing quotes in Symja strings
    *
-   * @param quotes
+   * @param inputForm
    */
-  public void setQuotes(final boolean quotes) {
-    fQuotes = quotes;
+  public void setInputForm(final boolean inputForm) {
+    fInputForm = inputForm;
   }
 
   public void setEmpty(final boolean empty) {

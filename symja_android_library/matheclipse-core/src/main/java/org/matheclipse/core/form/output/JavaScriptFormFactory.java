@@ -45,184 +45,199 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
    * need to do inline operators with the JavaScript ternary operator. If <code>false</code> the
    * converter will use <code>if(...){...}</code> statements.
    */
-  public boolean INLINE_PIECEWISE = true;
+  public boolean INLINE_PIECEWISE = false;
   private final int javascriptFlavor;
   private List<String> sliderNames;
+  private List<String> variableNames;
   private static final Map<ISymbol, String> FUNCTIONS_STR_MATHCELL = new HashMap<ISymbol, String>();
   private static final Map<ISymbol, String> FUNCTIONS_STR_PURE_JS = new HashMap<ISymbol, String>();
 
   static {
-    FUNCTIONS_STR_MATHCELL.put(F.BetaRegularized, "betaRegularized");
-    FUNCTIONS_STR_MATHCELL.put(F.AiryAi, "airyAi");
-    FUNCTIONS_STR_MATHCELL.put(F.AiryBi, "airyBi");
-    FUNCTIONS_STR_MATHCELL.put(F.DirichletEta, "dirichletEta");
-    FUNCTIONS_STR_MATHCELL.put(F.HankelH1, "hankel1");
-    FUNCTIONS_STR_MATHCELL.put(F.HankelH2, "hankel2");
-    FUNCTIONS_STR_MATHCELL.put(F.GammaRegularized, "gammaRegularized");
-    FUNCTIONS_STR_MATHCELL.put(F.InverseWeierstrassP, "inverseWeierstrassP");
-    FUNCTIONS_STR_MATHCELL.put(F.PolyGamma, "digamma");
-    FUNCTIONS_STR_MATHCELL.put(F.SphericalBesselJ, "sphericalBesselJ");
-    FUNCTIONS_STR_MATHCELL.put(F.SphericalBesselY, "sphericalBesselY");
-    FUNCTIONS_STR_MATHCELL.put(F.SphericalHankelH1, "sphericalHankel1");
-    FUNCTIONS_STR_MATHCELL.put(F.SphericalHankelH2, "sphericalHankel2");
+    FUNCTIONS_STR_MATHCELL.put(S.BetaRegularized, "betaRegularized");
+    FUNCTIONS_STR_MATHCELL.put(S.AiryAi, "airyAi");
+    FUNCTIONS_STR_MATHCELL.put(S.AiryBi, "airyBi");
+    FUNCTIONS_STR_MATHCELL.put(S.DirichletEta, "dirichletEta");
+    FUNCTIONS_STR_MATHCELL.put(S.HankelH1, "hankel1");
+    FUNCTIONS_STR_MATHCELL.put(S.HankelH2, "hankel2");
+    FUNCTIONS_STR_MATHCELL.put(S.GammaRegularized, "gammaRegularized");
+    FUNCTIONS_STR_MATHCELL.put(S.InverseWeierstrassP, "inverseWeierstrassP");
+    FUNCTIONS_STR_MATHCELL.put(S.PolyGamma, "digamma");
+    FUNCTIONS_STR_MATHCELL.put(S.SphericalBesselJ, "sphericalBesselJ");
+    FUNCTIONS_STR_MATHCELL.put(S.SphericalBesselY, "sphericalBesselY");
+    FUNCTIONS_STR_MATHCELL.put(S.SphericalHankelH1, "sphericalHankel1");
+    FUNCTIONS_STR_MATHCELL.put(S.SphericalHankelH2, "sphericalHankel2");
 
-    FUNCTIONS_STR_MATHCELL.put(F.WeierstrassHalfPeriods, "weierstrassHalfPeriods");
-    FUNCTIONS_STR_MATHCELL.put(F.WeierstrassInvariants, "weierstrassInvariants");
-    FUNCTIONS_STR_MATHCELL.put(F.WeierstrassP, "weierstrassP");
-    FUNCTIONS_STR_MATHCELL.put(F.WeierstrassPPrime, "weierstrassPPrime");
-    FUNCTIONS_STR_MATHCELL.put(F.WhittakerM, "whittakerM");
-    FUNCTIONS_STR_MATHCELL.put(F.WhittakerW, "whittakerW");
+    FUNCTIONS_STR_MATHCELL.put(S.WeierstrassHalfPeriods, "weierstrassHalfPeriods");
+    FUNCTIONS_STR_MATHCELL.put(S.WeierstrassInvariants, "weierstrassInvariants");
+    FUNCTIONS_STR_MATHCELL.put(S.WeierstrassP, "weierstrassP");
+    FUNCTIONS_STR_MATHCELL.put(S.WeierstrassPPrime, "weierstrassPPrime");
+    FUNCTIONS_STR_MATHCELL.put(S.WhittakerM, "whittakerM");
+    FUNCTIONS_STR_MATHCELL.put(S.WhittakerW, "whittakerW");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Abs, "abs");
-    FUNCTIONS_STR_MATHCELL.put(F.Arg, "arg");
-    FUNCTIONS_STR_MATHCELL.put(F.Chop, "chop");
+    FUNCTIONS_STR_MATHCELL.put(S.Abs, "abs");
+    FUNCTIONS_STR_MATHCELL.put(S.Arg, "arg");
+    FUNCTIONS_STR_MATHCELL.put(S.Chop, "chop");
 
-    FUNCTIONS_STR_MATHCELL.put(F.BesselJ, "besselJ");
-    FUNCTIONS_STR_MATHCELL.put(F.BesselY, "besselY");
-    FUNCTIONS_STR_MATHCELL.put(F.BesselI, "besselI");
-    FUNCTIONS_STR_MATHCELL.put(F.BesselK, "besselK");
-    FUNCTIONS_STR_MATHCELL.put(F.StruveH, "struveH");
-    FUNCTIONS_STR_MATHCELL.put(F.StruveL, "struveL");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselJ, "besselJ");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselY, "besselY");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselI, "besselI");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselK, "besselK");
+    FUNCTIONS_STR_MATHCELL.put(S.StruveH, "struveH");
+    FUNCTIONS_STR_MATHCELL.put(S.StruveL, "struveL");
 
-    FUNCTIONS_STR_MATHCELL.put(F.BesselJZero, "besselJZero ");
-    FUNCTIONS_STR_MATHCELL.put(F.BesselYZero, "besselYZero ");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselJZero, "besselJZero ");
+    FUNCTIONS_STR_MATHCELL.put(S.BesselYZero, "besselYZero ");
 
     // TODO see math.js - https://github.com/paulmasson/math
-    // FUNCTIONS_STR_MATHCELL.put(F.Hankel1, "hankel1");
-    // FUNCTIONS_STR_MATHCELL.put(F.Hankel2, "hankel2");
+    // FUNCTIONS_STR_MATHCELL.put(S.Hankel1, "hankel1");
+    // FUNCTIONS_STR_MATHCELL.put(S.Hankel2, "hankel2");
 
-    FUNCTIONS_STR_MATHCELL.put(F.AiryAi, "airyAi");
-    FUNCTIONS_STR_MATHCELL.put(F.AiryBi, "airyBi");
+    FUNCTIONS_STR_MATHCELL.put(S.AiryAi, "airyAi");
+    FUNCTIONS_STR_MATHCELL.put(S.AiryBi, "airyBi");
 
-    FUNCTIONS_STR_MATHCELL.put(F.EllipticF, "ellipticF");
-    FUNCTIONS_STR_MATHCELL.put(F.EllipticK, "ellipticK");
-    FUNCTIONS_STR_MATHCELL.put(F.EllipticE, "ellipticE");
-    FUNCTIONS_STR_MATHCELL.put(F.EllipticPi, "ellipticPi");
-    FUNCTIONS_STR_MATHCELL.put(F.EllipticTheta, "jacobiTheta");
+    FUNCTIONS_STR_MATHCELL.put(S.CarlsonRC, "carlsonRC");
+    FUNCTIONS_STR_MATHCELL.put(S.CarlsonRD, "carlsonRD");
+    FUNCTIONS_STR_MATHCELL.put(S.CarlsonRF, "carlsonRF");
+    FUNCTIONS_STR_MATHCELL.put(S.CarlsonRG, "carlsonRG");
+    FUNCTIONS_STR_MATHCELL.put(S.CarlsonRJ, "carlsonRJ");
 
-    FUNCTIONS_STR_MATHCELL.put(F.JacobiAmplitude, "am");
-    FUNCTIONS_STR_MATHCELL.put(F.JacobiCN, "cn");
-    FUNCTIONS_STR_MATHCELL.put(F.JacobiDN, "dn");
-    FUNCTIONS_STR_MATHCELL.put(F.JacobiSN, "sn");
-    FUNCTIONS_STR_MATHCELL.put(F.JacobiZeta, "jacobiZeta");
-    FUNCTIONS_STR_MATHCELL.put(F.KleinInvariantJ, "kleinJ");
-    FUNCTIONS_STR_MATHCELL.put(F.Factorial, "factorial");
-    FUNCTIONS_STR_MATHCELL.put(F.Factorial2, "factorial2");
-    FUNCTIONS_STR_MATHCELL.put(F.Binomial, "binomial");
-    FUNCTIONS_STR_MATHCELL.put(F.LogGamma, "logGamma");
-    FUNCTIONS_STR_MATHCELL.put(F.Gamma, "gamma");
-    FUNCTIONS_STR_MATHCELL.put(F.Beta, "beta");
-    FUNCTIONS_STR_MATHCELL.put(F.Erf, "erf");
-    FUNCTIONS_STR_MATHCELL.put(F.Erfc, "erfc");
-    FUNCTIONS_STR_MATHCELL.put(F.FresnelC, "fresnelC");
-    FUNCTIONS_STR_MATHCELL.put(F.FresnelS, "fresnelS");
+    FUNCTIONS_STR_MATHCELL.put(S.EllipticF, "ellipticF");
+    FUNCTIONS_STR_MATHCELL.put(S.EllipticK, "ellipticK");
+    FUNCTIONS_STR_MATHCELL.put(S.EllipticE, "ellipticE");
+    FUNCTIONS_STR_MATHCELL.put(S.EllipticPi, "ellipticPi");
+    FUNCTIONS_STR_MATHCELL.put(S.EllipticTheta, "jacobiTheta");
+
+    FUNCTIONS_STR_MATHCELL.put(S.JacobiAmplitude, "am");
+    FUNCTIONS_STR_MATHCELL.put(S.JacobiCN, "cn");
+    FUNCTIONS_STR_MATHCELL.put(S.JacobiDN, "dn");
+    FUNCTIONS_STR_MATHCELL.put(S.JacobiSN, "sn");
+    FUNCTIONS_STR_MATHCELL.put(S.JacobiZeta, "jacobiZeta");
+    FUNCTIONS_STR_MATHCELL.put(S.KleinInvariantJ, "kleinJ");
+    FUNCTIONS_STR_MATHCELL.put(S.Factorial, "factorial");
+    FUNCTIONS_STR_MATHCELL.put(S.Factorial2, "factorial2");
+    FUNCTIONS_STR_MATHCELL.put(S.Binomial, "binomial");
+    FUNCTIONS_STR_MATHCELL.put(S.LogGamma, "logGamma");
+    FUNCTIONS_STR_MATHCELL.put(S.Gamma, "gamma");
+    FUNCTIONS_STR_MATHCELL.put(S.Beta, "beta");
+    FUNCTIONS_STR_MATHCELL.put(S.Erf, "erf");
+    FUNCTIONS_STR_MATHCELL.put(S.Erfc, "erfc");
+    FUNCTIONS_STR_MATHCELL.put(S.FresnelC, "fresnelC");
+    FUNCTIONS_STR_MATHCELL.put(S.FresnelS, "fresnelS");
+    FUNCTIONS_STR_MATHCELL.put(S.Gudermannian, "gudermannian");
+    FUNCTIONS_STR_MATHCELL.put(S.InverseGudermannian, "inverseGudermannian");
     // PM: Since polylog is a shortened form of the full function name, polylogarithm, the small "l"
     // is
     // more appropriate here:
     FUNCTIONS_STR_MATHCELL.put(S.PolyLog, "polylog");
 
-    FUNCTIONS_STR_MATHCELL.put(F.CosIntegral, "cosIntegral");
-    FUNCTIONS_STR_MATHCELL.put(F.CoshIntegral, "coshIntegral");
-    FUNCTIONS_STR_MATHCELL.put(F.LogIntegral, "logIntegral");
-    FUNCTIONS_STR_MATHCELL.put(F.SinIntegral, "sinIntegral");
-    FUNCTIONS_STR_MATHCELL.put(F.SinhIntegral, "sinhIntegral");
+    FUNCTIONS_STR_MATHCELL.put(S.CosIntegral, "cosIntegral");
+    FUNCTIONS_STR_MATHCELL.put(S.CoshIntegral, "coshIntegral");
+    FUNCTIONS_STR_MATHCELL.put(S.LogIntegral, "logIntegral");
+    FUNCTIONS_STR_MATHCELL.put(S.SinIntegral, "sinIntegral");
+    FUNCTIONS_STR_MATHCELL.put(S.SinhIntegral, "sinhIntegral");
 
-    FUNCTIONS_STR_MATHCELL.put(F.ExpIntegralEi, "expIntegralEi");
-    FUNCTIONS_STR_MATHCELL.put(F.ExpIntegralE, "expIntegralE");
+    FUNCTIONS_STR_MATHCELL.put(S.ExpIntegralEi, "expIntegralEi");
+    FUNCTIONS_STR_MATHCELL.put(S.ExpIntegralE, "expIntegralE");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric0F1, "hypergeometric0F1");
-    FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric1F1, "hypergeometric1F1");
-    // FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric2??, "hypergeometric2F0");
-    FUNCTIONS_STR_MATHCELL.put(F.Hypergeometric2F1, "hypergeometric2F1");
-    FUNCTIONS_STR_MATHCELL.put(F.HypergeometricPFQ, "hypergeometricPFQ");
-    FUNCTIONS_STR_MATHCELL.put(F.Exp, "exp");
-    FUNCTIONS_STR_MATHCELL.put(F.Im, "im");
-    FUNCTIONS_STR_MATHCELL.put(F.Log, "log");
-    FUNCTIONS_STR_MATHCELL.put(F.Re, "re");
+    FUNCTIONS_STR_MATHCELL.put(S.Hypergeometric0F1, "hypergeometric0F1");
+    FUNCTIONS_STR_MATHCELL.put(S.Hypergeometric1F1, "hypergeometric1F1");
+    // FUNCTIONS_STR_MATHCELL.put(S.Hypergeometric2??, "hypergeometric2F0");
+    FUNCTIONS_STR_MATHCELL.put(S.Hypergeometric2F1, "hypergeometric2F1");
+    FUNCTIONS_STR_MATHCELL.put(S.HypergeometricPFQ, "hypergeometricPFQ");
+    FUNCTIONS_STR_MATHCELL.put(S.Exp, "exp");
+    FUNCTIONS_STR_MATHCELL.put(S.Im, "im");
+    FUNCTIONS_STR_MATHCELL.put(S.Log, "log");
+    FUNCTIONS_STR_MATHCELL.put(S.Re, "re");
 
-    FUNCTIONS_STR_MATHCELL.put(F.ProductLog, "lambertW");
-    FUNCTIONS_STR_MATHCELL.put(F.Chop, "chop");
-    FUNCTIONS_STR_MATHCELL.put(F.KroneckerDelta, "kronecker");
+    FUNCTIONS_STR_MATHCELL.put(S.ProductLog, "lambertW");
+    FUNCTIONS_STR_MATHCELL.put(S.KroneckerDelta, "kronecker");
 
-    FUNCTIONS_STR_MATHCELL.put(F.HermiteH, "hermite");
-    FUNCTIONS_STR_MATHCELL.put(F.LaguerreL, "laguerre");
-    FUNCTIONS_STR_MATHCELL.put(F.ChebyshevT, "chebyshevT");
-    FUNCTIONS_STR_MATHCELL.put(F.ChebyshevU, "chebyshevU");
-    FUNCTIONS_STR_MATHCELL.put(F.LegendreP, "legendreP");
-    // FUNCTIONS_STR_MATHCELL.put(F.SpheriacelHarmonic, "sphericalHarmonic");
+    FUNCTIONS_STR_MATHCELL.put(S.HermiteH, "hermite");
+    FUNCTIONS_STR_MATHCELL.put(S.LaguerreL, "laguerre");
+    FUNCTIONS_STR_MATHCELL.put(S.ChebyshevT, "chebyshevT");
+    FUNCTIONS_STR_MATHCELL.put(S.ChebyshevU, "chebyshevU");
+    FUNCTIONS_STR_MATHCELL.put(S.LegendreP, "legendreP");
+    FUNCTIONS_STR_MATHCELL.put(S.LegendreQ, "legendreQ");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Sin, "sin");
-    FUNCTIONS_STR_MATHCELL.put(F.Cos, "cos");
-    FUNCTIONS_STR_MATHCELL.put(F.Tan, "tan");
-    FUNCTIONS_STR_MATHCELL.put(F.Cot, "cot");
-    FUNCTIONS_STR_MATHCELL.put(F.Sec, "sec");
-    FUNCTIONS_STR_MATHCELL.put(F.Csc, "csc");
+    // FUNCTIONS_STR_MATHCELL.put(S.SpheriacelHarmonic, "sphericalHarmonic");
 
-    FUNCTIONS_STR_MATHCELL.put(F.ArcSin, "arcsin");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCos, "arccos");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcTan, "arctan");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCot, "arccot");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcSec, "arcsec");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCsc, "arccsc");
+    FUNCTIONS_STR_MATHCELL.put(S.Sin, "sin");
+    FUNCTIONS_STR_MATHCELL.put(S.Cos, "cos");
+    FUNCTIONS_STR_MATHCELL.put(S.Tan, "tan");
+    FUNCTIONS_STR_MATHCELL.put(S.Cot, "cot");
+    FUNCTIONS_STR_MATHCELL.put(S.Sec, "sec");
+    FUNCTIONS_STR_MATHCELL.put(S.Csc, "csc");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Sinh, "sinh");
-    FUNCTIONS_STR_MATHCELL.put(F.Cosh, "cosh");
-    FUNCTIONS_STR_MATHCELL.put(F.Tanh, "tanh");
-    FUNCTIONS_STR_MATHCELL.put(F.Coth, "coth");
-    FUNCTIONS_STR_MATHCELL.put(F.Sech, "sech");
-    FUNCTIONS_STR_MATHCELL.put(F.Csch, "csch");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcSin, "arcsin");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCos, "arccos");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcTan, "arctan");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCot, "arccot");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcSec, "arcsec");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCsc, "arccsc");
 
-    FUNCTIONS_STR_MATHCELL.put(F.ArcSinh, "arcsinh");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCosh, "arccosh");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcTanh, "arctanh");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCoth, "arccoth");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcSech, "arcsech");
-    FUNCTIONS_STR_MATHCELL.put(F.ArcCsch, "arccsch");
+    FUNCTIONS_STR_MATHCELL.put(S.Sinh, "sinh");
+    FUNCTIONS_STR_MATHCELL.put(S.Cosh, "cosh");
+    FUNCTIONS_STR_MATHCELL.put(S.Tanh, "tanh");
+    FUNCTIONS_STR_MATHCELL.put(S.Coth, "coth");
+    FUNCTIONS_STR_MATHCELL.put(S.Sech, "sech");
+    FUNCTIONS_STR_MATHCELL.put(S.Csch, "csch");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Sinc, "sinc");
-    FUNCTIONS_STR_MATHCELL.put(F.HurwitzZeta, "hurwitzZeta");
-    FUNCTIONS_STR_MATHCELL.put(F.Zeta, "zeta");
-    // FUNCTIONS_STR_MATHCELL.put(F.DirichletEta, "dirichletEta");
-    FUNCTIONS_STR_MATHCELL.put(F.BernoulliB, "bernoulli");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcSinh, "arcsinh");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCosh, "arccosh");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcTanh, "arctanh");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCoth, "arccoth");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcSech, "arcsech");
+    FUNCTIONS_STR_MATHCELL.put(S.ArcCsch, "arccsch");
 
-    FUNCTIONS_STR_MATHCELL.put(F.Ceiling, "Math.ceil");
-    FUNCTIONS_STR_MATHCELL.put(F.Floor, "Math.floor");
-    FUNCTIONS_STR_MATHCELL.put(F.IntegerPart, "Math.trunc");
-    FUNCTIONS_STR_MATHCELL.put(F.Max, "Math.max");
-    FUNCTIONS_STR_MATHCELL.put(F.Min, "Math.min");
-    FUNCTIONS_STR_MATHCELL.put(F.Round, "Math.round");
-    FUNCTIONS_STR_MATHCELL.put(F.Sign, "Math.sign");
+    FUNCTIONS_STR_MATHCELL.put(S.Sinc, "sinc");
+    FUNCTIONS_STR_MATHCELL.put(S.HurwitzZeta, "hurwitzZeta");
+    FUNCTIONS_STR_MATHCELL.put(S.Zeta, "zeta");
+    // FUNCTIONS_STR_MATHCELL.put(S.DirichletEta, "dirichletEta");
+    FUNCTIONS_STR_MATHCELL.put(S.BernoulliB, "bernoulli");
+
+    FUNCTIONS_STR_MATHCELL.put(S.Ceiling, "ceiling");
+    FUNCTIONS_STR_MATHCELL.put(S.Floor, "floor");
+    FUNCTIONS_STR_MATHCELL.put(S.KroneckerDelta, "kronecker");
+    FUNCTIONS_STR_MATHCELL.put(S.Round, "round");
+
+    FUNCTIONS_STR_MATHCELL.put(S.IntegerPart, "integerPart");
+    FUNCTIONS_STR_MATHCELL.put(S.FractionalPart, "fractionalPart");
+    FUNCTIONS_STR_MATHCELL.put(S.Sign, "sign");
+    FUNCTIONS_STR_MATHCELL.put(S.Max, "Math.max");
+    FUNCTIONS_STR_MATHCELL.put(S.Min, "Math.min");
+    FUNCTIONS_STR_MATHCELL.put(S.Surd, "surd");
+    FUNCTIONS_STR_MATHCELL.put(S.Root, "root");
 
     //
     // pure JavaScript mappings
     //
-    FUNCTIONS_STR_PURE_JS.put(F.Abs, "Math.abs");
+    FUNCTIONS_STR_PURE_JS.put(S.Abs, "Math.abs");
 
-    FUNCTIONS_STR_PURE_JS.put(F.ArcCos, "Math.acos");
-    FUNCTIONS_STR_PURE_JS.put(F.ArcCosh, "Math.acosh");
-    FUNCTIONS_STR_PURE_JS.put(F.ArcSin, "Math.asin");
-    FUNCTIONS_STR_PURE_JS.put(F.ArcSinh, "Math.asinh");
-    FUNCTIONS_STR_PURE_JS.put(F.ArcTan, "Math.atan");
-    FUNCTIONS_STR_PURE_JS.put(F.ArcTanh, "Math.atanh");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcCos, "Math.acos");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcCosh, "Math.acosh");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcSin, "Math.asin");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcSinh, "Math.asinh");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcTan, "Math.atan");
+    FUNCTIONS_STR_PURE_JS.put(S.ArcTanh, "Math.atanh");
 
-    FUNCTIONS_STR_PURE_JS.put(F.Ceiling, "Math.ceil");
-    FUNCTIONS_STR_PURE_JS.put(F.Cos, "Math.cos");
-    FUNCTIONS_STR_PURE_JS.put(F.Cosh, "Math.cosh");
-    FUNCTIONS_STR_PURE_JS.put(F.Exp, "Math.exp");
-    FUNCTIONS_STR_PURE_JS.put(F.Floor, "Math.floor");
-    FUNCTIONS_STR_PURE_JS.put(F.IntegerPart, "Math.trunc");
+    FUNCTIONS_STR_PURE_JS.put(S.Ceiling, "Math.ceil");
+    FUNCTIONS_STR_PURE_JS.put(S.Cos, "Math.cos");
+    FUNCTIONS_STR_PURE_JS.put(S.Cosh, "Math.cosh");
+    FUNCTIONS_STR_PURE_JS.put(S.Exp, "Math.exp");
+    FUNCTIONS_STR_PURE_JS.put(S.Floor, "Math.floor");
+    FUNCTIONS_STR_PURE_JS.put(S.IntegerPart, "Math.trunc");
 
-    FUNCTIONS_STR_PURE_JS.put(F.Log, "Math.log");
-    FUNCTIONS_STR_PURE_JS.put(F.Max, "Math.max");
-    FUNCTIONS_STR_PURE_JS.put(F.Min, "Math.min");
+    FUNCTIONS_STR_PURE_JS.put(S.Log, "Math.log");
+    FUNCTIONS_STR_PURE_JS.put(S.Max, "Math.max");
+    FUNCTIONS_STR_PURE_JS.put(S.Min, "Math.min");
     // Power is handled by coding
-    // FUNCTIONS_STR_PURE_JS.put(F.Power, "Math.pow");
-    FUNCTIONS_STR_PURE_JS.put(F.Round, "Math.round");
-    FUNCTIONS_STR_PURE_JS.put(F.Sign, "Math.sign");
-    FUNCTIONS_STR_PURE_JS.put(F.Sin, "Math.sin");
-    FUNCTIONS_STR_PURE_JS.put(F.Sinh, "Math.sinh");
-    FUNCTIONS_STR_PURE_JS.put(F.Tan, "Math.tan");
-    FUNCTIONS_STR_PURE_JS.put(F.Tanh, "Math.tanh");
+    // FUNCTIONS_STR_PURE_JS.put(S.Power, "Math.pow");
+    FUNCTIONS_STR_PURE_JS.put(S.Round, "Math.round");
+    FUNCTIONS_STR_PURE_JS.put(S.Sign, "Math.sign");
+    FUNCTIONS_STR_PURE_JS.put(S.Sin, "Math.sin");
+    FUNCTIONS_STR_PURE_JS.put(S.Sinh, "Math.sinh");
+    FUNCTIONS_STR_PURE_JS.put(S.Tan, "Math.tan");
+    FUNCTIONS_STR_PURE_JS.put(S.Tanh, "Math.tanh");
 
   }
 
@@ -246,6 +261,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       int significantFigures, int javascriptFlavor) {
     super(relaxedSyntax, reversed, exponentFigures, significantFigures);
     this.sliderNames = new ArrayList<String>();
+    this.variableNames = new ArrayList<String>();
     this.javascriptFlavor = javascriptFlavor;
   }
 
@@ -253,6 +269,10 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     sliderNames.add(sliderName);
   }
 
+  public void setVariables(ISymbol sliderName) {
+    variableNames.clear();
+    variableNames.add(sliderName.toString());
+  }
   /**
    * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user
    * readable string.
@@ -284,13 +304,15 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
   }
 
   /**
-   * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user readable string.
+   * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user
+   * readable string.
    *
-   * @param relaxedSyntax if <code>true</code> use paranthesis instead of square brackets and ignore case for functions, i.e.
-   * sin() instead of Sin[]. If <code>true</code> use single square brackets instead of double square
-   * brackets for extracting parts of an expression, i.e. {a,b,c,d}[1] instead of {a,b,c,d}[[1]].
-   * @param plusReversed if <code>true</code> the arguments of the <code>Plus()</code> function will be printed in reversed
-   * order
+   * @param relaxedSyntax if <code>true</code> use paranthesis instead of square brackets and ignore
+   *     case for functions, i.e. sin() instead of Sin[]. If <code>true</code> use single square
+   *     brackets instead of double square brackets for extracting parts of an expression, i.e.
+   *     {a,b,c,d}[1] instead of {a,b,c,d}[[1]].
+   * @param plusReversed if <code>true</code> the arguments of the <code>Plus()</code> function will
+   *     be printed in reversed order
    * @param exponentFigures
    * @param significantFigures
    * @return
@@ -301,6 +323,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
         significantFigures);
   }
 
+  @Override
   public String functionHead(ISymbol symbol) {
     if (javascriptFlavor == USE_MATHCELL) {
       return FUNCTIONS_STR_MATHCELL.get(symbol);
@@ -308,10 +331,11 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     return FUNCTIONS_STR_PURE_JS.get(symbol);
   }
 
+  @Override
   public void convertSymbol(final StringBuilder buf, final ISymbol symbol) {
 
     if (symbol.isBuiltInSymbol()) {
-      String str = functionHead((ISymbol) symbol);
+      String str = functionHead(symbol);
       if (str != null) {
         buf.append(str);
         return;
@@ -321,7 +345,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       buf.append(symbol.toString() + ".Value()");
       return;
     }
-    if (symbol == F.Indeterminate) {
+    if (symbol == S.Indeterminate) {
       buf.append("Number.NaN");
       return;
     }
@@ -329,8 +353,8 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
   }
 
   /**
-   * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user readable string, with
-   * <code>relaxedSyntax</code> set to false.
+   * Get an <code>JavaScriptFormFactory</code> for converting an internal expression to a user
+   * readable string, with <code>relaxedSyntax</code> set to false.
    *
    * @return
    * @see #get(boolean)
@@ -339,6 +363,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     return get(false);
   }
 
+  @Override
   public void convertAST(final StringBuilder buf, final IAST function) {
     if (function.isNumericFunction(true)) {
       try {
@@ -356,7 +381,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
         if (function.isASTSizeGE(S.Round, 3)) {
           throw new ArgumentTypeException("Cannot convert to JavaScript: " + function.toString());
         }
-        if (function.isAST(F.ArcTan, 3)) {
+        if (function.isAST(S.ArcTan, 3)) {
           buf.append("Math.atan2");
         } else {
           buf.append(str);
@@ -421,9 +446,6 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       } else if (function.isPower()) {
         convertPowerMathcell(buf, function);
         return;
-      } else if (function.head() == S.Surd && function.size() == 3) {
-        convertPowerMathcell(buf, function);
-        return;
       } else if (function.isInfinity()) {
         buf.append("Number.POSITIVE_INFINITY");
         return;
@@ -447,19 +469,19 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
           buf.append(")");
           return;
         }
-      } else if (function.head() == F.Piecewise && function.size() > 1) {
+      } else if (function.head() == S.Piecewise && function.size() > 1) {
         int[] dim = function.isPiecewise();
         if (dim != null && convertPiecewise(dim, function, buf)) {
           return;
         }
-      } else if (function.head() == F.ConditionalExpression && function.size() == 3) {
+      } else if (function.head() == S.ConditionalExpression && function.size() == 3) {
         convertConditionalExpression(function, buf);
         return;
-      } else if (function.head() == F.HeavisideTheta && function.size() >= 2) {
+      } else if (function.head() == S.HeavisideTheta && function.size() >= 2) {
         convertHeavisideTheta(function, buf);
         return;
       }
-      IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, F.Reals);
+      IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, S.Reals);
       int[] dim = piecewiseExpand.isPiecewise();
       if (dim != null && convertPiecewise(dim, piecewiseExpand, buf)) {
         return;
@@ -468,42 +490,39 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       if (function.isPower()) {
         convertPower(buf, function);
         return;
-      } else if (function.head() == F.Surd && function.size() == 3) {
-        convertPower(buf, function);
-        return;
       } else if (function.isInfinity()) {
         buf.append("Number.POSITIVE_INFINITY");
         return;
       } else if (function.isNegativeInfinity()) {
         buf.append("Number.NEGATIVE_INFINITY");
         return;
-      } else if (function.head() == F.Piecewise && function.size() > 1) {
+      } else if (function.head() == S.Piecewise && function.size() > 1) {
         int[] dim = function.isPiecewise();
         if (dim != null && convertPiecewise(dim, function, buf)) {
           return;
         }
-      } else if (function.head() == F.ConditionalExpression && function.size() == 3) {
+      } else if (function.head() == S.ConditionalExpression && function.size() == 3) {
         convertConditionalExpression(function, buf);
         return;
-      } else if (function.head() == F.Cot && function.size() == 2) {
+      } else if (function.head() == S.Cot && function.size() == 2) {
         buf.append("(1/Math.tan(");
         convertInternal(buf, function.arg1());
         buf.append("))");
         return;
-      } else if (function.head() == F.ArcCot && function.size() == 2) {
+      } else if (function.head() == S.ArcCot && function.size() == 2) {
         buf.append("((Math.PI/2.0)-Math.atan(");
         convertInternal(buf, function.arg1());
         buf.append("))");
         return;
       }
-      IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, F.Reals);
+      IAST piecewiseExpand = Arithmetic.piecewiseExpand(function, S.Reals);
       int[] dim = piecewiseExpand.isPiecewise();
       if (dim != null && convertPiecewise(dim, piecewiseExpand, buf)) {
         return;
       }
     }
 
-    if (function.head() == F.If && function.size() >= 3 && function.size() <= 4) {
+    if (function.head() == S.If && function.size() >= 3 && function.size() <= 4) {
       // use the ternary operator
       buf.append("((");
       convertInternal(buf, function.arg1());
@@ -518,7 +537,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       buf.append(" ))");
       return;
     }
-    if (function.isAST(F.Missing)) {
+    if (function.isAST(S.Missing)) {
       // Missing value
       buf.append("Number.NaN");
       return;
@@ -542,7 +561,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     IExpr base = powerAST.base();
     IExpr exponent = powerAST.exponent();
     if (exponent.isMinusOne()) {
-      buf.append("(1.0/");
+      buf.append("1.0/(");
       convertInternal(buf, base);
       buf.append(")");
       return;
@@ -587,7 +606,6 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     }
     buf.append("pow");
     convertArgs(buf, powerAST.head(), powerAST);
-    return;
   }
 
   private void convertConditionalExpression(final IAST function, final StringBuilder buf) {
@@ -656,23 +674,26 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
       return true;
     } else {
       // use if... statements
+      piecewiseBuffer.append("\n (function(");
+      appendVariables(piecewiseBuffer);
+      piecewiseBuffer.append(") {");
       final int size = list.size();
       for (int i = 1; i < size; i++) {
         IExpr arg = list.get(i);
         if (arg.isList2()) {
           IAST row = (IAST) arg;
-          if (i == 1) {
-            piecewiseBuffer.append("if (");
+          //          if (i == 1) {
+          //            piecewiseBuffer.append("if (");
+          //            convertInternal(piecewiseBuffer, row.second());
+          //            piecewiseBuffer.append(") {\n");
+          //          } else {
+          piecewiseBuffer.append("\nif (");
             convertInternal(piecewiseBuffer, row.second());
             piecewiseBuffer.append(") {");
-          } else {
-            piecewiseBuffer.append(" else if (");
-            convertInternal(piecewiseBuffer, row.second());
-            piecewiseBuffer.append(") {");
-          }
+          //          }
           piecewiseBuffer.append(" return ");
           convertInternal(piecewiseBuffer, row.first());
-          piecewiseBuffer.append("}");
+          piecewiseBuffer.append(";}");
         } else {
           if (i == size - 1) {
             last = arg;
@@ -681,15 +702,29 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
           }
         }
       }
-      piecewiseBuffer.append(" else { return ");
+      piecewiseBuffer.append("\n return ");
       convertInternal(piecewiseBuffer, last);
-      piecewiseBuffer.append("}");
+      piecewiseBuffer.append(";})(");
+      appendVariables(piecewiseBuffer);
+      piecewiseBuffer.append(")\n");
       buffer.append(piecewiseBuffer);
       return true;
     }
   }
 
-  protected boolean convertOperator(final Operator operator, final IAST list,
+  private void appendVariables(StringBuilder buf) {
+    for (int i = 0; i < variableNames.size(); i++) {
+      buf.append(variableNames.get(i));
+      if (i < variableNames.size() - 1) {
+        buf.append(",");
+      }
+    }
+  }
+
+  @Override
+  protected boolean convertOperator(
+      final Operator operator,
+      final IAST list,
       final StringBuilder buf,
       final int precedence, ISymbol head) {
     if (!super.convertOperator(operator, list, buf, precedence, head)) {
@@ -703,6 +738,7 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     return true;
   }
 
+  @Override
   public Operator getOperator(ISymbol head) {
     if (javascriptFlavor == USE_MATHCELL) {
       if (head.isSymbolID(ID.Equal, ID.Unequal, ID.Less, ID.LessEqual, ID.Greater, ID.GreaterEqual,
@@ -715,8 +751,9 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     return super.getOperator(head);
   }
 
-  public void convertComplex(final StringBuilder buf, final IComplex c, final int precedence,
-      boolean caller) {
+  @Override
+  public void convertComplex(
+      final StringBuilder buf, final IComplex c, final int precedence, boolean caller) {
     buf.append("complex(");
     convertFraction(buf, c.getRealPart(), 0, NO_PLUS_CALL);
     buf.append(",");
@@ -724,9 +761,9 @@ public class JavaScriptFormFactory extends DoubleFormFactory {
     buf.append(")");
   }
 
-  public void convertDoubleComplex(final StringBuilder buf, final IComplexNum dc,
-      final int precedence,
-      boolean caller) {
+  @Override
+  public void convertDoubleComplex(
+      final StringBuilder buf, final IComplexNum dc, final int precedence, boolean caller) {
     buf.append("complex(");
     convertDoubleString(buf, convertDoubleToFormattedString(dc.getRealPart()), 0, false);
     buf.append(",");

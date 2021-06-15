@@ -13,7 +13,6 @@ import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 
 /* package */ class UnitImpl implements IUnit, Serializable {
-
   private final TreeMap<String, IExpr> navigableMap;
 
   UnitImpl(TreeMap<String, IExpr> navigableMap) {
@@ -94,8 +93,6 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 
   @Override // from Object
   public String toString() {
-    //
-    //
     DStringJoiner joiner = new DStringJoiner(IUnit.JOIN_DELIMITER);
     for (Entry<String, IExpr> entry : navigableMap.entrySet()) {
       String s = entry.getKey() + exponentString(entry.getValue());

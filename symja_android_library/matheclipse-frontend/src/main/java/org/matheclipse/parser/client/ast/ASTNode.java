@@ -15,10 +15,7 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * The basic node for a parsed expression string
- * 
- */
+/** The basic node for a parsed expression string */
 public abstract class ASTNode {
 
 	protected final String fStringValue;
@@ -58,14 +55,12 @@ public abstract class ASTNode {
 	}
 
 	/**
-	 * Returns <code>true</code>, if <b>none of the elements</b> in the
-	 * subexpressions or the expression itself equals <code>node</code> .
+   * Returns <code>true</code>, if <b>none of the elements</b> in the subexpressions or the
+   * expression itself equals <code>node</code> .
 	 * 
-	 * @param node
-	 *            a node to compare with
-	 * @return <code>true</code>, if <b>none of the elements</b> in the
-	 *         subexpressions or the expression itself equals <code>node</code>
-	 *         .
+   * @param node a node to compare with
+   * @return <code>true</code>, if <b>none of the elements</b> in the subexpressions or the
+   *     expression itself equals <code>node</code> .
 	 */
 	public boolean isFree(final ASTNode node) {
 		return !this.equals(node);

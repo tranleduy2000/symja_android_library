@@ -17,7 +17,7 @@
 
 package org.hipparchus.ode.sampling;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
 
 /**
@@ -36,7 +36,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
  * @see FieldODEStepHandler
  */
 
-public interface FieldODEStateInterpolator<T extends RealFieldElement<T>> {
+public interface FieldODEStateInterpolator<T extends CalculusFieldElement<T>> {
 
     /**
      * Get the state at previous grid point time.
@@ -47,7 +47,7 @@ public interface FieldODEStateInterpolator<T extends RealFieldElement<T>> {
 
     /**
      * Determines if the {@link #getPreviousState() previous state} is computed directly
-     * by the integrator, or if it is calculated using {@link #getInterpolatedState(RealFieldElement)
+     * by the integrator, or if it is calculated using {@link #getInterpolatedState(CalculusFieldElement)
      * interpolation}.
      *
      * <p> Typically the previous state is directly computed by the integrator, but when
@@ -68,7 +68,7 @@ public interface FieldODEStateInterpolator<T extends RealFieldElement<T>> {
 
     /**
      * Determines if the {@link #getCurrentState() current state} is computed directly by
-     * the integrator, or if it is calculated using {@link #getInterpolatedState(RealFieldElement)
+     * the integrator, or if it is calculated using {@link #getInterpolatedState(CalculusFieldElement)
      * interpolation}.
      *
      * <p> Typically the current state is directly computed by the integrator, but when

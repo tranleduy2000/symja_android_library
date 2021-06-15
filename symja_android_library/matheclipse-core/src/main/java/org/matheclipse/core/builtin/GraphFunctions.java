@@ -1192,7 +1192,7 @@ public class GraphFunctions {
         SingleSourcePaths<IExpr, ExprEdge> iPaths = dijkstraAlg.getPaths(ast.arg2());
         GraphPath<IExpr, ExprEdge> path = iPaths.getPath(ast.arg3());
 
-        return Object2Expr.convertList(path.getVertexList());
+        return Object2Expr.convertList(path.getVertexList(), true, false);
       } catch (RuntimeException rex) {
         if (FEConfig.SHOW_STACKTRACE) {
           rex.printStackTrace();

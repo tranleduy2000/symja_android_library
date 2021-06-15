@@ -22,20 +22,22 @@ import org.hipparchus.linear.RealVector;
 import org.jgrapht.GraphType;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.PredicateQ;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.IterationLimitExceeded;
 import org.matheclipse.core.eval.util.AbstractAssumptions;
 import org.matheclipse.core.expression.ASTRealMatrix;
 import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ComplexNum;
-import org.matheclipse.core.expression.ExprField;
 import org.matheclipse.core.expression.ExprID;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.form.output.WolframFormFactory;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
@@ -185,9 +187,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   @Override
   public IExpr multiply(int n) {
     if (isPlus()) {
-      return F.evalExpand(times(F.integer(n)));
+      return F.evalExpand(times(F.ZZ(n)));
     }
-    return times(F.integer(n));
+    return times(F.ZZ(n));
   }
 
   @Override
@@ -197,7 +199,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
   @Override
   public Field<IExpr> getField() {
-    return ExprField.CONST;
+    return F.EXPR_FIELD;
   }
 
   @Override
@@ -285,6 +287,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr base() {
+    if (Config.FUZZ_TESTING) {
+      if (!isPower() && !isAST(S.Surd)) {
+        throw new NullPointerException();
+      }
+    }
     return first();
   }
 
@@ -315,10 +322,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * v.constantArray(2, 3) -> {{v, v, v}, {v, v, v}}
    * </pre>
    *
-   * @param head the head for the new <code>IASTAppendable</code> objects.
+   * @param head          the head for the new <code>IASTAppendable</code> objects.
    * @param startPosition the position from there to create the constant array recusively.
-   * @param arr the nested lists dimensions. <code>arr.length</code> must be greater
-   * <code>0</code>
+   * @param arr           the nested lists dimensions. <code>arr.length</code> must be greater
+   *                      <code>0</code>
    * @return <code>F.NIL</code> if <code>arr</code> has length 0.
    */
   public IASTAppendable constantArray(IExpr head, final int startPosition, int... arr) {
@@ -349,7 +356,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr copySign(ISignedNumber number) {
-    return number.sign() < 0 ? negate() : this;
+    return number.complexSign() < 0 ? negate() : this;
   }
 
   /**
@@ -381,7 +388,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>false</code> otherwise.
    *
    * @param position the position in the <code>IAST</code> which should be tested for equality
-   * @param expr the expression which should be tested for equality
+   * @param expr     the expression which should be tested for equality
    * @return
    */
   @Override
@@ -402,8 +409,87 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr equalTo(IExpr that) {
-    IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
+    IExpr_COMPARE_TERNARY temp = this.equalTernary(that, EvalEngine.get());
     return convertToExpr(temp);
+  }
+
+  @Override
+  public IExpr_COMPARE_TERNARY equalTernary(IExpr that, EvalEngine engine) {
+    if (isIndeterminate() || that.isIndeterminate()) {
+      return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+    }
+    if (this == that) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    }
+
+    IExpr arg1 = this;
+    IExpr arg2 = that;
+    if (!arg1.isReal() && arg1.isNumericFunction(new Function<IExpr, String>() {
+      @Override
+      public String apply(IExpr x) {
+        return x.isDirectedInfinity() ? "" : null;
+      }
+    })) {
+      arg1 = engine.evalN(arg1);
+    }
+    if (!arg2.isReal() && arg2.isNumericFunction(new Function<IExpr, String>() {
+      @Override
+      public String apply(IExpr x) {
+        return x.isDirectedInfinity() ? "" : null;
+      }
+    })) {
+      arg2 = engine.evalN(arg2);
+    }
+    if (arg2.isInexactNumber() && arg1.isExactNumber()) {
+      arg1 = engine.evalN(arg1);
+    }
+    if (arg1.isInexactNumber() && arg2.isExactNumber()) {
+      arg2 = engine.evalN(arg2);
+    }
+
+    if (isSame(that)) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    } else {
+      if (isConstantAttribute() && that.isConstantAttribute()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (isString() && that.isString()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+    if (arg2.isDirectedInfinity()) {
+      if (arg1.isNumber()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (arg1.isDirectedInfinity()) {
+        return arg1.equals(arg2) ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+    if (arg1.isDirectedInfinity()) {
+      if (arg2.isNumber()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+      if (arg2.isDirectedInfinity()) {
+        return arg1.equals(arg2) ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+
+    IExpr difference = engine.evaluate(F.Subtract(arg1, arg2));
+    if (difference.isNumber()) {
+      if (difference.isZero()) {
+        return IExpr_COMPARE_TERNARY.TRUE;
+      }
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+    if (difference.isConstantAttribute()) {
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+
+    if (arg1.isNumber() && arg2.isNumber()) {
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+
+    return IExpr_COMPARE_TERNARY.UNDECIDABLE;
   }
 
   /**
@@ -423,6 +509,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   public double evalDouble() {
     return EvalEngine.get().evalDouble(this);
+  }
+
+  @Override
+  public double getReal() throws ArgumentTypeException {
+    return evalDouble();
   }
 
   /**
@@ -471,7 +562,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
   @Override
   public IExpr evaluateHead(IAST ast, EvalEngine engine) {
-    IExpr result = engine.evaluateNull(this);
+    IExpr result = engine.evaluateNIL(this);
     if (result.isPresent()) {
       // set the new evaluated header !
       return ast.apply(result);
@@ -490,6 +581,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr exponent() {
+    if (Config.FUZZ_TESTING) {
+      if (!isPower() && !isAST(S.Surd)) {
+        throw new NullPointerException();
+      }
+    }
     return second();
   }
 
@@ -681,7 +777,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * If a value is present, performs the given <code>consumer</code> with the value, otherwise
    * performs the given empty-based action.
    *
-   * @param consumer the action to be performed, if a value is present
+   * @param consumer    the action to be performed, if a value is present
    * @param emptyAction the empty-based action to be performed, if no value is present
    */
   public void ifPresentOrElse​(Consumer<? super IExpr> consumer, Runnable emptyAction) {
@@ -732,9 +828,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Return the internal Java form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
    * @return the internal Java form of this expression
    */
   public String internalFormString(boolean symbolsAsFactoryMethod, int depth) {
@@ -745,13 +841,13 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Return the internal Java form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
-   * @param useOperators use operators instead of function names for representation of
-   * Plus, Times, Power,...
-   * @param usePrefix use the <code>F....</code> class prefix for genrating Java code.
-   * @param noSymbolPrefix TODO
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
+   * @param useOperators           use operators instead of function names for representation of
+   *                               Plus, Times, Power,...
+   * @param usePrefix              use the <code>F....</code> class prefix for genrating Java code.
+   * @param noSymbolPrefix         TODO
    * @return the internal Java form of this expression
    */
   public String internalJavaString(
@@ -773,9 +869,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Return the internal Scala form of this expression.
    *
    * @param symbolsAsFactoryMethod if <code>true</code> use the <code>F.symbol()</code> method,
-   * otherwise print the symbol name.
-   * @param depth the recursion depth of this call. <code>0</code> indicates
-   * &quot;recurse without a limit&quot;.
+   *                               otherwise print the symbol name.
+   * @param depth                  the recursion depth of this call. <code>0</code> indicates
+   *                               &quot;recurse without a limit&quot;.
    * @return the internal Scala form of this expression
    */
   public String internalScalaString(boolean symbolsAsFactoryMethod, int depth) {
@@ -945,8 +1041,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    *
    * @param header the header element at position 0, which should be tested
    * @param length the size the AST expression must have
-   * @param args the arguments of this AST which should be tested, if they are equal, a
-   * <code>null</code> value argument skips the equals check.
+   * @param args   the arguments of this AST which should be tested, if they are equal, a
+   *               <code>null</code> value argument skips the equals check.
    * @return
    * @see #isAtom()
    */
@@ -962,7 +1058,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>1..(length-1)</code>. If this
    * test gives <code>true</code> this expression is not an <b>atomic expression</b>.
    *
-   * @param header the header element at position 0, which should be tested
+   * @param header    the header element at position 0, which should be tested
    * @param minLength the minimum size the AST expression must have
    * @param maxLength the maximum size the AST expression must have
    * @return
@@ -990,7 +1086,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * </p>
    *
    * @param headerStr string representation of the <b>header element</b> at index position
-   * <code>0</code>
+   *                  <code>0</code>
    * @return
    * @see #isAtom()
    */
@@ -1009,8 +1105,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * </p>
    *
    * @param headerStr string representation of the <b>header element</b> at index position
-   * <code>0</code>
-   * @param length the size the AST expression must have
+   *                  <code>0</code>
+   * @param length    the size the AST expression must have
    * @return
    * @see #isAtom()
    */
@@ -1545,9 +1641,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * expression itself, did not match the given pattern.
    *
    * @param pattern a pattern-matching expression
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested and
-   * not the
-   * <code>Head[]</code> element.
+   * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                not the
+   *                <code>Head[]</code> element.
    * @return
    */
   @Override
@@ -1560,8 +1656,22 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
         }
       }, heads);
     }
-    final IPatternMatcher matcher = new PatternMatcher(pattern);
-    return !matcher.test(this);
+    final IPatternMatcher matcher;
+    if (pattern.isOrderlessAST() && pattern.isFreeOfPatterns()) {
+      // append a BlankNullSequence[] to match the parts of an Orderless expression
+      IPatternSequence blankNullRest = F.$ps(null, true);
+      IASTAppendable newPattern = ((IAST) pattern).copyAppendable();
+      newPattern.append(blankNullRest);
+      matcher = new PatternMatcher(newPattern);
+    } else {
+      matcher = new PatternMatcher(pattern);
+    }
+    return !has(matcher, heads);
+  }
+
+  @Override
+  public boolean isFree(IPatternMatcher predicate, boolean heads) {
+    return !predicate.test(this);
   }
 
   /**
@@ -1569,9 +1679,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * expression itself, did not satisfy the given unary predicate.
    *
    * @param predicate a unary predicate
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested
-   * and not the
-   * <code>Head[]</code> element.
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested
+   *                  and not the
+   *                  <code>Head[]</code> element.
    * @return
    */
   @Override
@@ -1647,6 +1757,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   @Override
   public boolean isGTOrdered(IExpr expr) {
     return compareTo(expr) > 0;
+  }
+
+  @Override
+  public boolean isHoldAllCompleteAST() {
+    return false;
   }
 
   /**
@@ -1943,9 +2058,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * expression itself, match the given pattern.
    *
    * @param pattern a pattern-matching expression
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested and
-   * not the
-   * <code>Head[]</code> element.
+   * @param heads   if set to <code>false</code>, only the arguments of an IAST should be tested and
+   *                not the
+   *                <code>Head[]</code> element.
    * @return
    */
   @Override
@@ -1967,9 +2082,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * expression itself, satisfy the given unary predicate.
    *
    * @param predicate a unary predicate
-   * @param heads if set to <code>false</code>, only the arguments of an IAST should be tested
-   * and not the
-   * <code>Head[]</code> element.
+   * @param heads     if set to <code>false</code>, only the arguments of an IAST should be tested
+   *                  and not the
+   *                  <code>Head[]</code> element.
    * @return
    */
   @Override
@@ -2163,7 +2278,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public boolean isNumber() {
-    return this instanceof INumber;
+    return false;
   }
 
   /**
@@ -2240,7 +2355,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
 
   @Override
   public boolean isNumericFunction(boolean allowList) {
-    return isNumber() || isConstantAttribute();
+    return false;
   }
 
   @Override
@@ -2504,7 +2619,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Test if this expression is a polynomial of <code>maxDegree</code> (i.e. the maximum exponent <=
    * maxDegree) for the given <code>variable</code>.
    *
-   * @param variable the variable of the polynomial
+   * @param variable  the variable of the polynomial
    * @param maxDegree the maximum degree of the polynomial; maxDegree must be greater 0
    * @return
    */
@@ -2774,7 +2889,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Check if the object at index 0 (i.e. the head of the list) is the same object as
    * <code>head</code> and if the size of the list is greater or equal <code>length</code>.
    *
-   * @param head object to compare with element at location <code>0</code>
+   * @param head   object to compare with element at location <code>0</code>
    * @param length
    * @return
    */
@@ -2915,14 +3030,20 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   }
 
   @Override
+  public boolean isString(String str) {
+    return this instanceof IStringX && toString().equals(str);
+  }
+
+  @Override
+  public boolean isStringIgnoreCase(String str) {
+    return this instanceof IStringX && toString().equalsIgnoreCase(str);
+  }
+
+  @Override
   public boolean isSubscript() {
     return false;
   }
 
-  @Override
-  public boolean isString(String str) {
-    return this instanceof IStringX && toString().equals(str);
-  }
 
   /**
    * Test if this expression is a symbol (instanceof ISymbol)
@@ -3093,6 +3214,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     return false;
   }
 
+  @Override
+  public boolean isPossibleZero(boolean fastTest) {
+    return isZero();
+  }
+
   /**
    * Count the number of leaves of this expression.
    *
@@ -3223,6 +3349,11 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   }
 
   @Override
+  public IExpr most() {
+    return F.NIL;
+  }
+
+  @Override
   public IExpr mod(final IExpr that) {
     return F.Mod.of(this, that);
   }
@@ -3276,6 +3407,21 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
   @Override
   public IExpr negative() {
     return opposite();
+  }
+
+  @Override
+  public IExpr nest(final IExpr head, int n) {
+    IExpr temp = this;
+    final Function<IExpr, IExpr> function = new Function<IExpr, IExpr>() {
+      @Override
+      public IExpr apply(IExpr x) {
+        return F.unaryAST1(head, x);
+      }
+    };
+    for (int i = 0; i < n; i++) {
+      temp = function.apply(temp);
+    }
+    return temp;
   }
 
   @Override
@@ -3351,7 +3497,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> , otherwise throw an
    * exception to be created by the provided supplier.
    *
-   * @param <X> Type of the exception to be thrown
+   * @param <X>               Type of the exception to be thrown
    * @param exceptionSupplier The supplier which will return the exception to be thrown
    * @return <code>this</code> if <code>this</code> unequals <code>F.NIL</code> or throw an
    * exception
@@ -3386,14 +3532,14 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Partitioning of Algebraic Subexpressions in Computer Algebra Systems</a>
    * </p>
    *
-   * @param operator the if the head of this expression equals <code>operator</code>, otherwise
-   * return <code>F.NIL</code>.
+   * @param operator  the if the head of this expression equals <code>operator</code>, otherwise
+   *                  return <code>F.NIL</code>.
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
-   * @param combiner the 1st and 2md results element head
+   *                  <code>false</code> for any of the arguments in this AST.
+   * @param combiner  the 1st and 2md results element head
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   public IAST partition(ISymbol operator, Predicate<? super IExpr> predicate, IExpr initTrue,
@@ -3415,10 +3561,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * </p>
    *
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
+   *                  <code>false</code> for any of the arguments in this AST.
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   public IAST partitionPlus(Predicate<? super IExpr> predicate, IExpr initTrue, IExpr initFalse,
@@ -3439,10 +3585,10 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * </p>
    *
    * @param predicate the predicate which filters each element in this AST
-   * @param initTrue the result for the 1st result element, if the predicate doesn't give
-   * <code>true</code> for any of the arguments in this AST.
+   * @param initTrue  the result for the 1st result element, if the predicate doesn't give
+   *                  <code>true</code> for any of the arguments in this AST.
    * @param initFalse the result for the 2nd result element, if the predicate doesn't give
-   * <code>false</code> for any of the arguments in this AST.
+   *                  <code>false</code> for any of the arguments in this AST.
    * @return <code>F.NIL</code> if partitioning wasn't possible
    */
   public IAST partitionTimes(Predicate<? super IExpr> predicate, IExpr initTrue, IExpr initFalse,
@@ -3512,8 +3658,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>true</code>. If no substitution matches, the method returns <code>this</code>.
    *
    * @param predicate
-   * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
-   * the expression isn't substituted.
+   * @param function  if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
+   *                  the expression isn't substituted.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
@@ -3527,7 +3673,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>null</code>.
    *
    * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
-   * the expression isn't substituted.
+   *                 the expression isn't substituted.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
@@ -3541,7 +3687,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>null</code>.
    *
    * @param astRules rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the
-   * left-hand-side of the rule can contain pattern objects.
+   *                 left-hand-side of the rule can contain pattern objects.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
@@ -3554,7 +3700,7 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * matches, the method returns <code>F.NIL</code>.
    *
    * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
-   * the expression isn't substituted.
+   *                 the expression isn't substituted.
    * @return <code>F.NIL</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
@@ -3567,18 +3713,9 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     return accept(visitor);
   }
 
-  /**
-   * Replace all subexpressions with the given rule set. A rule must contain the position of the
-   * subexpression which should be replaced on the left-hand-side. If no substitution matches, the
-   * method returns <code>F.NIL</code>.
-   *
-   * @param astRules rules of the form <code>position-&gt;y</code> or <code>{position1-&gt;b,
-   * position2-&gt;d}</code>
-   * @return <code>F.NIL</code> if no substitution of a subexpression was possible.
-   */
   @Override
-  public IExpr replacePart(final IAST astRules) {
-    return this.accept(new VisitorReplacePart(astRules));
+  public IExpr replacePart(IAST astRules, IExpr_COMPARE_TERNARY heads) {
+    return this.accept(new VisitorReplacePart(astRules, heads));
   }
 
   /**
@@ -3586,12 +3723,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * matches, the method returns <code>this</code>.
    *
    * @param function if the unary functions <code>apply()</code> method returns <code>null</code>
-   * the expression isn't substituted.
+   *                 the expression isn't substituted.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
   public IExpr replaceRepeated(final Function<IExpr, IExpr> function) {
-    return replaceRepeated(new VisitorReplaceAll(function));
+    return replaceRepeated(new VisitorReplaceAll(function), -1);
   }
 
   /**
@@ -3600,12 +3737,36 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * <code>this</code>.
    *
    * @param astRules rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the
-   * left-hand-side of the rule can contain pattern objects.
+   *                 left-hand-side of the rule can contain pattern objects.
    * @return <code>this</code> if no substitution of a (sub-)expression was possible.
    */
   @Override
   public IExpr replaceRepeated(final IAST astRules) {
-    return replaceRepeated(new VisitorReplaceAll(astRules));
+    return replaceRepeated(new VisitorReplaceAll(astRules), -1);
+  }
+
+  @Override
+  public IExpr replaceRepeated(VisitorReplaceAll visitor, int maxIterations) {
+    IExpr result = this;
+    IExpr temp = accept(visitor);
+    final EvalEngine engine = EvalEngine.get();
+    int iterationLimit = engine.getIterationLimit();
+    if (maxIterations > 0 && maxIterations < iterationLimit) {
+      iterationLimit = maxIterations;
+    }
+    int iterationCounter = 0;
+    while (temp.isPresent()) {
+      result = engine.evaluate(temp);
+      if (iterationLimit >= 0 && iterationLimit <= ++iterationCounter) {
+        // Exiting after `1` scanned `2` times.
+        IOFunctions.printMessage(
+            S.ReplaceRepeated, "rrlim", F.List(this, F.ZZ(iterationLimit)), engine);
+        return result;
+      }
+
+      temp = result.accept(visitor);
+    }
+    return result;
   }
 
   /**
@@ -3896,8 +4057,14 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
   @Override
   public IExpr unequalTo(IExpr that) {
-    IExpr_COMPARE_TERNARY temp = BooleanFunctions.CONST_EQUAL.compareTernary(this, that);
-    return ExprUtil.convertToExpr(temp);
+    IExpr_COMPARE_TERNARY temp = this.equalTernary(that, EvalEngine.get());
+    if (temp == IExpr_COMPARE_TERNARY.TRUE) {
+      return S.False;
+    }
+    if (temp == IExpr_COMPARE_TERNARY.FALSE) {
+      return S.True;
+    }
+    return F.NIL;
   }
 
   /**
@@ -3934,8 +4101,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    * Convert the variables (i.e. expressions of type <code>ISymbol</code> which aren't constants) in
    * this expression into Slot[] s.
    *
-   * @param map for every given symbol argument return the associated unique slot from
-   * this map
+   * @param map               for every given symbol argument return the associated unique slot from
+   *                          this map
    * @param variableCollector collects the variables which are used in the replacement process
    * @return <code>F.NIL</code> if no variable symbol was found.
    */
@@ -4054,7 +4221,8 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
     if (isNumber()) {
       return isZero();
     }
-    return isAST() && PredicateQ.isZeroTogether(this, EvalEngine.get());
+    return isAST() && PredicateQ.isPossibleZeroQ((IAST) this, false, EvalEngine.get());
+    // PredicateQ.isZeroTogether(this, EvalEngine.get());
   }
 
   /**
@@ -4064,12 +4232,12 @@ public abstract class IExprImpl extends RingElemImpl<IExpr> implements IExpr {
    */
 
   @Override
-  public int signum() {
+  public int signum(){
     if (isZero()) {
       return 0;
     }
-    if (isReal()) {
-      return ((ISignedNumber) this).sign();
+    if (this instanceof INumber) {
+      return ((INumber) this).complexSign();
     }
     return 1;
   }

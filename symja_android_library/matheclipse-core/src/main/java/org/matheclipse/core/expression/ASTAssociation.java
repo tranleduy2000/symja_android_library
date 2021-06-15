@@ -199,21 +199,6 @@ public class ASTAssociation extends AST implements IAssociation {
     return get(5);
   }
 
-  /**
-   * Get the index of the left-hand-side of a rule. If the returned value is<code>0</code> no value
-   * was found.
-   *
-   * @param expr
-   * @return if <code>0</code> no value was found
-   */
-  // private int getIndex(IExpr expr) {
-  // return keyToIndexMap.getInt(expr);
-  // }
-  //  @Override
-  //  public IAST clone() {
-  //	  throw new UnsupportedOperationException();
-  ////    return copy();
-  //  }
   @Override
   public ASTAssociation copy() {
     ASTAssociation ast = new ASTAssociation();
@@ -336,7 +321,7 @@ public class ASTAssociation extends AST implements IAssociation {
         IExpr arg = getRule(i);
         if (arg.isRule()) {
           // for Rules eval rhs / for RuleDelayed don't
-          IExpr temp = engine.evaluateNull(arg.second());
+          IExpr temp = engine.evaluateNIL(arg.second());
           if (temp.isPresent()) {
             if (!result.isPresent()) {
               result = copy();
@@ -517,6 +502,19 @@ public class ASTAssociation extends AST implements IAssociation {
     }
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public final int indexOf(Predicate<? super IExpr> predicate, int fromIndex) {
+    int index = fromIndex;
+    int start = firstIndex + index;
+    for (int i = start; i < lastIndex; i++) {
+      if (predicate.test(get(i))) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
+  }
   /**
    * Test if this AST is an association <code>&lt;|a-&gt;b, c-&gt;d|&gt;</code>(i.e. type <code>
    * AssociationAST</code>)
@@ -533,6 +531,65 @@ public class ASTAssociation extends AST implements IAssociation {
     return false;
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST(final IExpr header) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST(final IExpr header, final int length) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST(IExpr header, int length, IExpr... args) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isAST(IExpr head, int minLength, int maxLength) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isAST(final String symbol) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isAST(final String symbol, final int length) {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST0() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST1() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST2() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isAST3() {
+    return false;
+  }
   @Override
   public boolean isAtom() {
     return true;
@@ -665,6 +722,14 @@ public class ASTAssociation extends AST implements IAssociation {
     }
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public IAST most() {
+    if (size() > 1) {
+      return splice(argSize());
+    }
+    return F.NIL;
+  }
   @Override
   public IASTMutable normal(boolean nilIfUnevaluated) {
     return normal(S.List);
@@ -794,6 +859,17 @@ public class ASTAssociation extends AST implements IAssociation {
     return F.NIL;
   }
 
+  @Override
+  public IExpr setValue(final int location, final IExpr value) {
+    if (location > 0) {
+      final IAST oldRule = getRule(location);
+      keyToIndexMap.removeInt(oldRule.first());
+      keyToIndexMap.put(oldRule.first(), location);
+      return super.set(location, oldRule.setAtCopy(2, value));
+    }
+    // set header
+    return super.set(0, value);
+  }
   @Override
   public IAssociation sort() {
     return sort(null);

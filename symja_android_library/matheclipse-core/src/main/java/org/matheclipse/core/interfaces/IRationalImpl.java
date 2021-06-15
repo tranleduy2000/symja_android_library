@@ -68,7 +68,7 @@ public abstract class IRationalImpl extends ISignedNumberImpl implements IRation
      * @return <code>this<sup>exp</sup></code>
      * @throws ArithmeticException if {@code 0^0} is given.
      */
-    public abstract IRational pow(final long exp) throws ArithmeticException;
+    public abstract IRational powerRational(final long exp) throws ArithmeticException;
 
     @Override
     public IRational reRational() {

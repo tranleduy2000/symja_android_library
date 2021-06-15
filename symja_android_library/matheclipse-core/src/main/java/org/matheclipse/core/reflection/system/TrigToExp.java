@@ -6,6 +6,7 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.StructureFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
@@ -38,8 +39,9 @@ public class TrigToExp extends AbstractEvaluator {
 	/**
 	 * Exponential definitions for trigonometric functions
 	 *
-	 * See <a href= "http://en.wikipedia.org/wiki/List_of_trigonometric_identities#Exponential_definitions"> List of
-	 * trigonometric identities - Exponential definitions</a>,<br/>
+   * <p>See <a href=
+   * "http://en.wikipedia.org/wiki/List_of_trigonometric_identities#Exponential_definitions"> List
+   * of trigonometric identities - Exponential definitions</a>,<br>
 	 * <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">Hyperbolic function</a>
 	 */
 	@Override
@@ -66,12 +68,11 @@ public class TrigToExp extends AbstractEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_1_1;
+    return IFunctionEvaluator.ARGS_1_1;
 	}
 
 	@Override
 	public void setUp(final ISymbol newSymbol) {
 		newSymbol.setAttributes(ISymbol.LISTABLE);
 	}
-
 }

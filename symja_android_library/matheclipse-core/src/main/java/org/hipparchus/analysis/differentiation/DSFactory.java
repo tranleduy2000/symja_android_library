@@ -264,17 +264,13 @@ public class DSFactory implements Serializable {
             return one;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
-        public Class<? extends FieldElement<DerivativeStructure>> getRuntimeClass() {
+        public Class<DerivativeStructure> getRuntimeClass() {
             return DerivativeStructure.class;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public boolean equals(final Object other) {
             if (this == other) {
@@ -288,9 +284,7 @@ public class DSFactory implements Serializable {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public int hashCode() {
             final DSCompiler compiler = zero.getFactory().getCompiler();

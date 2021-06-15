@@ -7,6 +7,7 @@ import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractPredicateEvaluator;
 import org.matheclipse.core.eval.interfaces.ICoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.ISignedNumberConstant;
@@ -18,6 +19,7 @@ import org.matheclipse.core.interfaces.IComparatorFunction;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IEvaluatorImpl;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExpr_COMPARE_TERNARY;
 import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.parser.client.FEConfig;
@@ -28,7 +30,7 @@ import java.io.ObjectStreamException;
 /** Implements Symbols for function, constant and variable names */
 public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
-  private static final class PredicateEvaluator extends AbstractCorePredicateEvaluator
+  private static final class PredicateEvaluator extends AbstractPredicateEvaluator
       implements IPredicate {
 
     Predicate<IExpr> predicate;
@@ -40,14 +42,15 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
     /** {@inheritDoc} */
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      return predicate.test(engine.evaluate(ast.arg1())) ? F.True : F.False;
+      return predicate.test(ast.arg1()) ? S.True : S.False;
     }
 
     @Override
     public boolean evalArg1Boole(IExpr arg1, EvalEngine engine) {
-      return predicate.test(engine.evaluate(arg1));
+      return predicate.test(arg1);
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return IFunctionEvaluator.ARGS_1_1;
     }
@@ -93,10 +96,8 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
     super(symbolName, Context.SYSTEM);
     fEvaluator = DUMMY_EVALUATOR;
     fOrdinal = ordinal;
-    if (symbolName.charAt(0) != '$') {
-      fAttributes = ISymbol.PROTECTED;
-    } else if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
-      fAttributes = ISymbol.PROTECTED;
+    if ((symbolName.charAt(0) != '$') || FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+      fAttributes = Config.BUILTIN_PROTECTED;
     }
   }
 
@@ -165,6 +166,30 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
 
   /** {@inheritDoc} */
   @Override
+  public IExpr_COMPARE_TERNARY equalTernary(IExpr arg2, EvalEngine engine) {
+    if (isIndeterminate() || arg2.isIndeterminate()) {
+      return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+    }
+    if (this == arg2) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    }
+
+    if (isTrue()) {
+      if (arg2.isFalse()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+    } else if (isFalse()) {
+      if (arg2.isTrue()) {
+        return IExpr_COMPARE_TERNARY.FALSE;
+      }
+    }
+    if (isConstantAttribute() && arg2.isConstantAttribute()) {
+      return IExpr_COMPARE_TERNARY.FALSE;
+    }
+    return super.equalTernary(arg2, engine);
+  }
+  /** {@inheritDoc} */
+  @Override
   public IExpr evaluate(EvalEngine engine) {
     // final IEvaluator module = getEvaluator();
     if (fEvaluator instanceof ISymbolEvaluator) {
@@ -214,6 +239,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
     return fOrdinal;
   }
 
+  @Override
   protected String internalJavaStringAsFactoryMethod() {
     if (Config.RUBI_CONVERT_SYMBOLS) {
       if (fOrdinal >= 1) {
@@ -303,6 +329,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
   }
 
   /** {@inheritDoc} */
+  @Override
   public final boolean isSymbolID(int... ids) {
     for (int i = 0; i < ids.length; i++) {
       if (fOrdinal == ids[i]) {
@@ -360,7 +387,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
   /** {@inheritDoc} */
   @Override
   public final void setAttributes(final int attributes) {
-    super.setAttributes(attributes | ISymbol.PROTECTED);
+    super.setAttributes(attributes | Config.BUILTIN_PROTECTED | ISymbol.PROTECTED);
   }
 
   /** {@inheritDoc} */
@@ -388,6 +415,7 @@ public class BuiltInSymbol extends Symbol implements IBuiltInSymbol {
     fOrdinal = stream.readInt();
   }
 
+  @Override
   public Object readResolve() throws ObjectStreamException {
     return F.symbol(fOrdinal);
   }

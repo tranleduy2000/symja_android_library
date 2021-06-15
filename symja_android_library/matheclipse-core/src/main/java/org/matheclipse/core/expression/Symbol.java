@@ -5,6 +5,7 @@ import com.duy.lambda.Function;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.AttributeFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
@@ -22,6 +23,8 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
+import org.matheclipse.core.interfaces.ISymbolStatic;
+import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -440,15 +443,22 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
   /** {@inheritDoc} */
   @Override
   public String fullFormString() {
-    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
-      String str = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(fSymbolName);
-      if (str != null) {
-        return str;
-      }
-    }
+    try {
+      StringBuilder sb = new StringBuilder();
+      OutputFormFactory.get(EvalEngine.get().isRelaxedSyntax()).convertSymbol(sb, this);
+      return sb.toString();
+    } catch (Exception e1) {
     return fSymbolName;
   }
 
+    //    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+    //      String str = AST2Expr.PREDEFINED_SYMBOLS_MAP.get(fSymbolName);
+    //      if (str != null) {
+    //        return str;
+    //      }
+    //    }
+    //    return fSymbolName;
+  }
 
   /** {@inheritDoc} */
   @Override
@@ -503,7 +513,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 
   @Override
   public final boolean hasFlatAttribute() {
-    return ISymbolImpl.hasFlatAttribute(fAttributes);
+    return ISymbolStatic.hasFlatAttribute(fAttributes);
+  }
+
+  @Override
+  public final boolean hasHoldAllCompleteAttribute() {
+    return ISymbolStatic.hasHoldAllCompleteAttribute(fAttributes);
   }
 
   /** {@inheritDoc} */
@@ -519,12 +534,12 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 
   @Override
   public final boolean hasOrderlessAttribute() {
-    return ISymbolImpl.hasOrderlessAttribute(fAttributes);
+    return ISymbolStatic.hasOrderlessAttribute(fAttributes);
   }
 
   @Override
   public final boolean hasOrderlessFlatAttribute() {
-    return ISymbolImpl.hasOrderlessAttributeFlat(fAttributes);
+    return ISymbolStatic.hasOrderlessFlatAttribute(fAttributes);
   }
 
   /** {@inheritDoc} */
@@ -778,6 +793,11 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
   }
 
   @Override
+  public final boolean isStringIgnoreCase(final String str) {
+    return fSymbolName.equalsIgnoreCase(str);
+  }
+
+  @Override
   public final boolean isSymbolName(String name) {
     if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
       if (fSymbolName.length() == 1) {
@@ -833,7 +853,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
   @Override
   public final IExpr ofNIL(EvalEngine engine, IExpr... args) {
     IAST ast = F.function(this, args);
-    IExpr temp = engine.evaluateNull(ast);
+    IExpr temp = engine.evaluateNIL(ast);
     if (temp.isPresent() && temp.head() == this) {
       return F.NIL;
     }
@@ -865,7 +885,7 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         equalRule,
         leftHandSide,
         rightHandSide,
-        IPatternMapImpl.DEFAULT_RULE_PRIORITY,
+        IPatternMap.DEFAULT_RULE_PRIORITY,
         packageMode);
   }
 
@@ -912,10 +932,10 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
 
   /** {@inheritDoc} */
   @Override
-  public final IPatternMatcher putUpRule(final int setSymbol, boolean equalRule, IAST leftHandSide,
-      IExpr rightHandSide) {
-    return putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide,
-        IPatternMapImpl.DEFAULT_RULE_PRIORITY);
+  public final IPatternMatcher putUpRule(
+      final int setSymbol, boolean equalRule, IAST leftHandSide, IExpr rightHandSide) {
+    return putUpRule(
+        setSymbol, equalRule, leftHandSide, rightHandSide, IPatternMap.DEFAULT_RULE_PRIORITY);
   }
 
   /** {@inheritDoc} */
@@ -1007,8 +1027,13 @@ public class Symbol extends ISymbolImpl implements ISymbol, Serializable {
         return result;
       }
     }
-    engine.printMessage(functionSymbol.toString() + ": " + toString()
-        + " is not a variable with a value, so its value cannot be changed.");
+    // `1` is not a variable with a value, so its value cannot be changed.
+    IOFunctions.printMessage(functionSymbol, "rvalue", F.List(this), engine);
+    //    engine.printMessage(
+    //        functionSymbol.toString()
+    //            + ": "
+    //            + toString()
+    //            + " is not a variable with a value, so its value cannot be changed.");
     return null;
   }
 

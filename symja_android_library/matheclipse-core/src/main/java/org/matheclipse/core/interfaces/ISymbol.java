@@ -1,53 +1,43 @@
 package org.matheclipse.core.interfaces;
 
-import com.duy.annotations.Nonnull;
 import com.duy.lambda.DoubleFunction;
 import com.duy.lambda.Function;
-
+import java.io.IOException;
+import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
-
-import java.io.IOException;
 
 
 /**
  * An expression representing a symbol (i.e. variable- constant- or function-name)
  */
 @SuppressWarnings({"JavadocReference", "UnnecessaryInterfaceModifier", "JavaDoc"})
-public interface ISymbol extends IExpr { // Variable<IExpr>
+public interface ISymbol extends IExpr {
 
   /**
    * ISymbol attribute to indicate that a symbols evaluation should be printed to Console with
    * System.out.println();
    */
-  // public static final int CONSOLE_OUTPUT = 0x1000;
-  /**
-   * ISymbol attribute to indicate that a symbol has a constant value
-   */
+  // public final static int CONSOLE_OUTPUT = 0x1000;
+
+  /** ISymbol attribute to indicate that a symbol has a constant value */
   public static final int CONSTANT = 0x0002;
   /**
    * ISymbol attribute for an associative function transformation. The evaluation of the function
    * will flatten the arguments list
    */
   public static final int FLAT = 0x0008;
-  /**
-   * ISymbol attribute for a function, where the first argument should not be evaluated
-   */
+  /** ISymbol attribute for a function, where the first argument should not be evaluated */
   public static final int HOLDFIRST = 0x0020;
-  /**
-   * ISymbol attribute for a function, where only the first argument should be evaluated
-   */
+  /** ISymbol attribute for a function, where only the first argument should be evaluated */
   public static final int HOLDREST = 0x0040;
-  /**
-   * ISymbol attribute for a function, where no argument should be evaluated
-   */
+  /** ISymbol attribute for a function, where no argument should be evaluated */
   public static final int HOLDALL = HOLDFIRST | HOLDREST;
 
-  /**
-   * ISymbol attribute for a function, where no argument should be evaluated
-   */
+  /** ISymbol attribute for a function, where no argument should be evaluated */
   public static final int HOLDCOMPLETE = HOLDALL | 0x0080;
 
   /**
@@ -126,9 +116,9 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
   /**
    * Set the <code>OwnValues</code> value of this variable
    *
-   * @param value the assigned 'right-hand-side' expression
+   * @param value      the assigned 'right-hand-side' expression
    * @param setDelayed if <code>true</code>, the value is assigned with the ':=' SetDelayed operator
-   *     otherwise with the '=' operator.
+   *                   otherwise with the '=' operator.
    */
   public void assignValue(IExpr value, boolean setDelayed);
 
@@ -227,11 +217,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    */
   public IExpr evalUpRules(IExpr expression, EvalEngine engine);
 
-  IAST f(IExpr arg1);
+  IAST f(IExpr arg1); /* {
+    return F.unaryAST1(this, arg1);
+  }*/
 
-  IAST f(IExpr arg1, IExpr arg2);
+  IAST f(IExpr arg1, IExpr arg2); /*{
+    return F.binaryAST2(this, arg1, arg2);
+  }*/
 
-  IAST f(IExpr arg1, IExpr arg2, IExpr arg3);
+  IAST f(IExpr arg1, IExpr arg2, IExpr arg3);/*{
+    return F.ternaryAST3(this, arg1, arg2, arg3);
+  }*/
 
   /**
    * Get the value which is assigned to the symbol or <code>null</code>, if no value is assigned.
@@ -239,7 +235,10 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * @return <code>null</code>, if no value is assigned.
    * @deprecated use {@link #assignedValue()} instead
    */
-  public IExpr get();
+  @Deprecated
+  public IExpr get(); /*{
+    return assignedValue();
+  }*/
 
   /**
    * Get the Attributes of this symbol (i.e. LISTABLE, FLAT, ORDERLESS,...)
@@ -304,16 +303,64 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * Does this symbols attribute set contains the <code>Flat</code> attribute?
    *
    * @return <code>true</code> if this symbols attribute set contains the <code>Flat</code>
-   *     attribute.
+   * attribute.
    */
   boolean hasFlatAttribute();
 
 
   /**
+   * Does this symbols attribute set contains the {@link ISymbol#HOLDALLCOMPLETE} attribute?
+   *
+   * @return
+   */
+  boolean hasHoldAllCompleteAttribute();
+
+//  /**
+//   * Does the attributes flag set contains the {@link ISymbol#FLAT} bit set?
+//   *
+//   * @return <code>true</code> if this attribute set contains the <code>ISymbol.Flat</code>
+//   *     attribute.
+//   */
+//  public static boolean hasFlatAttribute(int attributes) {
+//    return (attributes & FLAT) == FLAT;
+//  }
+//
+//  /**
+//   * Does the attributes flag set contains the {@link ISymbol#HOLDALLCOMPLETE} bit set?
+//   *
+//   * @param attributes
+//   * @return
+//   */
+//  public static boolean hasHoldAllCompleteAttribute(int attributes) {
+//    return (attributes & HOLDALLCOMPLETE) == HOLDALLCOMPLETE;
+//  }
+//
+//  /**
+//   * Does this symbols attribute set contains the <code>Orderless</code> attribute?
+//   *
+//   * @return <code>true</code> if this symbols attribute set contains the <code>Orderless</code>
+//   *     attribute.
+//   */
+//  public static boolean hasOrderlessAttribute(int attributes) {
+//    return (attributes & ORDERLESS) == ORDERLESS;
+//  }
+//
+//  /**
+//   * Does the attributes flag set contains the <code>ISymbol.Flat</code> and <code>ISymbol.Orderless
+//   * </code> bits set?
+//   *
+//   * @return <code>true</code> if this attribute set contains the <code>ISymbol.Flat</code> and
+//   *     <code>ISymbol.Orderless</code> attribute.
+//   */
+//  public static boolean hasOrderlessFlatAttribute(int attributes) {
+//    return (attributes & FLATORDERLESS) == FLATORDERLESS;
+//  }
+
+  /**
    * Does this symbols attribute set contains the <code>OneIdentity</code> attribute?
    *
    * @return <code>true</code> if this symbols attribute set contains the <code>OneIdentity</code>
-   *     attribute.
+   * attribute.
    */
   boolean hasOneIdentityAttribute();
 
@@ -321,7 +368,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * Does this symbols attribute set contains the <code>Orderless</code> attribute?
    *
    * @return <code>true</code> if this symbols attribute set contains the <code>Orderless</code>
-   *     attribute.
+   * attribute.
    */
   boolean hasOrderlessAttribute();
 
@@ -330,7 +377,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * attribute?
    *
    * @return <code>true</code> if this symbols attribute set contains the <code>Flat</code> and the
-   *     <code>Orderless</code> attribute.
+   * <code>Orderless</code> attribute.
    */
   boolean hasOrderlessFlatAttribute();
 
@@ -372,19 +419,17 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    */
   public boolean isLocked(boolean packageMode);
 
-  boolean isNumericFunctionAttribute();
+  boolean isNumericFunction(boolean allowList);/*{
+    return isConstantAttribute();
+  }*/
 
+  boolean isNumericFunctionAttribute(); /*{
+    return ((getAttributes() & NUMERICFUNCTION) == NUMERICFUNCTION);
+  }*/
 
-  boolean isProtected();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  boolean isBooleanResult();
-
-  @Override
-  IExpr[] linear(IExpr variable);
+  boolean isProtected(); /*{
+    return ((getAttributes() & PROTECTED) == PROTECTED);
+  }*/
 
 
   /**
@@ -393,6 +438,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * @param symbolName
    * @return
    */
+  @Override
   public boolean isString(String symbolName);
 
   /**
@@ -412,7 +458,25 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * @return
    * @see org.matheclipse.core.expression.ID
    */
-  boolean isSymbolID(int... ids);
+  boolean isSymbolID(int... ids); /*{
+    return false;
+  }*/
+
+  @Override
+  IExpr[] linear(IExpr variable); /*{
+    if (this.equals(variable)) {
+      return new IExpr[] {F.C0, F.C1};
+    }
+    return new IExpr[] {this, F.C0};
+  }*/
+
+  @Override
+  IExpr[] linearPower(IExpr variable);/* {
+    if (this.equals(variable)) {
+      return new IExpr[] {F.C0, F.C1, F.C1};
+    }
+    return new IExpr[] {this, F.C0, F.C1};
+  }*/
 
   /**
    * If this symbol has attribute <code>ISymbol.CONSTANT</code> and the symbol's evaluator is of
@@ -420,13 +484,15 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * function and return the result, otherwise return <code>F.NIL</code>.
    *
    * @param function applys the function to a <code>double</code> value, resulting in an object of
-   *     type {@code IExpr}.
+   *                 type {@code IExpr}.
    * @return the resulting expression from the function or <code>F.NIL</code>.
    * @see org.matheclipse.core.reflection.system.Abs
    * @see org.matheclipse.core.reflection.system.Ceiling
    * @see org.matheclipse.core.reflection.system.Floor
    */
-  IExpr mapConstantDouble(DoubleFunction<IExpr> function);
+  IExpr mapConstantDouble(DoubleFunction<IExpr> function); /*{
+    return F.NIL;
+  }*/
 
 
   /**
@@ -435,7 +501,8 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    *
    * @param engine the current evaluation engine
    * @param args   the arguments for which this function symbol should be evaluated
-   * @return
+   * @return the evaluated expression; if no evaluation was possible return the created input
+   * expression.
    */
   public IExpr of(EvalEngine engine, IExpr... args);
 
@@ -444,9 +511,10 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * symbol(arg, part1, part2, .... , partN)</code>.
    *
    * @param engine the current evaluation engine
-   * @param arg the main argument
-   * @param parts the arguments for which this function symbol should be evaluated
-   * @return
+   * @param arg    the main argument
+   * @param parts  the arguments for which this function symbol should be evaluated
+   * @return the evaluated expression; if no evaluation was possible return the created input
+   * expression.
    */
   public IExpr of1(EvalEngine engine, IExpr arg, IExpr... parts);
 
@@ -454,15 +522,76 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>.
    *
    * @param args the arguments for which this function symbol should be evaluated
+   * @return the evaluated expression; if no evaluation was possible return the created input
+   * expression.
+   */
+  public IExpr of(IExpr... args); /*{
+    return of(EvalEngine.get(), args);
+  }*/
+
+  /**
+   * Evaluate this symbol for the arguments as function <code>
+   * symbol(F.ZZ(arg1), F.ZZ(arg2), .... ,F.ZZ(argN))</code> by converting the args to {@link
+   * IInteger} objects.
+   *
+   * @param args
+   * @return the evaluated expression; if no evaluation was possible return the created input
+   * expression.
+   */
+  IExpr of(int... args); /* {
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = F.ZZ(args[i]);
+    }
+    return of(array);
+  }*/
+
+  /**
+   * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>,
+   * The <code>args</code> are converted from Java double to {@link INum} values.
+   *
+   * @param args
    * @return
    */
-  public IExpr of(IExpr... args);
+  double ofN(double... args) throws ArgumentTypeException; /*{
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = F.num(args[i]);
+    }
+    return of(array).evalDouble();
+  }*/
 
-  IExpr of(int... args);
+  /**
+   * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>,
+   * The <code>args</code> are converted from Java <code>String</code> to <code>IStringX</code>
+   * values.
+   *
+   * @param args the string arguments of the function
+   * @return
+   */
+  IExpr of(String... args);/* {
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = F.stringx(args[i]);
+    }
+    return of(array);
+  }*/
 
-  double ofN(double... args);
-
-  IExpr of(boolean... args);
+  /**
+   * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>,
+   * The <code>args</code> are converted from Java boolean to {@link S#True} or {@link S#False}
+   * values.
+   *
+   * @param args
+   * @return
+   */
+  IExpr of(boolean... args); /*{
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = args[i] ? S.True : S.False;
+    }
+    return of(array);
+  }*/
 
 
   /**
@@ -495,13 +624,32 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    */
   public boolean ofQ(IExpr... args);
 
+
+  /**
+   * Evaluate this symbol for the arguments as function <code>symbol(arg1, arg2, .... ,argN)</code>,
+   * The objects are converted from Java form to IExpr for according to method {@link
+   * Object2Expr#convert(Object, boolean, boolean)}.
+   *
+   * @param args the objects which should be used as arguments
+   * @return
+   */
+  IExpr ofObject(Object... args); /*{
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = Object2Expr.convert(args[i], true, false);
+    }
+    return of(array);
+  }*/
+
   /**
    * Get the ordinal number of this built-in symbol in the enumeration of built-in symbols. If this
    * is no built-in symbol return <code>-1</code> (ID.UNKNOWN)
    *
    * @return
    */
-  int ordinal();
+  int ordinal(); /* {
+    return ID.UNKNOWN;
+  }*/
 
   /**
    * Associate a new &quot;down value&quot; rule with default priority to this symbol.
@@ -524,7 +672,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * Rules with lower numbers have higher priorities.
    *
    * @param setSymbol     which of the symbols <code>Set, SetDelayed, UpSet, UpSetDelayed</code> was
-   *     used for defining this rule
+   *                      used for defining this rule
    * @param equalRule     <code>true</code> if the leftHandSide could be matched with equality
    * @param leftHandSide
    * @param rightHandSide
@@ -545,13 +693,14 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    */
   // Android changed: remove reflection
 //    public void putDownRule(final PatternMatcherAndInvoker pmEvaluator);
+
   public void putMessage(final int setSymbol, String messageName, IStringX message);
 
   /**
    * Associate a new &quot;up value&quot; rule with default priority to this symbol.
    *
    * @param setSymbol     which of the symbols <code>Set, SetDelayed, UpSet, UpSetDelayed</code> was
-   *     used for defining this rule
+   *                      used for defining this rule
    * @param equalRule     <code>true</code> if the leftHandSide could be matched with equality
    * @param leftHandSide
    * @param rightHandSide
@@ -566,7 +715,7 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * Rules with lower numbers have higher priorities.
    *
    * @param setSymbol     which of the symbols <code>Set, SetDelayed, UpSet, UpSetDelayed</code> was
-   *     used for defining this rule
+   *                      used for defining this rule
    * @param equalRule     <code>true</code> if the leftHandSide could be matched with equality
    * @param leftHandSide
    * @param rightHandSide
@@ -594,10 +743,10 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    *
    * @param function       the function which should be applied
    * @param functionSymbol if this method throws an exception the symbol will be displayed in the
-   *     exceptions message
+   *                       exceptions message
    * @param engine         the evaluation engine
    * @return an array with the currently assigned value of the symbol and the new calculated value
-   *     of the symbol or <code>null</code> if the reassignment isn't possible.
+   * of the symbol or <code>null</code> if the reassignment isn't possible.
    */
   public IExpr[] reassignSymbolValue(Function<IExpr, IExpr> function, ISymbol functionSymbol,
       EvalEngine engine);
@@ -607,13 +756,13 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * the symbol. Used for functions like AppendTo, Decrement, Increment,...
    *
    * @param ast
-   * @param ast the ast which should be evaluated by replacing the first argument with the current
-   *     value of the symbol
+   * @param ast            the ast which should be evaluated by replacing the first argument with the current
+   *                       value of the symbol
    * @param functionSymbol if this method throws an exception the symbol will be displayed in the
-   *     exceptions message
+   *                       exceptions message
    * @param engine         the evaluation engine
    * @return an array with the currently assigned value of the symbol and the new calculated value
-   *     of the symbol or <code>null</code> if the reassignment isn't possible.
+   * of the symbol or <code>null</code> if the reassignment isn't possible.
    */
   public IExpr[] reassignSymbolValue(IASTMutable ast, ISymbol functionSymbol, EvalEngine engine);
 
@@ -669,6 +818,12 @@ public interface ISymbol extends IExpr { // Variable<IExpr>
    * @return <code>false</code> if the symbol contains no rule definion.
    */
   public boolean writeRules(java.io.ObjectOutputStream stream) throws java.io.IOException;
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  boolean isBooleanResult();
 
 
 }

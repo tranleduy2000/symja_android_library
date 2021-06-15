@@ -6,7 +6,9 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.exception.ValidateException;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -18,10 +20,12 @@ import org.matheclipse.parser.client.FEConfig;
  * </pre>
  * 
  * <blockquote>
- * <p>
- * attempts to find one instance which solves the <code>equations</code> for the variables <code>vars</code>.
- * </p>
+ *
+ * <p>attempts to find one instance which solves the <code>equations</code> for the variables <code>
+ * vars</code>.
+ *
  * </blockquote>
+ *
  * <h3>Examples</h3>
  * 
  * <pre>
@@ -30,9 +34,8 @@ import org.matheclipse.parser.client.FEConfig;
  * </pre>
  * 
  * <h3>Related terms</h3>
- * <p>
- * <a href="Solve.md">Solve</a>
- * </p>
+ *
+ * <p><a href="Solve.md">Solve</a>
  */
 public class FindInstance extends Solve {
 
@@ -46,7 +49,7 @@ public class FindInstance extends Solve {
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
-		IAST vars = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+    IAST vars = Validate.checkIsVariableOrVariableList(ast, 2, ast.topHead(), engine);
 		if (!vars.isPresent()) {
 			return F.NIL;
 		}
@@ -76,7 +79,7 @@ public class FindInstance extends Solve {
 				}
 			}
 			if (ast.isAST3()) {
-				if (ast.arg3().equals(F.Booleans) || formula) {
+        if (ast.arg3().equals(S.Booleans) || formula) {
 					return BooleanFunctions.solveInstances(ast.arg1(), vars, maxChoices);
 				}
 				return engine.printMessage(ast.topHead()
@@ -96,7 +99,8 @@ public class FindInstance extends Solve {
 
 		return F.NIL;
 	}
+  @Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_2_3;
+    return IFunctionEvaluator.ARGS_2_3;
 	}
 }

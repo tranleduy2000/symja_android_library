@@ -94,18 +94,19 @@ public class DoubleToMMA {
   }
 
   /**
-   * Convert a Java <code>double</code> value into a string similar to the Mathematica output format.
+   * Convert a Java <code>double</code> value into a string similar to the Mathematica output
+   * format.
    *
    * @param buf a string builder where the output should be appended
    * @param value the double value which should be formatted
-   * @param exponent use scientific notation for all numbers with exponents outside the range <code>-exponent</code> to
-   * <code>exponent</code>.
+   * @param exponent use scientific notation for all numbers with exponents outside the range <code>
+   *     -exponent</code> to <code>exponent</code>.
    * @param significantFigures the number of significant figures which should be printed
    */
   public static void doubleToMMA(StringBuilder buf, double value, int exponent,
       int significantFigures) {
     try {
-      doubleToMMA((Appendable) buf, value, exponent, significantFigures, false);
+      doubleToMMA(buf, value, exponent, significantFigures, false);
     } catch (IOException ioex) {
       ioex.printStackTrace();
     }
@@ -118,7 +119,8 @@ public class DoubleToMMA {
    * @param value
    * @param significantFigures
    * @param exponent
-   * @param texScientificNotation if <code>true</code> use <code>123^{456}</code> style to write the exponent
+   * @param texScientificNotation if <code>true</code> use <code>123^{456}</code> style to write the
+   *     exponent
    * @throws IOException
    */
   public static void doubleToScientific(Appendable buf, double value, int significantFigures,
@@ -144,7 +146,8 @@ public class DoubleToMMA {
   }
 
   /**
-   * Convert a Java <code>double</code> value into a string similar to the Mathematica scientific output format.
+   * Convert a Java <code>double</code> value into a string similar to the Mathematica scientific
+   * output format.
    *
    * @param buf a string builder where the output should be appended
    * @param value the double value which should be formatted

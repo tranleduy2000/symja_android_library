@@ -106,12 +106,10 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
   private static class ShareReplaceAll extends VisitorExpr {
 
     final Function<IASTMutable, IASTMutable> fFunction;
-    public int fCounter;
 
     public ShareReplaceAll(Function<IASTMutable, IASTMutable> function) {
       super();
       this.fFunction = function;
-      this.fCounter = 0;
     }
 
     @Override
@@ -121,7 +119,6 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
       }
       IExpr temp = fFunction.apply(ast);
       if (temp.isPresent()) {
-        fCounter++;
         return temp;
       }
       return visitAST(ast);
@@ -197,7 +194,7 @@ public class OptimizeExpression extends AbstractFunctionEvaluator {
         variableSubstitutions.append(F.Rule(reference, dummyVariable));
         varCounter++;
       }
-      sharedExpr = sharedExpr.replaceAll(variableSubstitutions);
+      sharedExpr = sharedExpr.replaceRepeated(variableSubstitutions);
       if (sharedExpr.isPresent()) {
         return F.List(sharedExpr, replaceList);
       }

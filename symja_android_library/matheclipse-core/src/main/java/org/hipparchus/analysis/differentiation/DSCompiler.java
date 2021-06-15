@@ -21,22 +21,23 @@
  */
 package org.hipparchus.analysis.differentiation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.util.CombinatoricsUtils;
 import org.hipparchus.util.FastMath;
 import org.hipparchus.util.FieldSinCos;
+import org.hipparchus.util.FieldSinhCosh;
 import org.hipparchus.util.MathArrays;
 import org.hipparchus.util.MathUtils;
 import org.hipparchus.util.SinCos;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import org.hipparchus.util.SinhCosh;
 
 /**
  * Class holding "compiled" computation rules for derivative structures.
@@ -183,25 +184,25 @@ public class DSCompiler {
      * @throws MathIllegalArgumentException if order is too large
      */
     private DSCompiler(final int parameters, final int order,
-                       final DSCompiler valueCompiler, final DSCompiler derivativeCompiler)
-            throws MathIllegalArgumentException {
+        final DSCompiler valueCompiler, final DSCompiler derivativeCompiler)
+        throws MathIllegalArgumentException {
 
         this.parameters = parameters;
         this.order = order;
         this.sizes = compileSizes(parameters, order, valueCompiler);
         this.derivativesIndirection =
-                compileDerivativesIndirection(parameters, order,
-                        valueCompiler, derivativeCompiler);
+            compileDerivativesIndirection(parameters, order,
+                valueCompiler, derivativeCompiler);
         this.lowerIndirection =
-                compileLowerIndirection(parameters, order,
-                        valueCompiler, derivativeCompiler);
+            compileLowerIndirection(parameters, order,
+                valueCompiler, derivativeCompiler);
         this.multIndirection =
-                compileMultiplicationIndirection(parameters, order,
-                        valueCompiler, derivativeCompiler, lowerIndirection);
+            compileMultiplicationIndirection(parameters, order,
+                valueCompiler, derivativeCompiler, lowerIndirection);
         this.compIndirection =
-                compileCompositionIndirection(parameters, order,
-                        valueCompiler, derivativeCompiler,
-                        sizes, derivativesIndirection);
+            compileCompositionIndirection(parameters, order,
+                valueCompiler, derivativeCompiler,
+                sizes, derivativesIndirection);
 
     }
 
@@ -214,12 +215,12 @@ public class DSCompiler {
      * @throws MathIllegalArgumentException if order is too large
      */
     public static DSCompiler getCompiler(int parameters, int order)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
 
         // get the cached compilers
         final DSCompiler[][] cache = compilers.get();
         if (cache != null && cache.length > parameters &&
-                cache[parameters].length > order && cache[parameters][order] != null) {
+            cache[parameters].length > order && cache[parameters][order] != null) {
             // the compiler has already been created
             return cache[parameters][order];
         }
@@ -264,7 +265,7 @@ public class DSCompiler {
      * @return sizes array
      */
     private static int[][] compileSizes(final int parameters, final int order,
-                                        final DSCompiler valueCompiler) {
+        final DSCompiler valueCompiler) {
 
         final int[][] sizes = new int[parameters + 1][order + 1];
         if (parameters == 0) {
@@ -291,8 +292,8 @@ public class DSCompiler {
      * @return derivatives indirection array
      */
     private static int[][] compileDerivativesIndirection(final int parameters, final int order,
-                                                         final DSCompiler valueCompiler,
-                                                         final DSCompiler derivativeCompiler) {
+        final DSCompiler valueCompiler,
+        final DSCompiler derivativeCompiler) {
 
         if (parameters == 0 || order == 0) {
             return new int[1][parameters];
@@ -306,8 +307,8 @@ public class DSCompiler {
         for (int i = 0; i < vSize; ++i) {
             // copy the first indices, the last one remaining set to 0
             System.arraycopy(valueCompiler.derivativesIndirection[i], 0,
-                    derivativesIndirection[i], 0,
-                    parameters - 1);
+                derivativesIndirection[i], 0,
+                parameters - 1);
         }
 
         // set up the indices for the derivative part
@@ -315,8 +316,8 @@ public class DSCompiler {
 
             // copy the indices
             System.arraycopy(derivativeCompiler.derivativesIndirection[i], 0,
-                    derivativesIndirection[vSize + i], 0,
-                    parameters);
+                derivativesIndirection[vSize + i], 0,
+                parameters);
 
             // increment the derivation order for the last parameter
             derivativesIndirection[vSize + i][parameters - 1]++;
@@ -341,8 +342,8 @@ public class DSCompiler {
      * @return lower derivatives indirection array
      */
     private static int[] compileLowerIndirection(final int parameters, final int order,
-                                                 final DSCompiler valueCompiler,
-                                                 final DSCompiler derivativeCompiler) {
+        final DSCompiler valueCompiler,
+        final DSCompiler derivativeCompiler) {
 
         if (parameters == 0 || order <= 1) {
             return new int[]{0};
@@ -354,7 +355,8 @@ public class DSCompiler {
         final int[] lowerIndirection = new int[vSize + dSize];
         System.arraycopy(valueCompiler.lowerIndirection, 0, lowerIndirection, 0, vSize);
         for (int i = 0; i < dSize; ++i) {
-            lowerIndirection[vSize + i] = valueCompiler.getSize() + derivativeCompiler.lowerIndirection[i];
+            lowerIndirection[vSize + i] =
+                valueCompiler.getSize() + derivativeCompiler.lowerIndirection[i];
         }
 
         return lowerIndirection;
@@ -377,9 +379,9 @@ public class DSCompiler {
      * @return multiplication indirection array
      */
     private static int[][][] compileMultiplicationIndirection(final int parameters, final int order,
-                                                              final DSCompiler valueCompiler,
-                                                              final DSCompiler derivativeCompiler,
-                                                              final int[] lowerIndirection) {
+        final DSCompiler valueCompiler,
+        final DSCompiler derivativeCompiler,
+        final int[] lowerIndirection) {
 
         if ((parameters == 0) || (order == 0)) {
             return new int[][][]{{{1, 0, 0}}};
@@ -444,11 +446,11 @@ public class DSCompiler {
      * @throws MathIllegalArgumentException if order is too large
      */
     private static int[][][] compileCompositionIndirection(final int parameters, final int order,
-                                                           final DSCompiler valueCompiler,
-                                                           final DSCompiler derivativeCompiler,
-                                                           final int[][] sizes,
-                                                           final int[][] derivativesIndirection)
-            throws MathIllegalArgumentException {
+        final DSCompiler valueCompiler,
+        final DSCompiler derivativeCompiler,
+        final int[][] sizes,
+        final int[][] derivativesIndirection)
+        throws MathIllegalArgumentException {
 
         if ((parameters == 0) || (order == 0)) {
             return new int[][][]{{{1, 0}}};
@@ -477,13 +479,14 @@ public class DSCompiler {
                 derivedTermF[1] = term[1] + 1; // f_(k+1)
                 int[] orders = new int[parameters];
                 orders[parameters - 1] = 1;
-                derivedTermF[term.length] = getPartialDerivativeIndex(parameters, order, sizes, orders);  // g_1
+                derivedTermF[term.length] = getPartialDerivativeIndex(parameters, order, sizes,
+                    orders);  // g_1
                 for (int j = 2; j < term.length; ++j) {
                     // convert the indices as the mapping for the current order
                     // is different from the mapping with one less order
                     derivedTermF[j] = convertIndex(term[j], parameters,
-                            derivativeCompiler.derivativesIndirection,
-                            parameters, order, sizes);
+                        derivativeCompiler.derivativesIndirection,
+                        parameters, order, sizes);
                 }
                 Arrays.sort(derivedTermF, 2, derivedTermF.length);
                 row.add(derivedTermF);
@@ -497,13 +500,15 @@ public class DSCompiler {
                         // convert the indices as the mapping for the current order
                         // is different from the mapping with one less order
                         derivedTermG[j] = convertIndex(term[j], parameters,
-                                derivativeCompiler.derivativesIndirection,
-                                parameters, order, sizes);
+                            derivativeCompiler.derivativesIndirection,
+                            parameters, order, sizes);
                         if (j == l) {
                             // derive this term
-                            System.arraycopy(derivativesIndirection[derivedTermG[j]], 0, orders, 0, parameters);
+                            System.arraycopy(derivativesIndirection[derivedTermG[j]], 0, orders, 0,
+                                parameters);
                             orders[parameters - 1]++;
-                            derivedTermG[j] = getPartialDerivativeIndex(parameters, order, sizes, orders);
+                            derivedTermG[j] = getPartialDerivativeIndex(parameters, order, sizes,
+                                orders);
                         }
                     }
                     Arrays.sort(derivedTermG, 2, derivedTermG.length);
@@ -543,6 +548,49 @@ public class DSCompiler {
     }
 
     /**
+     * Get the index of a partial derivative in the array.
+     * <p>
+     * If all orders are set to 0, then the 0<sup>th</sup> order derivative
+     * is returned, which is the value of the function.
+     * </p>
+     * <p>The indices of derivatives are between 0 and {@link #getSize() getSize()} - 1.
+     * Their specific order is fixed for a given compiler, but otherwise not
+     * publicly specified. There are however some simple cases which have guaranteed
+     * indices:
+     * </p>
+     * <ul>
+     *   <li>the index of 0<sup>th</sup> order derivative is always 0</li>
+     *   <li>if there is only 1 {@link #getFreeParameters() free parameter}, then the
+     *   derivatives are sorted in increasing derivation order (i.e. f at index 0, df/dp
+     *   at index 1, d<sup>2</sup>f/dp<sup>2</sup> at index 2 ...
+     *   d<sup>k</sup>f/dp<sup>k</sup> at index k),</li>
+     *   <li>if the {@link #getOrder() derivation order} is 1, then the derivatives
+     *   are sorted in increasing free parameter order (i.e. f at index 0, df/dx<sub>1</sub>
+     *   at index 1, df/dx<sub>2</sub> at index 2 ... df/dx<sub>k</sub> at index k),</li>
+     *   <li>all other cases are not publicly specified</li>
+     * </ul>
+     * <p>
+     * This method is the inverse of method {@link #getPartialDerivativeOrders(int)}
+     * </p>
+     *
+     * @param orders derivation orders with respect to each parameter
+     * @return index of the partial derivative
+     * @throws MathIllegalArgumentException if the numbers of parameters does not
+     *                                      match the instance
+     * @throws MathIllegalArgumentException if sum of derivation orders is larger
+     *                                      than the instance limits
+     * @see #getPartialDerivativeOrders(int)
+     */
+    public int getPartialDerivativeIndex(final int... orders)
+        throws MathIllegalArgumentException {
+
+        // safety check
+        MathUtils.checkDimension(orders.length, getFreeParameters());
+        return getPartialDerivativeIndex(parameters, order, sizes, orders);
+
+    }
+
+    /**
      * Get the index of a partial derivative in an array.
      *
      * @param parameters number of free parameters
@@ -555,8 +603,8 @@ public class DSCompiler {
      *                                      than the instance limits
      */
     private static int getPartialDerivativeIndex(final int parameters, final int order,
-                                                 final int[][] sizes, final int... orders)
-            throws MathIllegalArgumentException {
+        final int[][] sizes, final int... orders)
+        throws MathIllegalArgumentException {
 
         // the value is obtained by diving into the recursive Dan Kalman's structure
         // this is theorem 2 of his paper, with recursion replaced by iteration
@@ -572,7 +620,7 @@ public class DSCompiler {
             ordersSum += derivativeOrder;
             if (ordersSum > order) {
                 throw new MathIllegalArgumentException(LocalizedCoreFormats.NUMBER_TOO_LARGE,
-                        ordersSum, order);
+                    ordersSum, order);
             }
 
             while (derivativeOrder > 0) {
@@ -604,56 +652,14 @@ public class DSCompiler {
      * @throws MathIllegalArgumentException if order is too large
      */
     private static int convertIndex(final int index,
-                                    final int srcP, final int[][] srcDerivativesIndirection,
-                                    final int destP, final int destO, final int[][] destSizes)
-            throws MathIllegalArgumentException {
+        final int srcP, final int[][] srcDerivativesIndirection,
+        final int destP, final int destO, final int[][] destSizes)
+        throws MathIllegalArgumentException {
         int[] orders = new int[destP];
         System.arraycopy(srcDerivativesIndirection[index], 0, orders, 0, FastMath.min(srcP, destP));
         return getPartialDerivativeIndex(destP, destO, destSizes, orders);
     }
 
-    /**
-     * Get the index of a partial derivative in the array.
-     * <p>
-     * If all orders are set to 0, then the 0<sup>th</sup> order derivative
-     * is returned, which is the value of the function.
-     * </p>
-     * <p>The indices of derivatives are between 0 and {@link #getSize() getSize()} - 1.
-     * Their specific order is fixed for a given compiler, but otherwise not
-     * publicly specified. There are however some simple cases which have guaranteed
-     * indices:
-     * </p>
-     * <ul>
-     * <li>the index of 0<sup>th</sup> order derivative is always 0</li>
-     * <li>if there is only 1 {@link #getFreeParameters() free parameter}, then the
-     * derivatives are sorted in increasing derivation order (i.e. f at index 0, df/dp
-     * at index 1, d<sup>2</sup>f/dp<sup>2</sup> at index 2 ...
-     * d<sup>k</sup>f/dp<sup>k</sup> at index k),</li>
-     * <li>if the {@link #getOrder() derivation order} is 1, then the derivatives
-     * are sorted in increasing free parameter order (i.e. f at index 0, df/dx<sub>1</sub>
-     * at index 1, df/dx<sub>2</sub> at index 2 ... df/dx<sub>k</sub> at index k),</li>
-     * <li>all other cases are not publicly specified</li>
-     * </ul>
-     * <p>
-     * This method is the inverse of method {@link #getPartialDerivativeOrders(int)}
-     * </p>
-     *
-     * @param orders derivation orders with respect to each parameter
-     * @return index of the partial derivative
-     * @throws MathIllegalArgumentException if the numbers of parameters does not
-     *                                      match the instance
-     * @throws MathIllegalArgumentException if sum of derivation orders is larger
-     *                                      than the instance limits
-     * @see #getPartialDerivativeOrders(int)
-     */
-    public int getPartialDerivativeIndex(final int... orders)
-            throws MathIllegalArgumentException {
-
-        // safety check
-        MathUtils.checkDimension(orders.length, getFreeParameters());
-        return getPartialDerivativeIndex(parameters, order, sizes, orders);
-
-    }
 
     /**
      * Get the derivation orders for a specific index in the array.
@@ -715,11 +721,11 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void linearCombination(final double a1, final double[] c1, final int offset1,
-                                  final double a2, final double[] c2, final int offset2,
-                                  final double[] result, final int resultOffset) {
+        final double a2, final double[] c2, final int offset2,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    MathArrays.linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
+                MathArrays.linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
         }
     }
 
@@ -738,12 +744,13 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final T a1, final T[] c1, final int offset1,
-                                                                  final T a2, final T[] c2, final int offset2,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final T a1, final T[] c1,
+        final int offset1,
+        final T a2, final T[] c2, final int offset2,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    a1.linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
+                a1.linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
         }
     }
 
@@ -762,12 +769,13 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final double a1, final T[] c1, final int offset1,
-                                                                  final double a2, final T[] c2, final int offset2,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final double a1, final T[] c1,
+        final int offset1,
+        final double a2, final T[] c2, final int offset2,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    c1[offset1].linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
+                c1[offset1].linearCombination(a1, c1[offset1 + i], a2, c2[offset2 + i]);
         }
     }
 
@@ -789,14 +797,14 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void linearCombination(final double a1, final double[] c1, final int offset1,
-                                  final double a2, final double[] c2, final int offset2,
-                                  final double a3, final double[] c3, final int offset3,
-                                  final double[] result, final int resultOffset) {
+        final double a2, final double[] c2, final int offset2,
+        final double a3, final double[] c3, final int offset3,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    MathArrays.linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i]);
+                MathArrays.linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i]);
         }
     }
 
@@ -818,15 +826,16 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final T a1, final T[] c1, final int offset1,
-                                                                  final T a2, final T[] c2, final int offset2,
-                                                                  final T a3, final T[] c3, final int offset3,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final T a1, final T[] c1,
+        final int offset1,
+        final T a2, final T[] c2, final int offset2,
+        final T a3, final T[] c3, final int offset3,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    a1.linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i]);
+                a1.linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i]);
         }
     }
 
@@ -848,15 +857,16 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final double a1, final T[] c1, final int offset1,
-                                                                  final double a2, final T[] c2, final int offset2,
-                                                                  final double a3, final T[] c3, final int offset3,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final double a1, final T[] c1,
+        final int offset1,
+        final double a2, final T[] c2, final int offset2,
+        final double a3, final T[] c3, final int offset3,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    c1[offset1].linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i]);
+                c1[offset1].linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i]);
         }
     }
 
@@ -881,16 +891,16 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void linearCombination(final double a1, final double[] c1, final int offset1,
-                                  final double a2, final double[] c2, final int offset2,
-                                  final double a3, final double[] c3, final int offset3,
-                                  final double a4, final double[] c4, final int offset4,
-                                  final double[] result, final int resultOffset) {
+        final double a2, final double[] c2, final int offset2,
+        final double a3, final double[] c3, final int offset3,
+        final double a4, final double[] c4, final int offset4,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    MathArrays.linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i],
-                            a4, c4[offset4 + i]);
+                MathArrays.linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i],
+                    a4, c4[offset4 + i]);
         }
     }
 
@@ -915,17 +925,18 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final T a1, final T[] c1, final int offset1,
-                                                                  final T a2, final T[] c2, final int offset2,
-                                                                  final T a3, final T[] c3, final int offset3,
-                                                                  final T a4, final T[] c4, final int offset4,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final T a1, final T[] c1,
+        final int offset1,
+        final T a2, final T[] c2, final int offset2,
+        final T a3, final T[] c3, final int offset3,
+        final T a4, final T[] c4, final int offset4,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    a1.linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i],
-                            a4, c4[offset4 + i]);
+                a1.linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i],
+                    a4, c4[offset4 + i]);
         }
     }
 
@@ -950,17 +961,18 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void linearCombination(final double a1, final T[] c1, final int offset1,
-                                                                  final double a2, final T[] c2, final int offset2,
-                                                                  final double a3, final T[] c3, final int offset3,
-                                                                  final double a4, final T[] c4, final int offset4,
-                                                                  final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void linearCombination(final double a1, final T[] c1,
+        final int offset1,
+        final double a2, final T[] c2, final int offset2,
+        final double a3, final T[] c3, final int offset3,
+        final double a4, final T[] c4, final int offset4,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] =
-                    c1[offset1].linearCombination(a1, c1[offset1 + i],
-                            a2, c2[offset2 + i],
-                            a3, c3[offset3 + i],
-                            a4, c4[offset4 + i]);
+                c1[offset1].linearCombination(a1, c1[offset1 + i],
+                    a2, c2[offset2 + i],
+                    a3, c3[offset3 + i],
+                    a4, c4[offset4 + i]);
         }
     }
 
@@ -976,8 +988,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void add(final double[] lhs, final int lhsOffset,
-                    final double[] rhs, final int rhsOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] rhs, final int rhsOffset,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] = lhs[lhsOffset + i] + rhs[rhsOffset + i];
         }
@@ -995,9 +1007,9 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void add(final T[] lhs, final int lhsOffset,
-                                                    final T[] rhs, final int rhsOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void add(final T[] lhs, final int lhsOffset,
+        final T[] rhs, final int rhsOffset,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] = lhs[lhsOffset + i].add(rhs[rhsOffset + i]);
         }
@@ -1015,8 +1027,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void subtract(final double[] lhs, final int lhsOffset,
-                         final double[] rhs, final int rhsOffset,
-                         final double[] result, final int resultOffset) {
+        final double[] rhs, final int rhsOffset,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] = lhs[lhsOffset + i] - rhs[rhsOffset + i];
         }
@@ -1034,9 +1046,9 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void subtract(final T[] lhs, final int lhsOffset,
-                                                         final T[] rhs, final int rhsOffset,
-                                                         final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void subtract(final T[] lhs, final int lhsOffset,
+        final T[] rhs, final int rhsOffset,
+        final T[] result, final int resultOffset) {
         for (int i = 0; i < getSize(); ++i) {
             result[resultOffset + i] = lhs[lhsOffset + i].subtract(rhs[rhsOffset + i]);
         }
@@ -1055,15 +1067,15 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void multiply(final double[] lhs, final int lhsOffset,
-                         final double[] rhs, final int rhsOffset,
-                         final double[] result, final int resultOffset) {
+        final double[] rhs, final int rhsOffset,
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < multIndirection.length; ++i) {
             final int[][] mappingI = multIndirection[i];
             double r = 0;
             for (int j = 0; j < mappingI.length; ++j) {
                 r += mappingI[j][0] *
-                        lhs[lhsOffset + mappingI[j][1]] *
-                        rhs[rhsOffset + mappingI[j][2]];
+                    lhs[lhsOffset + mappingI[j][1]] *
+                    rhs[rhsOffset + mappingI[j][2]];
             }
             result[resultOffset + i] = r;
         }
@@ -1082,17 +1094,17 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void multiply(final T[] lhs, final int lhsOffset,
-                                                         final T[] rhs, final int rhsOffset,
-                                                         final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void multiply(final T[] lhs, final int lhsOffset,
+        final T[] rhs, final int rhsOffset,
+        final T[] result, final int resultOffset) {
         T zero = lhs[lhsOffset].getField().getZero();
         for (int i = 0; i < multIndirection.length; ++i) {
             final int[][] mappingI = multIndirection[i];
             T r = zero;
             for (int j = 0; j < mappingI.length; ++j) {
                 r = r.add(lhs[lhsOffset + mappingI[j][1]].
-                        multiply(rhs[rhsOffset + mappingI[j][2]]).
-                        multiply(mappingI[j][0]));
+                    multiply(rhs[rhsOffset + mappingI[j][2]]).
+                    multiply(mappingI[j][0]));
             }
             result[resultOffset + i] = r;
         }
@@ -1111,8 +1123,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void divide(final double[] lhs, final int lhsOffset,
-                       final double[] rhs, final int rhsOffset,
-                       final double[] result, final int resultOffset) {
+        final double[] rhs, final int rhsOffset,
+        final double[] result, final int resultOffset) {
         final double[] reciprocal = new double[getSize()];
         pow(rhs, lhsOffset, -1, reciprocal, 0);
         multiply(lhs, lhsOffset, reciprocal, 0, result, resultOffset);
@@ -1131,9 +1143,9 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void divide(final T[] lhs, final int lhsOffset,
-                                                       final T[] rhs, final int rhsOffset,
-                                                       final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void divide(final T[] lhs, final int lhsOffset,
+        final T[] rhs, final int rhsOffset,
+        final T[] result, final int resultOffset) {
         final T[] reciprocal = MathArrays.buildArray(lhs[lhsOffset].getField(), getSize());
         pow(rhs, lhsOffset, -1, reciprocal, 0);
         multiply(lhs, lhsOffset, reciprocal, 0, result, resultOffset);
@@ -1151,8 +1163,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void remainder(final double[] lhs, final int lhsOffset,
-                          final double[] rhs, final int rhsOffset,
-                          final double[] result, final int resultOffset) {
+        final double[] rhs, final int rhsOffset,
+        final double[] result, final int resultOffset) {
 
         // compute k such that lhs % rhs = lhs - k rhs
         final double rem = FastMath.IEEEremainder(lhs[lhsOffset], rhs[rhsOffset]);
@@ -1180,13 +1192,14 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void remainder(final T[] lhs, final int lhsOffset,
-                                                          final T[] rhs, final int rhsOffset,
-                                                          final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void remainder(final T[] lhs, final int lhsOffset,
+        final T[] rhs, final int rhsOffset,
+        final T[] result, final int resultOffset) {
 
         // compute k such that lhs % rhs = lhs - k rhs
         final T rem = lhs[lhsOffset].remainder(rhs[rhsOffset]);
-        final double k = FastMath.rint((lhs[lhsOffset].getReal() - rem.getReal()) / rhs[rhsOffset].getReal());
+        final double k = FastMath
+            .rint((lhs[lhsOffset].getReal() - rem.getReal()) / rhs[rhsOffset].getReal());
 
         // set up value
         result[resultOffset] = rem;
@@ -1210,8 +1223,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void pow(final double a,
-                    final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] operand, final int operandOffset,
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         // [a^x, ln(a) a^x, ln(a)^2 a^x,, ln(a)^3 a^x, ... ]
@@ -1235,7 +1248,6 @@ public class DSCompiler {
             }
         }
 
-
         // apply function composition
         compose(operand, operandOffset, function, result, resultOffset);
 
@@ -1253,9 +1265,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void pow(final double a,
-                                                    final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void pow(final double a,
+        final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final T zero = operand[operandOffset].getField().getZero();
 
@@ -1281,7 +1293,6 @@ public class DSCompiler {
             }
         }
 
-
         // apply function composition
         compose(operand, operandOffset, function, result, resultOffset);
 
@@ -1299,7 +1310,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void pow(final double[] operand, final int operandOffset, final double p,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         if (p == 0) {
             // special case, x^0 = 1 for all x
@@ -1346,8 +1357,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void pow(final T[] operand, final int operandOffset, final double p,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void pow(final T[] operand, final int operandOffset,
+        final double p,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1396,7 +1408,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void pow(final double[] operand, final int operandOffset, final int n,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         if (n == 0) {
             // special case, x^0 = 1 for all x
@@ -1451,8 +1463,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void pow(final T[] operand, final int operandOffset, final int n,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void pow(final T[] operand, final int operandOffset,
+        final int n,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1510,8 +1523,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void pow(final double[] x, final int xOffset,
-                    final double[] y, final int yOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] y, final int yOffset,
+        final double[] result, final int resultOffset) {
         final double[] logX = new double[getSize()];
         log(x, xOffset, logX, 0);
         final double[] yLogX = new double[getSize()];
@@ -1532,9 +1545,9 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void pow(final T[] x, final int xOffset,
-                                                    final T[] y, final int yOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void pow(final T[] x, final int xOffset,
+        final T[] y, final int yOffset,
+        final T[] result, final int resultOffset) {
         final T[] logX = MathArrays.buildArray(x[xOffset].getField(), getSize());
         log(x, xOffset, logX, 0);
         final T[] yLogX = MathArrays.buildArray(x[xOffset].getField(), getSize());
@@ -1554,7 +1567,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void rootN(final double[] operand, final int operandOffset, final int n,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         // [x^(1/n), (1/n)x^((1/n)-1), (1-n)/n^2x^((1/n)-2), ... ]
@@ -1594,8 +1607,10 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void rootN(final T[] operand, final int operandOffset, final int n,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void rootN(final T[] operand,
+        final int operandOffset,
+        final int n,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1636,7 +1651,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void exp(final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1658,8 +1673,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void exp(final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void exp(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1683,7 +1698,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void expm1(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1706,8 +1721,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void expm1(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void expm1(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1732,7 +1748,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void log(final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1762,8 +1778,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void log(final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void log(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1794,7 +1810,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void log1p(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1823,8 +1839,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void log1p(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void log1p(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1855,7 +1872,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void log10(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1884,8 +1901,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void log10(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void log10(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1917,7 +1935,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void cos(final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -1946,8 +1964,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void cos(final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void cos(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -1984,7 +2002,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void sin(final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2013,8 +2031,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void sin(final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void sin(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2056,8 +2074,8 @@ public class DSCompiler {
      * @since 1.4
      */
     public void sinCos(final double[] operand, final int operandOffset,
-                       final double[] sin, final int sinOffset,
-                       final double[] cos, final int cosOffset) {
+        final double[] sin, final int sinOffset,
+        final double[] cos, final int cosOffset) {
 
         // create the function value and derivatives
         double[] functionSin = new double[1 + order];
@@ -2096,9 +2114,10 @@ public class DSCompiler {
      * @param <T>           the type of the function parameters and value
      * @since 1.4
      */
-    public <T extends RealFieldElement<T>> void sinCos(final T[] operand, final int operandOffset,
-                                                       final T[] sin, final int sinOffset,
-                                                       final T[] cos, final int cosOffset) {
+    public <T extends CalculusFieldElement<T>> void sinCos(final T[] operand,
+        final int operandOffset,
+        final T[] sin, final int sinOffset,
+        final T[] cos, final int cosOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2139,7 +2158,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void tan(final double[] operand, final int operandOffset,
-                    final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         final double[] function = new double[1 + order];
@@ -2196,8 +2215,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void tan(final T[] operand, final int operandOffset,
-                                                    final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void tan(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2256,7 +2275,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void acos(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2315,8 +2334,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void acos(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void acos(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2377,7 +2396,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void asin(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2436,8 +2455,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void asin(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void asin(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2498,7 +2517,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void atan(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2557,8 +2576,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void atan(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void atan(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2621,8 +2640,8 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      */
     public void atan2(final double[] y, final int yOffset,
-                      final double[] x, final int xOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] x, final int xOffset,
+        final double[] result, final int resultOffset) {
 
         // compute r = sqrt(x^2+y^2)
         double[] tmp1 = new double[getSize()];
@@ -2649,7 +2668,8 @@ public class DSCompiler {
             divide(y, yOffset, tmp2, 0, tmp1, 0);       // y /(r - x)
             atan(tmp1, 0, tmp2, 0);                     // atan(y / (r - x))
             result[resultOffset] =
-                    ((tmp2[0] <= 0) ? -FastMath.PI : FastMath.PI) - 2 * tmp2[0]; // +/-pi - 2 * atan(y / (r - x))
+                ((tmp2[0] <= 0) ? -FastMath.PI : FastMath.PI)
+                    - 2 * tmp2[0]; // +/-pi - 2 * atan(y / (r - x))
             for (int i = 1; i < tmp2.length; ++i) {
                 result[resultOffset + i] = -2 * tmp2[i]; // +/-pi - 2 * atan(y / (r - x))
             }
@@ -2674,9 +2694,9 @@ public class DSCompiler {
      * @param resultOffset offset of the result in its array
      * @param <T>          the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void atan2(final T[] y, final int yOffset,
-                                                      final T[] x, final int xOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void atan2(final T[] y, final int yOffset,
+        final T[] x, final int xOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = y[yOffset].getField();
 
@@ -2705,9 +2725,11 @@ public class DSCompiler {
             divide(y, yOffset, tmp2, 0, tmp1, 0);       // y /(r - x)
             atan(tmp1, 0, tmp2, 0);                     // atan(y / (r - x))
             result[resultOffset] = tmp2[0].add(tmp2[0]).negate().
-                    add((tmp2[0].getReal() <= 0) ? -FastMath.PI : FastMath.PI); // +/-pi - 2 * atan(y / (r - x))
+                add((tmp2[0].getReal() <= 0) ? -FastMath.PI
+                    : FastMath.PI); // +/-pi - 2 * atan(y / (r - x))
             for (int i = 1; i < tmp2.length; ++i) {
-                result[resultOffset + i] = tmp2[i].add(tmp2[i]).negate(); // +/-pi - 2 * atan(y / (r - x))
+                result[resultOffset + i] = tmp2[i].add(tmp2[i])
+                    .negate(); // +/-pi - 2 * atan(y / (r - x))
             }
 
         }
@@ -2728,7 +2750,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void cosh(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2756,8 +2778,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void cosh(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void cosh(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2787,7 +2809,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void sinh(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -2815,8 +2837,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void sinh(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void sinh(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2836,6 +2858,85 @@ public class DSCompiler {
     }
 
     /**
+     * Compute combined hyperbolic sine and cosine of a derivative structure.
+     *
+     * @param operand       array holding the operand
+     * @param operandOffset offset of the operand in its array
+     * @param sinh          array where hyperbolic sine must be stored (for
+     *                      sine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param sinhOffset    offset of the result in its array
+     * @param cosh          array where hyperbolic <em>cannot</em> be the input
+     *                      array)
+     * @param coshOffset    offset of the result in its array
+     * @since 2.0
+     */
+    public void sinhCosh(final double[] operand, final int operandOffset,
+        final double[] sinh, final int sinhOffset,
+        final double[] cosh, final int coshOffset) {
+
+        // create the function value and derivatives
+        double[] functionSinh = new double[1 + order];
+        double[] functionCosh = new double[1 + order];
+        final SinhCosh sinhCosh = FastMath.sinhCosh(operand[operandOffset]);
+        functionSinh[0] = sinhCosh.sinh();
+        functionCosh[0] = sinhCosh.cosh();
+        if (order > 0) {
+            functionSinh[1] = sinhCosh.cosh();
+            functionCosh[1] = sinhCosh.sinh();
+            for (int i = 2; i <= order; ++i) {
+                functionSinh[i] = functionSinh[i - 2];
+                functionCosh[i] = functionCosh[i - 2];
+            }
+        }
+
+        // apply function composition
+        compose(operand, operandOffset, functionSinh, sinh, sinhOffset);
+        compose(operand, operandOffset, functionCosh, cosh, coshOffset);
+
+    }
+
+    /**
+     * Compute combined hyperbolic sine and cosine of a derivative structure.
+     *
+     * @param operand       array holding the operand
+     * @param operandOffset offset of the operand in its array
+     * @param sinh          array where hyperbolic sine must be stored (for
+     *                      sine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param sinhOffset    offset of the result in its array
+     * @param cosh          array where hyperbolic cosine must be stored (for
+     *                      cosine the result array <em>cannot</em> be the input
+     *                      array)
+     * @param coshOffset    offset of the result in its array
+     * @param <T>           the type of the function parameters and value
+     * @since 1.4
+     */
+    public <T extends CalculusFieldElement<T>> void sinhCosh(final T[] operand,
+        final int operandOffset,
+        final T[] sinh, final int sinhOffset,
+        final T[] cosh, final int coshOffset) {
+
+        final Field<T> field = operand[operandOffset].getField();
+
+        // create the function value and derivatives
+        T[] functionSinh = MathArrays.buildArray(field, 1 + order);
+        T[] functionCosh = MathArrays.buildArray(field, 1 + order);
+        final FieldSinhCosh<T> sinhCosh = FastMath.sinhCosh(operand[operandOffset]);
+        functionSinh[0] = sinhCosh.sinh();
+        functionCosh[0] = sinhCosh.cosh();
+        for (int i = 1; i <= order; ++i) {
+            functionSinh[i] = functionCosh[i - 1];
+            functionCosh[i] = functionSinh[i - 1];
+        }
+
+        // apply function composition
+        compose(operand, operandOffset, functionSinh, sinh, sinhOffset);
+        compose(operand, operandOffset, functionCosh, cosh, coshOffset);
+
+    }
+
+    /**
      * Compute hyperbolic tangent of a derivative structure.
      *
      * @param operand       array holding the operand
@@ -2846,7 +2947,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void tanh(final double[] operand, final int operandOffset,
-                     final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         final double[] function = new double[1 + order];
@@ -2903,8 +3004,8 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void tanh(final T[] operand, final int operandOffset,
-                                                     final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void tanh(final T[] operand, final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -2963,7 +3064,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void acosh(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -3022,8 +3123,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void acosh(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void acosh(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -3084,7 +3186,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void asinh(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -3143,8 +3245,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void asinh(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void asinh(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -3205,7 +3308,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void atanh(final double[] operand, final int operandOffset,
-                      final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
 
         // create the function value and derivatives
         double[] function = new double[1 + order];
@@ -3264,8 +3367,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void atanh(final T[] operand, final int operandOffset,
-                                                      final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void atanh(final T[] operand,
+        final int operandOffset,
+        final T[] result, final int resultOffset) {
 
         final Field<T> field = operand[operandOffset].getField();
 
@@ -3328,7 +3432,7 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      */
     public void compose(final double[] operand, final int operandOffset, final double[] f,
-                        final double[] result, final int resultOffset) {
+        final double[] result, final int resultOffset) {
         for (int i = 0; i < compIndirection.length; ++i) {
             final int[][] mappingI = compIndirection[i];
             double r = 0;
@@ -3357,8 +3461,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void compose(final T[] operand, final int operandOffset, final T[] f,
-                                                        final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void compose(final T[] operand,
+        final int operandOffset, final T[] f,
+        final T[] result, final int resultOffset) {
         final T zero = f[0].getField().getZero();
         for (int i = 0; i < compIndirection.length; ++i) {
             final int[][] mappingI = compIndirection[i];
@@ -3388,8 +3493,9 @@ public class DSCompiler {
      * @param resultOffset  offset of the result in its array
      * @param <T>           the type of the function parameters and value
      */
-    public <T extends RealFieldElement<T>> void compose(final T[] operand, final int operandOffset, final double[] f,
-                                                        final T[] result, final int resultOffset) {
+    public <T extends CalculusFieldElement<T>> void compose(final T[] operand,
+        final int operandOffset, final double[] f,
+        final T[] result, final int resultOffset) {
         final T zero = operand[operandOffset].getField().getZero();
         for (int i = 0; i < compIndirection.length; ++i) {
             final int[][] mappingI = compIndirection[i];
@@ -3416,7 +3522,7 @@ public class DSCompiler {
      * @throws MathRuntimeException if factorials becomes too large
      */
     public double taylor(final double[] ds, final int dsOffset, final double... delta)
-            throws MathRuntimeException {
+        throws MathRuntimeException {
         double value = 0;
         for (int i = getSize() - 1; i >= 0; --i) {
             final int[] orders = getPartialDerivativeOrders(i);
@@ -3425,7 +3531,7 @@ public class DSCompiler {
                 if (orders[k] > 0) {
                     try {
                         term *= FastMath.pow(delta[k], orders[k]) /
-                                CombinatoricsUtils.factorial(orders[k]);
+                            CombinatoricsUtils.factorial(orders[k]);
                     } catch (MathIllegalArgumentException e) {
                         // this cannot happen
                         throw MathRuntimeException.createInternalError(e);
@@ -3448,9 +3554,9 @@ public class DSCompiler {
      * @throws MathRuntimeException if factorials becomes too large
      */
     @SafeVarargs
-    public final <T extends RealFieldElement<T>> T taylor(final T[] ds, final int dsOffset,
-                                                          final T... delta)
-            throws MathRuntimeException {
+    public final <T extends CalculusFieldElement<T>> T taylor(final T[] ds, final int dsOffset,
+        final T... delta)
+        throws MathRuntimeException {
         final Field<T> field = ds[dsOffset].getField();
         T value = field.getZero();
         for (int i = getSize() - 1; i >= 0; --i) {
@@ -3460,7 +3566,7 @@ public class DSCompiler {
                 if (orders[k] > 0) {
                     try {
                         term = term.multiply(delta[k].pow(orders[k]).
-                                divide(CombinatoricsUtils.factorial(orders[k])));
+                            divide(CombinatoricsUtils.factorial(orders[k])));
                     } catch (MathIllegalArgumentException e) {
                         // this cannot happen
                         throw MathRuntimeException.createInternalError(e);
@@ -3482,9 +3588,9 @@ public class DSCompiler {
      * @return value of the Taylor expansion at x + &Delta;x, y + &Delta;y, ...
      * @throws MathRuntimeException if factorials becomes too large
      */
-    public <T extends RealFieldElement<T>> T taylor(final T[] ds, final int dsOffset,
-                                                    final double... delta)
-            throws MathRuntimeException {
+    public <T extends CalculusFieldElement<T>> T taylor(final T[] ds, final int dsOffset,
+        final double... delta)
+        throws MathRuntimeException {
         final Field<T> field = ds[dsOffset].getField();
         T value = field.getZero();
         for (int i = getSize() - 1; i >= 0; --i) {
@@ -3493,8 +3599,8 @@ public class DSCompiler {
             for (int k = 0; k < orders.length; ++k) {
                 if (orders[k] > 0) {
                     try {
-                        term = term.multiply(field.getZero().add(delta[k]).pow(orders[k]).
-                                divide(CombinatoricsUtils.factorial(orders[k])));
+                        term = term.multiply(field.getZero().newInstance(delta[k]).pow(orders[k]).
+                            divide(CombinatoricsUtils.factorial(orders[k])));
                     } catch (MathIllegalArgumentException e) {
                         // this cannot happen
                         throw MathRuntimeException.createInternalError(e);
@@ -3513,7 +3619,7 @@ public class DSCompiler {
      * @throws MathIllegalArgumentException if number of free parameters or orders are inconsistent
      */
     public void checkCompatibility(final DSCompiler compiler)
-            throws MathIllegalArgumentException {
+        throws MathIllegalArgumentException {
         MathUtils.checkDimension(parameters, compiler.parameters);
         MathUtils.checkDimension(order, compiler.order);
     }

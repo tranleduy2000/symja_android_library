@@ -21,7 +21,7 @@ import com.duy.lambda.IntFunction;
  *       Times,...) at index <code>0</code> and
  *   <li>the <code>n</code> arguments of a function in the index <code>1 to n</code>
  * </ul>
- *
+ * <p>
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>, <a
  * href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
@@ -35,12 +35,30 @@ public interface IASTMutable extends IAST {
    * @param object the object to insert.
    * @return the previous element at the index.
    * @throws UnsupportedOperationException if replacing elements in this {@code IAST} is not
-   *     supported.
-   * @throws ClassCastException if the class of an object is inappropriate for this {@code IAST}.
+   *                                       supported.
+   * @throws ClassCastException            if the class of an object is inappropriate for this {@code IAST}.
    * @throws IllegalArgumentException      if an object cannot be added to this {@code IAST}.
    * @throws IndexOutOfBoundsException     if {@code location < 0 || >= size()}
    */
   public IExpr set(int i, IExpr object);
+
+  /**
+   * Replaces the element at the specified location in this {@code IAST} with the specified object.
+   * This operation does not change the size of the {@code IAST}. If <code>this</code> is an
+   * association, the value replaces the second argument of the rule at that place
+   *
+   * @param location the index at which to put the specified object.
+   * @param value    the object to insert.
+   * @return the previous element at the index.
+   * @throws UnsupportedOperationException if replacing elements in this {@code IAST} is not
+   *                                       supported.
+   * @throws ClassCastException            if the class of an object is inappropriate for this {@code IAST}.
+   * @throws IllegalArgumentException      if an object cannot be added to this {@code IAST}.
+   * @throws IndexOutOfBoundsException     if {@code location < 0 || >= size()}
+   */
+  IExpr setValue(final int location, final IExpr value); /*{
+    return set(location, value);
+  }*/
 
   public IExpr setPart(IExpr value, final int... positions);
 

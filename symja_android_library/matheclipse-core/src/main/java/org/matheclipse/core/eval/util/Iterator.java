@@ -103,7 +103,8 @@ public class Iterator {
     /**
      * Tests if this enumeration contains more elements.
      *
-     * @return <code>true</code> if this enumeration contains more elements; <code>false</code> otherwise.
+     * @return <code>true</code> if this enumeration contains more elements; <code>false</code>
+     *     otherwise.
      */
     @Override
     public boolean hasNext() {
@@ -120,18 +121,17 @@ public class Iterator {
         if (maxCounterOrListIndex <= ((IAST) maxCounterOrList).size()) {
           return true;
         }
-        return false;
       } else {
         if (step.isZero()) {
           throw NoEvalException.CONST;
         }
         if (step.isReal()) {
           if (step.isNegative()) {
-            if (F.LessEqual.ofQ(evalEngine, maxCounterOrList, count)) {
+            if (S.LessEqual.ofQ(evalEngine, maxCounterOrList, count)) {
               return true;
             }
           } else {
-            if (F.LessEqual.ofQ(evalEngine, count, maxCounterOrList)) {
+            if (S.LessEqual.ofQ(evalEngine, count, maxCounterOrList)) {
               return true;
             }
           }
@@ -147,10 +147,8 @@ public class Iterator {
         } catch (ValidateException ve) {
           // return false;
         }
-        return false;
-        // }
       }
-      // return false;
+        return false;
     }
 
     @Override

@@ -22,7 +22,7 @@
 
 package org.hipparchus.analysis.solvers;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -52,7 +52,7 @@ import org.hipparchus.exception.MathRuntimeException;
  * @param <T> the type of the field elements
  * @see AllowedSolution
  */
-public interface BracketedRealFieldUnivariateSolver<T extends RealFieldElement<T>> {
+public interface BracketedRealFieldUnivariateSolver<T extends CalculusFieldElement<T>> {
 
     /**
      * Get the maximum number of function evaluations.
@@ -210,10 +210,10 @@ public interface BracketedRealFieldUnivariateSolver<T extends RealFieldElement<T
      * Contains two end points and the value of the function at the two end points.
      *
      * @param <T> the element type
-     * @see #solveInterval(int, RealFieldUnivariateFunction, RealFieldElement,
-     * RealFieldElement)
+     * @see #solveInterval(int, RealFieldUnivariateFunction, CalculusFieldElement,
+     * CalculusFieldElement)
      */
-    class Interval<T extends RealFieldElement<T>> {
+    class Interval<T extends CalculusFieldElement<T>> {
 
         /**
          * Abscissa on the left end of the interval.

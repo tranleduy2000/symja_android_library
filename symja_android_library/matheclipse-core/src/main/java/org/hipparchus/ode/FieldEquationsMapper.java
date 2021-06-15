@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.MathArrays;
@@ -40,7 +40,7 @@ import java.io.Serializable;
  * @param <T> the type of the field elements
  * @see FieldExpandableODE
  */
-public class FieldEquationsMapper<T extends RealFieldElement<T>> implements Serializable {
+public class FieldEquationsMapper<T extends CalculusFieldElement<T>> implements Serializable {
 
     /**
      * Serializable UID.

@@ -1,5 +1,6 @@
 package org.matheclipse.core.patternmatching;
 
+import com.duy.annotations.ObjcMemoryIssue;
 import org.matheclipse.core.combinatoric.IStepVisitor;
 import org.matheclipse.core.combinatoric.MultisetPartitionsIterator;
 import org.matheclipse.core.eval.EvalEngine;
@@ -27,10 +28,19 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
    * @param patternMap
    * @deprecated used only for JUnit tests
    */
-  public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST,
-      PatternMatcher patternMatcher, IPatternMap patternMap) {
-    this(sym, lhsPatternAST, lhsEvalAST, //
-        patternMatcher.new StackMatcher(EvalEngine.get()), patternMap);
+  @Deprecated
+  public FlatOrderlessStepVisitor(
+      final ISymbol sym,
+      IAST lhsPatternAST,
+      IAST lhsEvalAST,
+      PatternMatcher patternMatcher,
+      IPatternMap patternMap) {
+    this(
+        sym,
+        lhsPatternAST,
+        lhsEvalAST, //
+        patternMatcher.new StackMatcher(EvalEngine.get()),
+        patternMap);
   }
 
   public FlatOrderlessStepVisitor(final ISymbol sym, IAST lhsPatternAST, IAST lhsEvalAST,
@@ -56,6 +66,7 @@ public class FlatOrderlessStepVisitor extends FlatStepVisitor implements IStepVi
    * @param end
    * @return
    */
+  @ObjcMemoryIssue
   final private void toIntArray(IAST sortedList, int start, int end) {
     multiset = new int[end - start];
     array = new IExpr[end - start];

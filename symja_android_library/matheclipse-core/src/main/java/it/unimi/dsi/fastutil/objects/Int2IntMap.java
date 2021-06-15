@@ -2,19 +2,24 @@ package it.unimi.dsi.fastutil.objects;
 
 public interface Int2IntMap {
 
-    int get(int key);
+  int get(int key);
 
-    Integer put(int k, int v);
+  Integer put(int k, int v);
 
-    int size();
+  int size();
 
-    Iterable<Int2IntMap.Entry> int2IntEntrySet();
+  Iterable<Int2IntMap.Entry> int2IntEntrySet();
 
-    interface Entry {
-        int getIntKey();
+  interface Entry {
 
-        int getIntValue();
+    int getKey();
 
-        void setValue(int value);
-    }
+    int getValue();
+
+    int getIntKey();
+
+    int getIntValue();
+
+    void setValue(int value);
+  }
 }

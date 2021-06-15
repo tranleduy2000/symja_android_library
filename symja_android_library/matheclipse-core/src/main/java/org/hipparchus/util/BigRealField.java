@@ -34,69 +34,77 @@ import org.hipparchus.FieldElement;
  *
  * @see BigReal
  */
-public class BigRealField implements Field<BigReal>, Serializable  {
+public class BigRealField implements Field<BigReal>, Serializable {
 
-    /** Serializable version identifier */
-    private static final long serialVersionUID = 20160327L;
+  /** Serializable version identifier */
+  private static final long serialVersionUID = 20160327L;
 
-    /** Private constructor for the singleton.
-     */
-    private BigRealField() {
-    }
+  /**
+   * Private constructor for the singleton.
+   */
+  private BigRealField() {
+  }
 
-    /** Get the unique instance.
-     * @return the unique instance
-     */
-    public static BigRealField getInstance() {
-        return LazyHolder.INSTANCE;
-    }
+  /**
+   * Get the unique instance.
+   *
+   * @return the unique instance
+   */
+  public static BigRealField getInstance() {
+    return LazyHolder.INSTANCE;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public BigReal getOne() {
-        return BigReal.ONE;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public BigReal getOne() {
+    return BigReal.ONE;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public BigReal getZero() {
-        return BigReal.ZERO;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public BigReal getZero() {
+    return BigReal.ZERO;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Class<? extends FieldElement<BigReal>> getRuntimeClass() {
-        return BigReal.class;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Class<BigReal> getRuntimeClass() {
+    return BigReal.class;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(final Object other) {
-        return this == other;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(final Object other) {
+    return this == other;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return 0xf38b3541;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    return 0xf38b3541;
+  }
 
-    // CHECKSTYLE: stop HideUtilityClassConstructor
-    /** Holder for the instance.
-     * <p>We use here the Initialization On Demand Holder Idiom.</p>
-     */
-    private static class LazyHolder {
-        /** Cached field instance. */
-        private static final BigRealField INSTANCE = new BigRealField();
-    }
-    // CHECKSTYLE: resume HideUtilityClassConstructor
+  // CHECKSTYLE: stop HideUtilityClassConstructor
 
-    /** Handle deserialization of the singleton.
-     * @return the singleton instance
-     */
-    private Object readResolve() {
-        // return the singleton instance
-        return LazyHolder.INSTANCE;
-    }
+  /**
+   * Holder for the instance.
+   * <p>We use here the Initialization On Demand Holder Idiom.</p>
+   */
+  private static class LazyHolder {
+
+    /** Cached field instance. */
+    private static final BigRealField INSTANCE = new BigRealField();
+  }
+  // CHECKSTYLE: resume HideUtilityClassConstructor
+
+  /**
+   * Handle deserialization of the singleton.
+   *
+   * @return the singleton instance
+   */
+  private Object readResolve() {
+    // return the singleton instance
+    return LazyHolder.INSTANCE;
+  }
 
 }

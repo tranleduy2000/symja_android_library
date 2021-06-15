@@ -1,8 +1,10 @@
 package org.matheclipse.core.interfaces;
 
+import org.apfloat.Apcomplex;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ComplexNum;
+import org.matheclipse.core.expression.F;
 
 /** Implemented by all number interfaces */
 public interface INumber extends IExpr {
@@ -19,9 +21,17 @@ public interface INumber extends IExpr {
    * Get a <code>Apcomplex</code> number wrapped into an <code>ApcomplexNum</code> object.
    *
    * @param precision set the precision of the resulting ApcomplexNum
-   * @return this signed number represented as an ApcomplexNum
+   * @return this number represented as an ApcomplexNum
    */
   public ApcomplexNum apcomplexNumValue(long precision);
+
+  /**
+   * Get a <code>Apcomplex</code> object.
+   *
+   * @param precision set the precision of the resulting Apcomplex
+   * @return this number represented as an Apcomplex
+   */
+  public Apcomplex apcomplexValue(long precision);
 
   /**
    * Returns the smallest (closest to negative infinity) <code>IInteger</code> value that is not
@@ -65,8 +75,8 @@ public interface INumber extends IExpr {
    * Gets the signum value of a complex number
    *
    * @return 0 for <code>this == 0</code>; +1 for <code>real(this) &gt; 0</code> or
-   *         <code>( real(this)==0 &amp;&amp; imaginary(this) &gt; 0 )</code>; -1 for <code>real(this) &lt; 0 || (
-   *         real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
+   * <code>( real(this)==0 &amp;&amp; imaginary(this) &gt; 0 )</code>; -1 for <code>real(this) &lt; 0 || (
+   * real(this) == 0 &amp;&amp; imaginary(this) &lt; 0 )
    */
   public int complexSign();
 
@@ -94,14 +104,12 @@ public interface INumber extends IExpr {
 
   /**
    * Returns the largest (closest to positive infinity) <code>IInteger</code> value that is not
-   * greater than
-   * <code>this</code> and is equal to a mathematical integer. <br/>
+   * greater than <code>this</code> and is equal to a mathematical integer. <br>
    * This method raises {@link ArithmeticException} if a numeric value cannot be represented by an
    * <code>long</code> type.
    *
    * @return the largest (closest to positive infinity) <code>IInteger</code> value that is not
-   * greater than
-   * <code>this</code> and is equal to a mathematical integer.
+   * greater than <code>this</code> and is equal to a mathematical integer.
    */
   public INumber floorFraction() throws ArithmeticException;
 
@@ -125,7 +133,9 @@ public interface INumber extends IExpr {
    * @return real part
    * @deprecated use {@link #imDoubleValue()}
    */
-  double getImaginary();
+  double getImaginary(); /*{
+    return imDoubleValue();
+  }*/
 
   /**
    * Returns the real part of a complex number
@@ -133,7 +143,21 @@ public interface INumber extends IExpr {
    * @return real part
    * @deprecated use {@link #reDoubleValue()}
    */
-  double getReal();
+  double getReal(); /*{
+    return reDoubleValue();
+  }
+*/
+
+  @Override
+  boolean isNumber(); /*{
+    return true;
+  }*/
+
+  @Override
+    /*default*/ boolean isNumericFunction(boolean allowList);/*{
+    return true;
+  }
+*/
 
   /**
    * Returns the imaginary part of a complex number
@@ -151,7 +175,14 @@ public interface INumber extends IExpr {
   public double imDoubleValue();
 
   @Override
-  IExpr[] linear(IExpr variable);
+  IExpr[] linear(IExpr variable); /*{
+    return new IExpr[] {this, F.C0};
+  }*/
+
+  @Override
+  public IExpr[] linearPower(IExpr variable);/* {
+    return new IExpr[] {this, F.C0, F.C1};
+  }*/
 
   @Override
   public INumber opposite();
@@ -162,7 +193,12 @@ public interface INumber extends IExpr {
    *
    * @return <code>null</code> if no factor could be extracted
    */
-  IRational rationalFactor();
+  IRational rationalFactor(); /*{
+    if (this instanceof IRational) {
+      return (IRational) this;
+    }
+    return null;
+  }*/
 
   /**
    * Returns the real part of a complex number
@@ -188,7 +224,7 @@ public interface INumber extends IExpr {
    *
    * @return the closest integer to the argument.
    */
-  public IExpr round();
+  public IExpr roundExpr();
 
   /**
    * Return the list <code>{r, theta}</code> of the polar coordinates of this number

@@ -166,7 +166,6 @@ public class ApfloatToMMA {
     if (style == OutputStyle.MATHML) {
       buf.append("</mn>");
     }
-    return;
 
     // String s = value.toString(); // String.format(Locale.US, "%16.16E", value);
     // int start = s.indexOf('e');
@@ -250,7 +249,7 @@ public class ApfloatToMMA {
   public static void apfloatToMMA(StringBuilder buf, Apfloat value, int exponent,
       long significantFigures) {
     try {
-      apfloatToMMA((Appendable) buf, value, exponent, significantFigures, OutputStyle.OUTPUT);
+      apfloatToMMA(buf, value, exponent, significantFigures, OutputStyle.OUTPUT);
     } catch (IOException ioex) {
       ioex.printStackTrace();
     }
@@ -259,7 +258,7 @@ public class ApfloatToMMA {
   public static void apfloatToTeX(StringBuilder buf, Apfloat value, int exponent,
       long significantFigures) {
     try {
-      apfloatToMMA((Appendable) buf, value, exponent, significantFigures, OutputStyle.TEX);
+      apfloatToMMA(buf, value, exponent, significantFigures, OutputStyle.TEX);
     } catch (IOException ioex) {
       ioex.printStackTrace();
     }
@@ -268,7 +267,7 @@ public class ApfloatToMMA {
   public static void apfloatToMathML(StringBuilder buf, Apfloat value, int exponent,
       long significantFigures) {
     try {
-      apfloatToMMA((Appendable) buf, value, exponent, significantFigures, OutputStyle.MATHML);
+      apfloatToMMA(buf, value, exponent, significantFigures, OutputStyle.MATHML);
     } catch (IOException ioex) {
       ioex.printStackTrace();
     }
@@ -279,23 +278,20 @@ public class ApfloatToMMA {
     apfloatToMMA(buf, new Apfloat(value), exponent, significantFigures);
   }
 
-  /**
-   * Write an <code>Apfloat</code> value in scientific notation.
-   *
-   * @param buf
-   * @param value
-   * @param significantFigures
-   * @param exponent
-   * @param texScientificNotation
-   *            if <code>true</code> use <code>123^{456}</code> style to write the exponent
-   * @throws IOException
-   */
-  // public static void apfloatToScientific(Appendable buf, Apfloat value, int significantFigures, int exponent,
+  //   * Write an <code>Apfloat</code> value in scientific notation.
+  //   *
+  //   * @param texScientificNotation if <code>true</code> use <code>123^{456}</code> style to write
+  // the
+  //   *     exponent
+
+  // public static void apfloatToScientific(Appendable buf, Apfloat value, int significantFigures,
+  // int exponent,
   // boolean texScientificNotation) throws IOException {
   // String s;
   // int start;
   // value = ApfloatMath.round(value, significantFigures + 1, RoundingMode.HALF_EVEN);
-  // s = value.toString(); // String.format(Locale.US, "%1." + (significantFigures - 1) + "E", value);
+  // s = value.toString(); // String.format(Locale.US, "%1." + (significantFigures - 1) + "E",
+  // value);
   // start = s.indexOf('e');
   // if (start < 0) {
   // start = s.indexOf('E');
@@ -324,14 +320,16 @@ public class ApfloatToMMA {
   // }
   // }
 
-  /**
-   * Convert a <code>Apfloat</code> value into a string similar to the Mathematica scientific output format.
-   *
-   * @param buf a string builder where the output should be appended
-   * @param value the Apfloat value which should be formatted
-   * @param significantFigures the number of significant figures which should be printed
-   */
-  // public static void apfloatToScientific(StringBuilder buf, Apfloat value, int significantFigures) {
+  //   * Convert a <code>Apfloat</code> value into a string similar to the Mathematica scientific
+  // output
+  //   * format.
+  //   *
+  //   * @param buf a string builder where the output should be appended
+  //   * @param value the Apfloat value which should be formatted
+  //   * @param significantFigures the number of significant figures which should be printed
+
+  // public static void apfloatToScientific(StringBuilder buf, Apfloat value, int
+  // significantFigures) {
   // try {
   // apfloatToScientific(buf, value, significantFigures, Integer.MIN_VALUE, false);
   // } catch (IOException ioex) {
@@ -339,10 +337,5 @@ public class ApfloatToMMA {
   // }
   // }
 
-  // public static void apfloatToScientific(StringBuilder buf, double value, int significantFigures) {
-  // apfloatToScientific(buf, new Apfloat(value), significantFigures);
-  // }
-  private ApfloatToMMA() {
+  private ApfloatToMMA() {}
   }
-
-}

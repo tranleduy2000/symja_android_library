@@ -3,6 +3,7 @@ package org.matheclipse.core.expression;
 import static java.lang.Math.abs;
 
 import com.duy.annotations.Nonnull;
+import com.duy.annotations.ObjcMemoryIssue;
 import com.duy.lambda.BiFunction;
 import com.duy.lambda.BiPredicate;
 import com.duy.lambda.Consumer;
@@ -14,11 +15,11 @@ import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
 
 import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatContext;
+import org.hipparchus.Field;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
@@ -109,6 +110,7 @@ import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.parser.ExprParser;
 import org.matheclipse.core.parser.ExprParserFactory;
+import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.parser.client.FEConfig;
@@ -162,14 +164,10 @@ public class F {
   public static Cache<IAST, IExpr> REMEMBER_AST_CACHE = CacheBuilder.newBuilder().maximumSize(500)
       .build();
 
-  /**
-   * Set to <code>true</code> at the start of initSymbols() method
-   */
+  /** Set to <code>true</code> at the start of initSymbols() method */
   public static volatile boolean isSystemStarted = false;
 
-  /**
-   * Set to <code>true</code> at the end of initSymbols() method
-   */
+  /** Set to <code>true</code> at the end of initSymbols() method */
   public static volatile boolean isSystemInitialized = false;
   /**
    * The map for predefined strings for the {@link IExpr#internalFormString(boolean, int)} method.
@@ -205,7 +203,10 @@ public class F {
   static IExpr[] COMMON_IDS = null;
 
   /**
-   * Global map of predefined constant expressions.
+   * Global map of predefined constant expressions. The predefined expressions corresponding to the
+   * <code>id</code> from the internal table of built-in symbols {@link #BUILT_IN_SYMBOLS} or from
+   * the internal table of predefined constant expressions {@link #COMMON_IDS} mapped to the
+   * corresponding expressions.
    */
   public static final Object2ShortOpenHashMap<IExpr> GLOBAL_IDS_MAP = new Object2ShortOpenHashMap<IExpr>(
       EXPRID_MAX_BUILTIN_LENGTH + 1000);
@@ -278,6 +279,10 @@ public class F {
   /***/
   public static final IBuiltInSymbol $RecursionLimit = initFinalSymbol("$RecursionLimit",
       ID.$RecursionLimit);
+
+  public static final IBuiltInSymbol $SingleEntryMatrix =
+      F.initFinalSymbol("$SingleEntryMatrix", ID.$SingleEntryMatrix);
+
   /***/
   public static final IBuiltInSymbol $UserName = initFinalSymbol("$UserName", ID.$UserName);
   /***/
@@ -299,9 +304,19 @@ public class F {
       ID.AbsoluteTiming);
   /** Accumulate(list) - accumulate the values of `list` returning a new list. */
   public static final IBuiltInSymbol Accumulate = initFinalSymbol("Accumulate", ID.Accumulate);
-  /** AddTo(x, dx) - is equivalent to `x = x + dx`. */
+  /**
+   * AddTo(x, dx) - is equivalent to `x = x + dx`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/AddTo.md">AddTo
+   * documentation</a>
+   */
   public static final IBuiltInSymbol AddTo = initFinalSymbol("AddTo", ID.AddTo);
-  /** AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix. */
+  /**
+   * AdjacencyMatrix(graph) - convert the `graph` into a adjacency matrix in sparse array format.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/AdjacencyMatrix.md">AdjacencyMatrix
+   * documentation</a>
+   */
   public static final IBuiltInSymbol AdjacencyMatrix = initFinalSymbol("AdjacencyMatrix",
       ID.AdjacencyMatrix);
   /** AiryAi(z) - returns the Airy function of the first kind of `z`. */
@@ -323,14 +338,30 @@ public class F {
   /**
    * AllTrue({expr1, expr2, ...}, test) - returns `True` if all applications of `test` to `expr1,
    * expr2, ...` evaluate to `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/AllTrue.md">AllTrue
+   * documentation</a>
    */
   public static final IBuiltInSymbol AllTrue = initFinalSymbol("AllTrue", ID.AllTrue);
+
+  public static final IBuiltInSymbol AllowShortContext =
+      F.initFinalSymbol("AllowShortContext", ID.AllowShortContext);
 
   public static final IBuiltInSymbol AllowedHeads =
       F.initFinalSymbol("AllowedHeads", ID.AllowedHeads);
   /**
+   * Alphabet() - gives the list of lowercase letters `a-z` in the English or Latin alphabet .
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Alphabet.md">Alphabet
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol Alphabet = F.initFinalSymbol("Alphabet", ID.Alphabet);
+  /**
    * Alternatives(p1, p2, ..., p_i) - is a pattern that matches any of the patterns `p1, p2,....,
    * p_i`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Alternatives.md">Alternatives
+   * documentation</a>
    */
   public static final IBuiltInSymbol Alternatives = initFinalSymbol("Alternatives",
       ID.Alternatives);
@@ -338,10 +369,20 @@ public class F {
    * And(expr1, expr2, ...) - `expr1 && expr2 && ...` evaluates each expression in turn, returning
    * `False` as soon as an expression evaluates to `False`. If all expressions evaluate to `True`,
    * `And` returns `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/And.md">And
+   * documentation</a>
    */
   public static final IBuiltInSymbol And = initFinalSymbol("And", ID.And);
-  /** AngleVector(phi) - returns the point at angle `phi` on the unit circle. */
+  /**
+   * AngleVector(phi) - returns the point at angle `phi` on the unit circle.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/AngleVector.md">AngleVector
+   * documentation</a>
+   */
   public static final IBuiltInSymbol AngleVector = initFinalSymbol("AngleVector", ID.AngleVector);
+
+  public static final IBuiltInSymbol Annotation = F.initFinalSymbol("Annotation", ID.Annotation);
   /** Annuity(p, t) - returns an annuity object. */
   public static final IBuiltInSymbol Annuity = initFinalSymbol("Annuity", ID.Annuity);
   /** AnnuityDue(p, t) - returns an annuity due object. */
@@ -431,6 +472,7 @@ public class F {
   public static final IBuiltInSymbol ArrayRules = initFinalSymbol("ArrayRules", ID.ArrayRules);
   /***/
   public static final IBuiltInSymbol Arrays = initFinalSymbol("Arrays", ID.Arrays);
+  public static final IBuiltInSymbol Assuming = initFinalSymbol("Assuming", ID.Assuming);
   /***/
   public static final IBuiltInSymbol AssociateTo = initFinalSymbol("AssociateTo", ID.AssociateTo);
   /** Association(list-of-rules) - create a `key->value` association map from the `list-of-rules`. */
@@ -509,6 +551,15 @@ public class F {
   public static final IBuiltInSymbol BernoulliDistribution = initFinalSymbol(
       "BernoulliDistribution",
       ID.BernoulliDistribution);
+
+  /**
+   * BernsteinBasis(n, v, expr) - computes the Bernstein basis for the expression `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/BernsteinBasis.md">BernsteinBasis
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol BernsteinBasis =
+      F.initFinalSymbol("BernsteinBasis", ID.BernsteinBasis);
   /** BesselI(n, z) - modified Bessel function of the first kind. */
   public static final IBuiltInSymbol BesselI = initFinalSymbol("BesselI", ID.BesselI);
   /** BesselJ(n, z) - Bessel function of the first kind. */
@@ -674,12 +725,19 @@ public class F {
 
   public static final IBuiltInSymbol CarlsonRJ = F.initFinalSymbol("CarlsonRJ", ID.CarlsonRJ);
 
-  /** CarmichaelLambda(n) - the Carmichael function of `n` */
+  /**
+   * CarmichaelLambda(n) - the Carmichael function of `n`
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/CarmichaelLambda.md">CarmichaelLambda
+   * documentation</a>
+   */
   public static final IBuiltInSymbol CarmichaelLambda = initFinalSymbol("CarmichaelLambda",
       ID.CarmichaelLambda);
   /** CartesianProduct(list1, list2) - returns the cartesian product for multiple lists. */
   public static final IBuiltInSymbol CartesianProduct = initFinalSymbol("CartesianProduct",
       ID.CartesianProduct);
+  public static final IBuiltInSymbol Cycles = initFinalSymbol("Cycles",
+      ID.Cycles);
   /** Cases(list, pattern) - returns the elements of `list` that match `pattern`. */
   public static final IBuiltInSymbol Cases = initFinalSymbol("Cases", ID.Cases);
   /** Catalan - Catalan's constant */
@@ -757,6 +815,8 @@ public class F {
   /** CirclePoints(i) - gives the `i` points on the unit circle for a positive integer `i`. */
   public static final IBuiltInSymbol CirclePoints = initFinalSymbol("CirclePoints",
       ID.CirclePoints);
+  public static final IBuiltInSymbol CircleTimes = initFinalSymbol("CircleTimes",
+      ID.CircleTimes);
   /** Clear(symbol1, symbol2,...) - clears all values of the given symbols. */
   public static final IBuiltInSymbol Clear = initFinalSymbol("Clear", ID.Clear);
   /**
@@ -923,6 +983,10 @@ public class F {
   /***/
   public static final IBuiltInSymbol ConvexHullMesh = initFinalSymbol("ConvexHullMesh",
       ID.ConvexHullMesh);
+  public static final IBuiltInSymbol CollinearPoints = initFinalSymbol("CollinearPoints",
+      ID.CollinearPoints);
+  public static final IBuiltInSymbol CoplanarPoints = initFinalSymbol("CoplanarPoints",
+      ID.CoplanarPoints);
   /**
    * CoprimeQ(x, y) - tests whether `x` and `y` are coprime by computing their greatest common
    * divisor.
@@ -1047,6 +1111,8 @@ public class F {
   public static final IBuiltInSymbol Depth = initFinalSymbol("Depth", ID.Depth);
   /** Derivative(n)[f] - represents the `n`-th derivative of the function `f`. */
   public static final IBuiltInSymbol Derivative = initFinalSymbol("Derivative", ID.Derivative);
+  public static final IBuiltInSymbol DifferenceDelta = initFinalSymbol("DifferenceDelta",
+      ID.DifferenceDelta);
   /** DesignMatrix(m, f, x) - returns the design matrix. */
   public static final IBuiltInSymbol DesignMatrix = initFinalSymbol("DesignMatrix",
       ID.DesignMatrix);
@@ -1077,6 +1143,8 @@ public class F {
    */
   public static final IBuiltInSymbol DiceDissimilarity = initFinalSymbol("DiceDissimilarity",
       ID.DiceDissimilarity);
+  public static final IBuiltInSymbol FindPermutation = initFinalSymbol("FindPermutation",
+      ID.FindPermutation);
   /***/
   public static final IBuiltInSymbol Differences = initFinalSymbol("Differences", ID.Differences);
   /***/
@@ -1184,6 +1252,8 @@ public class F {
       ID.EchoFunction);
   /***/
   public static final IBuiltInSymbol EdgeCount = initFinalSymbol("EdgeCount", ID.EdgeCount);
+
+  public static final IBuiltInSymbol EdgeLabels = initFinalSymbol("EdgeLabels", ID.EdgeLabels);
 
   /** EdgeList(graph) - convert the `graph` into a list of edges. */
   public static final IBuiltInSymbol EdgeList = initFinalSymbol("EdgeList", ID.EdgeList);
@@ -1457,6 +1527,9 @@ public class F {
       ID.FindVertexCover);
   /** First(expr) - returns the first element in `expr`. */
   public static final IBuiltInSymbol First = initFinalSymbol("First", ID.First);
+  public static final IBuiltInSymbol FirstCase = initFinalSymbol("FirstCase", ID.FirstCase);
+  public static final IBuiltInSymbol FirstPosition = initFinalSymbol("FirstPosition",
+      ID.FirstPosition);
   /**
    * Fit(list-of-data-points, degree, variable) - solve a least squares problem using the
    * Levenberg-Marquardt algorithm.
@@ -1713,67 +1786,143 @@ public class F {
   /***/
   public static final IBuiltInSymbol GroupBy = initFinalSymbol("GroupBy", ID.GroupBy);
 
-  /** GumbelDistribution(a, b) - returns a Gumbel distribution. */
-  public static final IBuiltInSymbol GumbelDistribution = initFinalSymbol("GumbelDistribution",
-      ID.GumbelDistribution);
+  public static final IBuiltInSymbol Gudermannian =
+      initFinalSymbol("Gudermannian", ID.Gudermannian);
+
+  /**
+   * GumbelDistribution(a, b) - returns a Gumbel distribution.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/GumbelDistribution.md">GumbelDistribution
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol GumbelDistribution =
+      initFinalSymbol("GumbelDistribution", ID.GumbelDistribution);
 
   /**
    * HamiltonianGraphQ(graph) - returns `True` if `graph` is an hamiltonian graph, and `False`
    * otherwise.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HamiltonianGraphQ.md">HamiltonianGraphQ
+   * documentation</a>
    */
   public static final IBuiltInSymbol HamiltonianGraphQ = initFinalSymbol("HamiltonianGraphQ",
       ID.HamiltonianGraphQ);
 
+  /**
+   * HammingDistance(a, b) - returns the Hamming distance of `a` and `b`, i.e. the number of
+   * different elements.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HammingDistance.md">HammingDistance
+   * documentation</a>
+   */
   public static final IBuiltInSymbol HammingDistance =
-      F.initFinalSymbol("HammingDistance", ID.HammingDistance);
+      initFinalSymbol("HammingDistance", ID.HammingDistance);
 
-  /***/
-  public static final IBuiltInSymbol HammingWindow = initFinalSymbol("HammingWindow",
-      ID.HammingWindow);
-  /***/
+  public static final IBuiltInSymbol HammingWindow =
+      initFinalSymbol("HammingWindow", ID.HammingWindow);
   public static final IBuiltInSymbol HankelH1 = initFinalSymbol("HankelH1", ID.HankelH1);
 
-  /***/
   public static final IBuiltInSymbol HankelH2 = initFinalSymbol("HankelH2", ID.HankelH2);
-  /***/
   public static final IBuiltInSymbol HannWindow = initFinalSymbol("HannWindow", ID.HannWindow);
-  /** HarmonicMean({a, b, c,...}) - returns the harmonic mean of `{a, b, c,...}`. */
-  public static final IBuiltInSymbol HarmonicMean = initFinalSymbol("HarmonicMean",
-      ID.HarmonicMean);
-  /** HarmonicNumber(n) - returns the `n`th harmonic number. */
-  public static final IBuiltInSymbol HarmonicNumber = initFinalSymbol("HarmonicNumber",
-      ID.HarmonicNumber);
-  /** Haversine(z) - returns the haversine function of `z`. */
+  /**
+   * HarmonicMean({a, b, c,...}) - returns the harmonic mean of `{a, b, c,...}`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HarmonicMean.md">HarmonicMean
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol HarmonicMean =
+      initFinalSymbol("HarmonicMean", ID.HarmonicMean);
+
+  /**
+   * HarmonicNumber(n) - returns the `n`th harmonic number.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HarmonicNumber.md">HarmonicNumber
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol HarmonicNumber =
+      initFinalSymbol("HarmonicNumber", ID.HarmonicNumber);
+
+  /**
+   * Haversine(z) - returns the haversine function of `z`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Haversine.md">Haversine
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Haversine = initFinalSymbol("Haversine", ID.Haversine);
-  /** Head(expr) - returns the head of the expression or atom `expr`. */
+  /**
+   * Head(expr) - returns the head of the expression or atom `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Head.md">Head
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Head = initFinalSymbol("Head", ID.Head);
-  /***/
   public static final IBuiltInSymbol Heads = initFinalSymbol("Heads", ID.Heads);
   /**
    * HeavisideTheta(expr1, expr2, ... exprN) - returns `1` if all `expr1, expr2, ... exprN` are
    * positive and `0` if one of the `expr1, expr2, ... exprN` is negative. `HeavisideTheta(0)`
    * returns unevaluated as `HeavisideTheta(0)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HeavisideTheta.md">HeavisideTheta
+   * documentation</a>
    */
-  public static final IBuiltInSymbol HeavisideTheta = initFinalSymbol("HeavisideTheta",
-      ID.HeavisideTheta);
-  /** HermiteH(n, x) - returns the Hermite polynomial `H_n(x)`. */
+  public static final IBuiltInSymbol HeavisideTheta =
+      initFinalSymbol("HeavisideTheta", ID.HeavisideTheta);
+
+  /**
+   * HermiteH(n, x) - returns the Hermite polynomial `H_n(x)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HermiteH.md">HermiteH
+   * documentation</a>
+   */
   public static final IBuiltInSymbol HermiteH = initFinalSymbol("HermiteH", ID.HermiteH);
-  /** HermitianMatrixQ(m) - returns `True` if `m` is a hermitian matrix. */
-  public static final IBuiltInSymbol HermitianMatrixQ = initFinalSymbol("HermitianMatrixQ",
-      ID.HermitianMatrixQ);
-  /***/
-  public static final IBuiltInSymbol HexidecimalCharacter = initFinalSymbol("HexidecimalCharacter",
-      ID.HexidecimalCharacter);
-  /** HilbertMatrix(n) - gives the hilbert matrix with `n` rows and columns. */
-  public static final IBuiltInSymbol HilbertMatrix = initFinalSymbol("HilbertMatrix",
-      ID.HilbertMatrix);
-  /** Histogram(list-of-values) - plots a histogram for a `list-of-values` */
+  /**
+   * HermitianMatrixQ(m) - returns `True` if `m` is a hermitian matrix.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HermitianMatrixQ.md">HermitianMatrixQ
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol HermitianMatrixQ =
+      initFinalSymbol("HermitianMatrixQ", ID.HermitianMatrixQ);
+
+  /**
+   * HexidecimalCharacter - represents the characters `0-9`, `a-f` and `A-F`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HexidecimalCharacter.md">HexidecimalCharacter
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol HexidecimalCharacter =
+      initFinalSymbol("HexidecimalCharacter", ID.HexidecimalCharacter);
+
+  /**
+   * HilbertMatrix(n) - gives the hilbert matrix with `n` rows and columns.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HilbertMatrix.md">HilbertMatrix
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol HilbertMatrix =
+      initFinalSymbol("HilbertMatrix", ID.HilbertMatrix);
+
+  /**
+   * Histogram(list-of-values) - plots a histogram for a `list-of-values`
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Histogram.md">Histogram
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Histogram = initFinalSymbol("Histogram", ID.Histogram);
-  /** Hold(expr) - `Hold` doesn't evaluate `expr`. */
+  /**
+   * Hold(expr) - `Hold` doesn't evaluate `expr`. `Hold` evaluates `UpValues`for its arguments.
+   * `HoldComplete` doesn't evaluate `UpValues`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Hold.md">Hold
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Hold = initFinalSymbol("Hold", ID.Hold);
   /**
    * HoldAll - is an attribute specifying that all arguments of a function should be left
    * unevaluated.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/HoldAll.md">HoldAll
+   * documentation</a>
    */
   public static final IBuiltInSymbol HoldAll = initFinalSymbol("HoldAll", ID.HoldAll);
   /***/
@@ -1991,41 +2140,75 @@ public class F {
    * InverseFourier(vector-of-complex-numbers) - Inverse discrete Fourier transform of a
    * `vector-of-complex-numbers`. Fourier transform is restricted to vectors with length of power of
    * 2.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/InverseFourier.md">InverseFourier
+   * documentation</a>
    */
-  public static final IBuiltInSymbol InverseFourier = initFinalSymbol("InverseFourier",
-      ID.InverseFourier);
+  public static final IBuiltInSymbol InverseFourier =
+      initFinalSymbol("InverseFourier", ID.InverseFourier);
 
-  /** InverseFunction(head) - returns the inverse function for the symbol `head`. */
-  public static final IBuiltInSymbol InverseFunction = initFinalSymbol("InverseFunction",
-      ID.InverseFunction);
-  /***/
-  public static final IBuiltInSymbol InverseGammaRegularized = initFinalSymbol(
-      "InverseGammaRegularized",
-      ID.InverseGammaRegularized);
-  /** InverseHaversine(z) - returns the inverse haversine function of `z`. */
-  public static final IBuiltInSymbol InverseHaversine = initFinalSymbol("InverseHaversine",
-      ID.InverseHaversine);
-  /** InverseLaplaceTransform(f,s,t) - returns the inverse laplace transform. */
-  public static final IBuiltInSymbol InverseLaplaceTransform = initFinalSymbol(
-      "InverseLaplaceTransform",
-      ID.InverseLaplaceTransform);
-  /** InverseSeries( series ) - return the inverse series. */
-  public static final IBuiltInSymbol InverseSeries = initFinalSymbol("InverseSeries",
-      ID.InverseSeries);
-  /***/
-  public static final IBuiltInSymbol InverseWeierstrassP = initFinalSymbol("InverseWeierstrassP",
-      ID.InverseWeierstrassP);
+  /**
+   * InverseFunction(head) - returns the inverse function for the symbol `head`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/InverseFunction.md">InverseFunction
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol InverseFunction =
+      initFinalSymbol("InverseFunction", ID.InverseFunction);
 
-  /** JSForm(expr) - returns the JavaScript form of the `expr`. */
+  public static final IBuiltInSymbol InverseGammaRegularized =
+      initFinalSymbol("InverseGammaRegularized", ID.InverseGammaRegularized);
+
+  public static final IBuiltInSymbol InverseGudermannian =
+      initFinalSymbol("InverseGudermannian", ID.InverseGudermannian);
+
+  /**
+   * InverseHaversine(z) - returns the inverse haversine function of `z`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/InverseHaversine.md">InverseHaversine
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol InverseHaversine =
+      initFinalSymbol("InverseHaversine", ID.InverseHaversine);
+
+  /**
+   * InverseLaplaceTransform(f,s,t) - returns the inverse laplace transform.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/InverseLaplaceTransform.md">InverseLaplaceTransform
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol InverseLaplaceTransform =
+      initFinalSymbol("InverseLaplaceTransform", ID.InverseLaplaceTransform);
+
+  /**
+   * InverseSeries( series ) - return the inverse series.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/InverseSeries.md">InverseSeries
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol InverseSeries =
+      initFinalSymbol("InverseSeries", ID.InverseSeries);
+
+  public static final IBuiltInSymbol InverseWeierstrassP =
+      initFinalSymbol("InverseWeierstrassP", ID.InverseWeierstrassP);
+
+  /**
+   * JSForm(expr) - returns the JavaScript form of the `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JSForm.md">JSForm
+   * documentation</a>
+   */
   public static final IBuiltInSymbol JSForm = initFinalSymbol("JSForm", ID.JSForm);
 
-  /***/
   public static final IBuiltInSymbol JSFormData = initFinalSymbol("JSFormData", ID.JSFormData);
 
   /**
    * JaccardDissimilarity(u, v) - returns the Jaccard-Needham dissimilarity between the two boolean
    * 1-D lists `u` and `v`, which is defined as `(c_tf + c_ft) / (c_tt + c_ft + c_tf)`, where n is
    * `len(u)` and `c_ij` is the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JaccardDissimilarity.md">JaccardDissimilarity
+   * documentation</a>
    */
   public static final IBuiltInSymbol JaccardDissimilarity = initFinalSymbol("JaccardDissimilarity",
       ID.JaccardDissimilarity);
@@ -2044,71 +2227,171 @@ public class F {
   /** JacobiDN(x, m) - returns the Jacobian elliptic function `dn(x, m)`. */
   public static final IBuiltInSymbol JacobiDN = initFinalSymbol("JacobiDN", ID.JacobiDN);
 
-  /** JacobiMatrix(matrix, var) - creates a Jacobian matrix. */
-  public static final IBuiltInSymbol JacobiMatrix = initFinalSymbol("JacobiMatrix",
-      ID.JacobiMatrix);
-  /***/
+  public static final IBuiltInSymbol JacobiEpsilon =
+      initFinalSymbol("JacobiEpsilon", ID.JacobiEpsilon);
+
+  /**
+   * JacobiMatrix(matrix, var) - creates a Jacobian matrix.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JacobiMatrix.md">JacobiMatrix
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol JacobiMatrix =
+      initFinalSymbol("JacobiMatrix", ID.JacobiMatrix);
   public static final IBuiltInSymbol JacobiNC = initFinalSymbol("JacobiNC", ID.JacobiNC);
 
-  /***/
   public static final IBuiltInSymbol JacobiND = initFinalSymbol("JacobiND", ID.JacobiND);
 
-  /***/
   public static final IBuiltInSymbol JacobiSC = initFinalSymbol("JacobiSC", ID.JacobiSC);
 
-  /***/
   public static final IBuiltInSymbol JacobiSD = initFinalSymbol("JacobiSD", ID.JacobiSD);
-  /** JacobiSN(x, m) - returns the Jacobian elliptic function `sn(x, m)`. */
+  /**
+   * JacobiSN(x, m) - returns the Jacobian elliptic function `sn(x, m)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JacobiSN.md">JacobiSN
+   * documentation</a>
+   */
   public static final IBuiltInSymbol JacobiSN = initFinalSymbol("JacobiSN", ID.JacobiSN);
-  /** JacobiSymbol(m, n) - calculates the Jacobi symbol. */
-  public static final IBuiltInSymbol JacobiSymbol = initFinalSymbol("JacobiSymbol",
-      ID.JacobiSymbol);
-  /***/
+  /**
+   * JacobiSymbol(m, n) - calculates the Jacobi symbol.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JacobiSymbol.md">JacobiSymbol
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol JacobiSymbol =
+      initFinalSymbol("JacobiSymbol", ID.JacobiSymbol);
   public static final IBuiltInSymbol JacobiZeta = initFinalSymbol("JacobiZeta", ID.JacobiZeta);
+  /**
+   * JavaClass[class-name] - a `JavaClass` expression can be created with the `LoadJavaClass`
+   * function and wraps a Java `java.lang.Class` object. All static method names are assigned to a
+   * context which will be created by the last part of the class name.
+   *
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaClass.md">JavaClass
+   * documentation</a>
+   */
+//  public static final IBuiltInSymbol JavaClass = initFinalSymbol("JavaClass", ID.JavaClass);
   /**
    * JavaForm(expr) - returns the Symja Java form of the `expr`. In Java you can use the created
    * Symja expressions.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaForm.md">JavaForm
+   * documentation</a>
    */
   public static final IBuiltInSymbol JavaForm = initFinalSymbol("JavaForm", ID.JavaForm);
-  /** Join(l1, l2) - concatenates the lists `l1` and `l2`. */
-  public static final IBuiltInSymbol Join = initFinalSymbol("Join", ID.Join);
-  /***/
-  public static final IBuiltInSymbol KOrderlessPartitions = initFinalSymbol("KOrderlessPartitions",
-      ID.KOrderlessPartitions);
-  /***/
-  public static final IBuiltInSymbol KPartitions = initFinalSymbol("KPartitions", ID.KPartitions);
-  /***/
-  public static final IBuiltInSymbol Key = initFinalSymbol("Key", ID.Key);
-  public static final IBuiltInSymbol KeyAbsent = F.initFinalSymbol("KeyAbsent", ID.KeyAbsent);
+  /**
+   * JavaObject[class className] - a `JavaObject` can be created with the `JavaNew` function.
+   *
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaNew.md">JavaNew
+   * documentation</a>
+   */
+//  public static final IBuiltInSymbol JavaNew = initFinalSymbol("JavaNew", ID.JavaNew);
 
-  /***/
+  /**
+   * JavaNew["class-name"] - create a `JavaObject` from the `class-name` default constructor.
+   *
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaObject.md">JavaObject
+   * documentation</a>
+   */
+//  public static final IBuiltInSymbol JavaObject = initFinalSymbol("JavaObject", ID.JavaObject);
+
+  /**
+   * JavaObjectQ[java-object] - return `True` if `java-object` is a `JavaObject` expression.
+   *
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaObjectQ.md">JavaObjectQ
+   * documentation</a>
+   */
+//  public static final IBuiltInSymbol JavaObjectQ = initFinalSymbol("JavaObjectQ", ID.JavaObjectQ);
+
+  /**
+   * JavaShow[ java.awt.Window ] - show the `JavaObject` which has to be an instance of
+   * `java.awt.Window`.
+   *
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/JavaShow.md">JavaShow
+   * documentation</a>
+   */
+//  public static final IBuiltInSymbol JavaShow = initFinalSymbol("JavaShow", ID.JavaShow);
+
+  /**
+   * Join(l1, l2) - concatenates the lists `l1` and `l2`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Join.md">Join
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol Join = initFinalSymbol("Join", ID.Join);
+  public static final IBuiltInSymbol KOrderlessPartitions =
+      initFinalSymbol("KOrderlessPartitions", ID.KOrderlessPartitions);
+  public static final IBuiltInSymbol KPartitions = initFinalSymbol("KPartitions", ID.KPartitions);
+  public static final IBuiltInSymbol KelvinBei = initFinalSymbol("KelvinBei", ID.KelvinBei);
+
+  public static final IBuiltInSymbol KelvinBer = initFinalSymbol("KelvinBer", ID.KelvinBer);
+
+  /**
+   * Key(key) - represents a `key` used to access a value in an association.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Key.md">Key
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol Key = initFinalSymbol("Key", ID.Key);
+
+  public static final IBuiltInSymbol KeyAbsent = initFinalSymbol("KeyAbsent", ID.KeyAbsent);
   public static final IBuiltInSymbol KeyExistsQ = initFinalSymbol("KeyExistsQ", ID.KeyExistsQ);
 
   /**
    * KeySelect(<|key1->value1, ...|>, head) - returns an association of the elements for which
    * `head(keyi)` returns `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/KeySelect.md">KeySelect
+   * documentation</a>
    */
-  public static final IBuiltInSymbol KeySelect = F.initFinalSymbol("KeySelect", ID.KeySelect);
+  public static final IBuiltInSymbol KeySelect = initFinalSymbol("KeySelect", ID.KeySelect);
 
-  /** KeySort(<|key1->value1, ...|>) - sort the `<|key1->value1, ...|>` entries by the `key` values. */
+  /**
+   * KeySort(<|key1->value1, ...|>) - sort the `<|key1->value1, ...|>` entries by the `key` values.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/KeySort.md">KeySort
+   * documentation</a>
+   */
   public static final IBuiltInSymbol KeySort = initFinalSymbol("KeySort", ID.KeySort);
 
-  /***/
+  /**
+   * KeyTake(<|key1->value1, ...|>, {k1, k2,...}) - returns an association of the rules for which
+   * the `k1, k2,...` are keys in the association.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/KeyTake.md">KeyTake
+   * documentation</a>
+   */
   public static final IBuiltInSymbol KeyTake = initFinalSymbol("KeyTake", ID.KeyTake);
-  /** Keys(association) - return a list of keys of the `association`. */
+  /**
+   * Keys(association) - return a list of keys of the `association`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Keys.md">Keys
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Keys = initFinalSymbol("Keys", ID.Keys);
-  /** Khinchin - Khinchin's constant */
+  /**
+   * Khinchin - Khinchin's constant
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Khinchin.md">Khinchin
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Khinchin = initFinalSymbol("Khinchin", ID.Khinchin);
-  /***/
-  public static final IBuiltInSymbol KleinInvariantJ = initFinalSymbol("KleinInvariantJ",
-      ID.KleinInvariantJ);
-  /***/
+  public static final IBuiltInSymbol KleinInvariantJ =
+      initFinalSymbol("KleinInvariantJ", ID.KleinInvariantJ);
   public static final IBuiltInSymbol KnownUnitQ = initFinalSymbol("KnownUnitQ", ID.KnownUnitQ);
 
   /**
    * KolmogorovSmirnovTest(data) - Computes the `p-value`, or <i>observed significance level</i>, of
-   * a one-sample [Wikipedia:Kolmogorov-Smirnov test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test)
-   * evaluating the null hypothesis that `data` conforms to the `NormalDistribution()`.
+   * a one-sample [Wikipedia:Kolmogorov-Smirnov
+   * test](http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test) evaluating the null hypothesis that
+   * `data` conforms to the `NormalDistribution()`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/KolmogorovSmirnovTest.md">KolmogorovSmirnovTest
+   * documentation</a>
    */
   public static final IBuiltInSymbol KolmogorovSmirnovTest = initFinalSymbol(
       "KolmogorovSmirnovTest",
@@ -2117,107 +2400,208 @@ public class F {
   /**
    * KroneckerDelta(arg1, arg2, ... argN) - if all arguments `arg1` to `argN` are equal return `1`,
    * otherwise return `0`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/KroneckerDelta.md">KroneckerDelta
+   * documentation</a>
    */
-  public static final IBuiltInSymbol KroneckerDelta = initFinalSymbol("KroneckerDelta",
-      ID.KroneckerDelta);
+  public static final IBuiltInSymbol KroneckerDelta =
+      initFinalSymbol("KroneckerDelta", ID.KroneckerDelta);
+
+  public static final IBuiltInSymbol KroneckerProduct =
+      initFinalSymbol("KroneckerProduct", ID.KroneckerProduct);
   /**
    * Kurtosis(list) - gives the Pearson measure of kurtosis for `list` (a measure of existing
    * outliers).
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Kurtosis.md">Kurtosis
+   * documentation</a>
    */
   public static final IBuiltInSymbol Kurtosis = initFinalSymbol("Kurtosis", ID.Kurtosis);
-  /** LCM(n1, n2, ...) - computes the least common multiple of the given integers. */
+  /**
+   * LCM(n1, n2, ...) - computes the least common multiple of the given integers.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LCM.md">LCM
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LCM = initFinalSymbol("LCM", ID.LCM);
-  /** LUDecomposition(matrix) - calculate the LUP-decomposition of a square `matrix`. */
-  public static final IBuiltInSymbol LUDecomposition = initFinalSymbol("LUDecomposition",
-      ID.LUDecomposition);
-  /** LaguerreL(n, x) - returns the Laguerre polynomial `L_n(x)`. */
+  /**
+   * LUDecomposition(matrix) - calculate the LUP-decomposition of a square `matrix`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LUDecomposition.md">LUDecomposition
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol LUDecomposition =
+      initFinalSymbol("LUDecomposition", ID.LUDecomposition);
+
+  public static final IBuiltInSymbol Labeled = initFinalSymbol("Labeled", ID.Labeled);
+
+  /**
+   * LaguerreL(n, x) - returns the Laguerre polynomial `L_n(x)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LaguerreL.md">LaguerreL
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LaguerreL = initFinalSymbol("LaguerreL", ID.LaguerreL);
-  /** LaplaceTransform(f,t,s) - returns the laplace transform. */
-  public static final IBuiltInSymbol LaplaceTransform = initFinalSymbol("LaplaceTransform",
-      ID.LaplaceTransform);
-  /** Last(expr) - returns the last element in `expr`. */
+  public static final IBuiltInSymbol LambertW = initFinalSymbol("LambertW", ID.LambertW);
+
+  /**
+   * LaplaceTransform(f,t,s) - returns the laplace transform.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LaplaceTransform.md">LaplaceTransform
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol LaplaceTransform =
+      initFinalSymbol("LaplaceTransform", ID.LaplaceTransform);
+
+  /**
+   * Last(expr) - returns the last element in `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Last.md">Last
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Last = initFinalSymbol("Last", ID.Last);
-  /** LeafCount(expr) - returns the total number of indivisible subexpressions in `expr`. */
+  /**
+   * LeafCount(expr) - returns the total number of indivisible subexpressions in `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LeafCount.md">LeafCount
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LeafCount = initFinalSymbol("LeafCount", ID.LeafCount);
-  /** LeastSquares(matrix, right) - solves the linear least-squares problem 'matrix . x = right'. */
-  public static final IBuiltInSymbol LeastSquares = initFinalSymbol("LeastSquares",
-      ID.LeastSquares);
-  /***/
+  /**
+   * LeastSquares(matrix, right) - solves the linear least-squares problem 'matrix . x = right'.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LeastSquares.md">LeastSquares
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol LeastSquares =
+      initFinalSymbol("LeastSquares", ID.LeastSquares);
   public static final IBuiltInSymbol Left = initFinalSymbol("Left", ID.Left);
-  /** LegendreP(n, x) - returns the Legendre polynomial `P_n(x)`. */
+  /**
+   * LegendreP(n, x) - returns the Legendre polynomial `P_n(x)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LegendreP.md">LegendreP
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LegendreP = initFinalSymbol("LegendreP", ID.LegendreP);
-  /** LegendreQ(n, x) - returns the Legendre functions of the second kind `Q_n(x)`. */
+  /**
+   * LegendreQ(n, x) - returns the Legendre functions of the second kind `Q_n(x)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LegendreQ.md">LegendreQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LegendreQ = initFinalSymbol("LegendreQ", ID.LegendreQ);
-  /** Length(expr) - returns the number of leaves in `expr`. */
+  /**
+   * Length(expr) - returns the number of leaves in `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Length.md">Length
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Length = initFinalSymbol("Length", ID.Length);
-  /** Less(x, y) - yields `True` if `x` is known to be less than `y`. */
+  /**
+   * Less(x, y) - yields `True` if `x` is known to be less than `y`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Less.md">Less
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Less = initFinalSymbol("Less", ID.Less);
-  /** LessEqual(x, y) - yields `True` if `x` is known to be less than or equal `y`. */
+  /**
+   * LessEqual(x, y) - yields `True` if `x` is known to be less than or equal `y`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LessEqual.md">LessEqual
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LessEqual = initFinalSymbol("LessEqual", ID.LessEqual);
-  /***/
-  public static final IBuiltInSymbol LetterCharacter = initFinalSymbol("LetterCharacter",
-      ID.LetterCharacter);
+  /**
+   * LetterCharacter - represents letters..
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LetterCharacter.md">LetterCharacter
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol LetterCharacter =
+      initFinalSymbol("LetterCharacter", ID.LetterCharacter);
 
   /**
    * LetterCounts(string) - count the number of each distinct character in the `string` and return
    * the result as an association `<|char->counter1, ...|>`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LetterCounts.md">LetterCounts
+   * documentation</a>
    */
-  public static final IBuiltInSymbol LetterCounts = initFinalSymbol("LetterCounts",
-      ID.LetterCounts);
-  /** LetterQ(expr) - tests whether `expr` is a string, which only contains letters. */
+  public static final IBuiltInSymbol LetterCounts =
+      initFinalSymbol("LetterCounts", ID.LetterCounts);
+
+  /**
+   * LetterNumber(character) - returns the position of the `character` in the English alphabet.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LetterNumber.md">LetterNumber
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol LetterNumber =
+      initFinalSymbol("LetterNumber", ID.LetterNumber);
+
+  /**
+   * LetterQ(expr) - tests whether `expr` is a string, which only contains letters.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LetterQ.md">LetterQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LetterQ = initFinalSymbol("LetterQ", ID.LetterQ);
   /**
    * Level(expr, levelspec) - gives a list of all sub-expressions of `expr` at the level(s)
    * specified by `levelspec`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Level.md">Level
+   * documentation</a>
    */
   public static final IBuiltInSymbol Level = initFinalSymbol("Level", ID.Level);
-  /** LevelQ(expr) - tests whether `expr` is a valid level specification. */
+  /**
+   * LevelQ(expr) - tests whether `expr` is a valid level specification.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LevelQ.md">LevelQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol LevelQ = initFinalSymbol("LevelQ", ID.LevelQ);
-  /***/
-  public static final IBuiltInSymbol Lexicographic = initFinalSymbol("Lexicographic",
-      ID.Lexicographic);
 
-  /***/
+  public static final IBuiltInSymbol Lexicographic =
+      initFinalSymbol("Lexicographic", ID.Lexicographic);
   public static final IBuiltInSymbol LightBlue = initFinalSymbol("LightBlue", ID.LightBlue);
 
-  /***/
   public static final IBuiltInSymbol LightBrown = initFinalSymbol("LightBrown", ID.LightBrown);
 
-  /***/
   public static final IBuiltInSymbol LightCyan = initFinalSymbol("LightCyan", ID.LightCyan);
 
-  /***/
   public static final IBuiltInSymbol LightGray = initFinalSymbol("LightGray", ID.LightGray);
 
-  /***/
   public static final IBuiltInSymbol LightGreen = initFinalSymbol("LightGreen", ID.LightGreen);
 
-  /***/
-  public static final IBuiltInSymbol LightMagenta = initFinalSymbol("LightMagenta",
-      ID.LightMagenta);
+  public static final IBuiltInSymbol LightMagenta =
+      initFinalSymbol("LightMagenta", ID.LightMagenta);
 
-  /***/
   public static final IBuiltInSymbol LightOrange = initFinalSymbol("LightOrange", ID.LightOrange);
 
-  /***/
   public static final IBuiltInSymbol LightPink = initFinalSymbol("LightPink", ID.LightPink);
 
-  /***/
   public static final IBuiltInSymbol LightPurple = initFinalSymbol("LightPurple", ID.LightPurple);
 
-  /***/
   public static final IBuiltInSymbol LightRed = initFinalSymbol("LightRed", ID.LightRed);
 
-  /***/
   public static final IBuiltInSymbol LightYellow = initFinalSymbol("LightYellow", ID.LightYellow);
-  /** Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0` */
+  /**
+   * Limit(expr, x->x0) - gives the limit of `expr` as `x` approaches `x0`
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Limit.md">Limit
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Limit = initFinalSymbol("Limit", ID.Limit);
-  /***/
   public static final IBuiltInSymbol Line = initFinalSymbol("Line", ID.Line);
+  public static final IBuiltInSymbol LineGraph = initFinalSymbol("LineGraph", ID.LineGraph);
   /**
    * LinearModelFit(list-of-data-points, expr, symbol) - In statistics, linear regression is a
    * linear approach to modeling the relationship between a scalar response (or dependent variable)
    * and one or more explanatory variables (or independent variables).
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LinearModelFit.md">LinearModelFit
+   * documentation</a>
    */
   public static final IBuiltInSymbol LinearModelFit = initFinalSymbol("LinearModelFit",
       ID.LinearModelFit);
@@ -2227,20 +2611,33 @@ public class F {
    * [George Dantzig's simplex algorithm](http://en.wikipedia.org/wiki/Simplex_algorithm) for
    * solving linear optimization problems with linear equality and inequality constraints and
    * implicit non-negative variables.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LinearProgramming.md">LinearProgramming
+   * documentation</a>
    */
   public static final IBuiltInSymbol LinearProgramming = initFinalSymbol("LinearProgramming",
       ID.LinearProgramming);
   /**
    * LinearRecurrence(list1, list2, n) - solve the linear recurrence and return the generated
    * sequence of elements.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LinearRecurrence.md">LinearRecurrence
+   * documentation</a>
    */
   public static final IBuiltInSymbol LinearRecurrence = initFinalSymbol("LinearRecurrence",
       ID.LinearRecurrence);
   /**
    * LinearSolve(matrix, right) - solves the linear equation system 'matrix . x = right' and returns
    * one corresponding solution `x`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/LinearSolve.md">LinearSolve
+   * documentation</a>
    */
   public static final IBuiltInSymbol LinearSolve = initFinalSymbol("LinearSolve", ID.LinearSolve);
+
+  public static final IBuiltInSymbol LinearSolveFunction =
+      F.initFinalSymbol("LinearSolveFunction", ID.LinearSolveFunction);
+
   /***/
   public static final IBuiltInSymbol LiouvilleLambda = initFinalSymbol("LiouvilleLambda",
       ID.LiouvilleLambda);
@@ -2378,149 +2775,314 @@ public class F {
    * lists `u` and `v`, which is defined as `(c_tf + c_ft) / n`, where `n` is `len(u)` and `c_ij` is
    * the number of occurrences of `u(k)=i` and `v(k)=j` for `k<n`.
    */
-  public static final IBuiltInSymbol MatchingDissimilarity = initFinalSymbol(
-      "MatchingDissimilarity",
-      ID.MatchingDissimilarity);
-  /** MathMLForm(expr) - returns the MathML form of the evaluated `expr`. */
+  public static final IBuiltInSymbol MatchingDissimilarity =
+      initFinalSymbol("MatchingDissimilarity", ID.MatchingDissimilarity);
+
+  /**
+   * MathMLForm(expr) - returns the MathML form of the evaluated `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MathMLForm.md">MathMLForm
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MathMLForm = initFinalSymbol("MathMLForm", ID.MathMLForm);
-  /** MatrixExp(matrix) - computes the matrix exponential of the square `matrix`. */
+  public static final IBuiltInSymbol Matrices = initFinalSymbol("Matrices", ID.Matrices);
+
+  public static final IBuiltInSymbol MatrixD = initFinalSymbol("MatrixD", ID.MatrixD);
+
+  /**
+   * MatrixExp(matrix) - computes the matrix exponential of the square `matrix`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixExp.md">MatrixExp
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixExp = initFinalSymbol("MatrixExp", ID.MatrixExp);
-  /***/
+  /**
+   * MatrixForm(matrix) - print a `matrix` or sparse array in matrix form
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixForm.md">MatrixForm
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixForm = initFinalSymbol("MatrixForm", ID.MatrixForm);
+
+  public static final IBuiltInSymbol MatrixLog = initFinalSymbol("MatrixLog", ID.MatrixLog);
+
   /**
    * MatrixMinimalPolynomial(matrix, var) - computes the matrix minimal polynomial of a `matrix` for
    * the variable `var`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixMinimalPolynomial.md">MatrixMinimalPolynomial
+   * documentation</a>
    */
-  public static final IBuiltInSymbol MatrixMinimalPolynomial = initFinalSymbol(
-      "MatrixMinimalPolynomial",
-      ID.MatrixMinimalPolynomial);
-  /** MatrixPlot( matrix ) - create a matrix plot. */
+  public static final IBuiltInSymbol MatrixMinimalPolynomial =
+      initFinalSymbol("MatrixMinimalPolynomial", ID.MatrixMinimalPolynomial);
+
+  /**
+   * MatrixPlot( matrix ) - create a matrix plot.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixPlot.md">MatrixPlot
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixPlot = initFinalSymbol("MatrixPlot", ID.MatrixPlot);
-  /** MatrixPower(matrix, n) - computes the `n`th power of a `matrix` */
+  /**
+   * MatrixPower(matrix, n) - computes the `n`th power of a `matrix`
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixPower.md">MatrixPower
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixPower = initFinalSymbol("MatrixPower", ID.MatrixPower);
-  /** MatrixQ(m) - returns `True` if `m` is a list of equal-length lists. */
+  /**
+   * MatrixQ(m) - returns `True` if `m` is a list of equal-length lists.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixQ.md">MatrixQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixQ = initFinalSymbol("MatrixQ", ID.MatrixQ);
-  /** MatrixRank(matrix) - returns the rank of `matrix`. */
+  /**
+   * MatrixRank(matrix) - returns the rank of `matrix`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MatrixRank.md">MatrixRank
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MatrixRank = initFinalSymbol("MatrixRank", ID.MatrixRank);
-  /** Max(e_1, e_2, ..., e_i) - returns the expression with the greatest value among the `e_i`. */
+  /**
+   * Max(e_1, e_2, ..., e_i) - returns the expression with the greatest value among the `e_i`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Max.md">Max
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Max = initFinalSymbol("Max", ID.Max);
-  /** MaxFilter(list, r) - filter which evaluates the `Max` of `list` for the radius `r`. */
+  /**
+   * MaxFilter(list, r) - filter which evaluates the `Max` of `list` for the radius `r`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MaxFilter.md">MaxFilter
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MaxFilter = initFinalSymbol("MaxFilter", ID.MaxFilter);
-  /***/
-  public static final IBuiltInSymbol MaxIterations = initFinalSymbol("MaxIterations",
-      ID.MaxIterations);
-  /***/
+  public static final IBuiltInSymbol MaxIterations =
+      initFinalSymbol("MaxIterations", ID.MaxIterations);
+
+  public static final IBuiltInSymbol MaxMemoryUsed =
+      initFinalSymbol("MaxMemoryUsed", ID.MaxMemoryUsed);
   public static final IBuiltInSymbol MaxPoints = initFinalSymbol("MaxPoints", ID.MaxPoints);
   /**
    * Maximize(unary-function, variable) - returns the maximum of the unary function for the given
    * `variable`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Maximize.md">Maximize
+   * documentation</a>
    */
   public static final IBuiltInSymbol Maximize = initFinalSymbol("Maximize", ID.Maximize);
-  /** Mean(list) - returns the statistical mean of `list`. */
+  /**
+   * Mean(list) - returns the statistical mean of `list`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Mean.md">Mean
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Mean = initFinalSymbol("Mean", ID.Mean);
-  /***/
-  public static final IBuiltInSymbol MeanDeviation = initFinalSymbol("MeanDeviation",
-      ID.MeanDeviation);
 
-  /** MeanFilter(list, r) - filter which evaluates the `Mean` of `list` for the radius `r`. */
+  public static final IBuiltInSymbol MeanDeviation =
+      initFinalSymbol("MeanDeviation", ID.MeanDeviation);
+
+  /**
+   * MeanFilter(list, r) - filter which evaluates the `Mean` of `list` for the radius `r`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MeanFilter.md">MeanFilter
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MeanFilter = initFinalSymbol("MeanFilter", ID.MeanFilter);
-  /** Median(list) - returns the median of `list`. */
+  /**
+   * Median(list) - returns the median of `list`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Median.md">Median
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Median = initFinalSymbol("Median", ID.Median);
-  /** MedianFilter(list, r) - filter which evaluates the `Median` of `list` for the radius `r`. */
-  public static final IBuiltInSymbol MedianFilter = initFinalSymbol("MedianFilter",
-      ID.MedianFilter);
-  /***/
+  /**
+   * MedianFilter(list, r) - filter which evaluates the `Median` of `list` for the radius `r`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MedianFilter.md">MedianFilter
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol MedianFilter =
+      initFinalSymbol("MedianFilter", ID.MedianFilter);
   public static final IBuiltInSymbol MeijerG = initFinalSymbol("MeijerG", ID.MeijerG);
   /**
    * MemberQ(list, pattern) - returns `True` if pattern matches any element of `list`, or `False`
    * otherwise.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MemberQ.md">MemberQ
+   * documentation</a>
    */
   public static final IBuiltInSymbol MemberQ = initFinalSymbol("MemberQ", ID.MemberQ);
+  public static final IBuiltInSymbol MemoryAvailable =
+      initFinalSymbol("MemoryAvailable", ID.MemoryAvailable);
+
+  public static final IBuiltInSymbol MemoryInUse = initFinalSymbol("MemoryInUse", ID.MemoryInUse);
   /**
    * MersennePrimeExponent(n) - returns the `n`th mersenne prime exponent. `2^n - 1` must be a prime
    * number.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MersennePrimeExponent.md">MersennePrimeExponent
+   * documentation</a>
    */
   public static final IBuiltInSymbol MersennePrimeExponent = initFinalSymbol(
       "MersennePrimeExponent", ID.MersennePrimeExponent);
   /**
    * MersennePrimeExponentQ(n) - returns `True` if `2^n - 1` is a prime number. Currently `0 <= n <=
    * 47` can be computed in reasonable time.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MersennePrimeExponentQ.md">MersennePrimeExponentQ
+   * documentation</a>
    */
-  public static final IBuiltInSymbol MersennePrimeExponentQ = initFinalSymbol(
-      "MersennePrimeExponentQ",
-      ID.MersennePrimeExponentQ);
-  /***/
+  public static final IBuiltInSymbol MersennePrimeExponentQ =
+      initFinalSymbol("MersennePrimeExponentQ", ID.MersennePrimeExponentQ);
   public static final IBuiltInSymbol MeshRange = initFinalSymbol("MeshRange", ID.MeshRange);
   /**
    * Message(symbol::msg, expr1, expr2, ...) - displays the specified message, replacing
    * placeholders in the message text with the corresponding expressions.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Message.md">Message
+   * documentation</a>
    */
   public static final IBuiltInSymbol Message = initFinalSymbol("Message", ID.Message);
   /**
    * MessageName(symbol, msg) - `symbol::msg` identifies a message. `MessageName` is the head of
    * message IDs of the form `symbol::tag`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MessageName.md">MessageName
+   * documentation</a>
    */
   public static final IBuiltInSymbol MessageName = initFinalSymbol("MessageName", ID.MessageName);
-  /***/
+  /**
+   * Messages(symbol) - return all messages which are asociated to `symbol`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Messages.md">Messages
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Messages = initFinalSymbol("Messages", ID.Messages);
-  /***/
   public static final IBuiltInSymbol Method = initFinalSymbol("Method", ID.Method);
-  /** Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`. */
+  /**
+   * Min(e_1, e_2, ..., e_i) - returns the expression with the lowest value among the `e_i`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Min.md">Min
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Min = initFinalSymbol("Min", ID.Min);
-  /** MinFilter(list, r) - filter which evaluates the `Min` of `list` for the radius `r`. */
+  /**
+   * MinFilter(list, r) - filter which evaluates the `Min` of `list` for the radius `r`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MinFilter.md">MinFilter
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MinFilter = initFinalSymbol("MinFilter", ID.MinFilter);
-  /***/
   public static final IBuiltInSymbol MinMax = initFinalSymbol("MinMax", ID.MinMax);
-  /***/
-  public static final IBuiltInSymbol MinimalPolynomial = initFinalSymbol("MinimalPolynomial",
-      ID.MinimalPolynomial);
+  public static final IBuiltInSymbol MinimalPolynomial =
+      initFinalSymbol("MinimalPolynomial", ID.MinimalPolynomial);
   /**
    * Minimize(unary-function, variable) - returns the minimum of the unary function for the given
    * `variable`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Minimize.md">Minimize
+   * documentation</a>
    */
   public static final IBuiltInSymbol Minimize = initFinalSymbol("Minimize", ID.Minimize);
-  /** Minus(expr) - is the negation of `expr`. */
+  /**
+   * Minus(expr) - is the negation of `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Minus.md">Minus
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Minus = initFinalSymbol("Minus", ID.Minus);
-  /***/
   public static final IBuiltInSymbol Missing = initFinalSymbol("Missing", ID.Missing);
-  /** MissingQ(expr) - returns `True` if `expr` is a `Missing()` expression. */
+  /**
+   * MissingQ(expr) - returns `True` if `expr` is a `Missing()` expression.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MissingQ.md">MissingQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MissingQ = initFinalSymbol("MissingQ", ID.MissingQ);
-  /** Mod(x, m) - returns `x` modulo `m`. */
+  /**
+   * Mod(x, m) - returns `x` modulo `m`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Mod.md">Mod
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Mod = initFinalSymbol("Mod", ID.Mod);
   /**
    * Module({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables`
    * by renaming local variables.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Module.md">Module
+   * documentation</a>
    */
   public static final IBuiltInSymbol Module = initFinalSymbol("Module", ID.Module);
-  /***/
   public static final IBuiltInSymbol Modulus = initFinalSymbol("Modulus", ID.Modulus);
-  /** MoebiusMu(expr) - calculate the Möbius function. */
+  /**
+   * MoebiusMu(expr) - calculate the Möbius function.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MoebiusMu.md">MoebiusMu
+   * documentation</a>
+   */
   public static final IBuiltInSymbol MoebiusMu = initFinalSymbol("MoebiusMu", ID.MoebiusMu);
   /**
    * MonomialList(polynomial, list-of-variables) - get the list of monomials of a `polynomial`
    * expression, with respect to the `list-of-variables`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MonomialList.md">MonomialList
+   * documentation</a>
    */
-  public static final IBuiltInSymbol MonomialList = initFinalSymbol("MonomialList",
-      ID.MonomialList);
-  /***/
-  public static final IBuiltInSymbol MonomialOrder = initFinalSymbol("MonomialOrder",
-      ID.MonomialOrder);
+  public static final IBuiltInSymbol MonomialList =
+      initFinalSymbol("MonomialList", ID.MonomialList);
 
-  /** Most(expr) - returns `expr` with the last element removed. */
+  public static final IBuiltInSymbol MonomialOrder =
+      initFinalSymbol("MonomialOrder", ID.MonomialOrder);
+
+  /**
+   * Most(expr) - returns `expr` with the last element removed.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Most.md">Most
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Most = initFinalSymbol("Most", ID.Most);
-  /** Multinomial(n1, n2, ...) - gives the multinomial coefficient `(n1+n2+...)!/(n1! n2! ...)`. */
+  /**
+   * Multinomial(n1, n2, ...) - gives the multinomial coefficient `(n1+n2+...)!/(n1! n2! ...)`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Multinomial.md">Multinomial
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Multinomial = initFinalSymbol("Multinomial", ID.Multinomial);
-  /** MultiplicativeOrder(a, n) - gives the multiplicative order `a` modulo `n`. */
-  public static final IBuiltInSymbol MultiplicativeOrder = initFinalSymbol("MultiplicativeOrder",
-      ID.MultiplicativeOrder);
-  /** N(expr) - gives the numerical value of `expr`. */
+  /**
+   * MultiplicativeOrder(a, n) - gives the multiplicative order `a` modulo `n`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/MultiplicativeOrder.md">MultiplicativeOrder
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol MultiplicativeOrder =
+      initFinalSymbol("MultiplicativeOrder", ID.MultiplicativeOrder);
+
+  /**
+   * N(expr) - gives the numerical value of `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/N.md">N
+   * documentation</a>
+   */
   public static final IBuiltInSymbol N = initFinalSymbol("N", ID.N);
   /**
    * ND(function, x, value) - returns a numerical approximation of the partial derivative of the
    * `function` for the variable `x` and the given `value`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/ND.md">ND
+   * documentation</a>
    */
   public static final IBuiltInSymbol ND = initFinalSymbol("ND", ID.ND);
-  /***/
+  /**
+   * NDSolve({equation-list}, functions, t) - attempts to solve the linear differential
+   * `equation-list` for the `functions` and the time-dependent-variable `t`. Returns an
+   * `InterpolatingFunction` function object.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/NDSolve.md">NDSolve
+   * documentation</a>
+   */
   public static final IBuiltInSymbol NDSolve = initFinalSymbol("NDSolve", ID.NDSolve);
   /***/
   public static final IBuiltInSymbol NFourierTransform = initFinalSymbol("NFourierTransform",
@@ -2572,39 +3134,57 @@ public class F {
   public static final IBuiltInSymbol Nand = initFinalSymbol("Nand", ID.Nand);
   /***/
   public static final IBuiltInSymbol Nearest = initFinalSymbol("Nearest", ID.Nearest);
-  /** Negative(x) - returns `True` if `x` is a negative real number. */
+  public static final IBuiltInSymbol Needs = initFinalSymbol("Needs", ID.Needs);
+
+  /**
+   * Negative(x) - returns `True` if `x` is a negative real number.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Negative.md">Negative
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Negative = initFinalSymbol("Negative", ID.Negative);
-  /***/
-  public static final IBuiltInSymbol NegativeDegreeLexicographic = initFinalSymbol(
-      "NegativeDegreeLexicographic", ID.NegativeDegreeLexicographic);
 
-  /***/
-  public static final IBuiltInSymbol NegativeDegreeReverseLexicographic = initFinalSymbol(
-      "NegativeDegreeReverseLexicographic", ID.NegativeDegreeReverseLexicographic);
+  public static final IBuiltInSymbol NegativeDegreeLexicographic =
+      initFinalSymbol("NegativeDegreeLexicographic", ID.NegativeDegreeLexicographic);
 
-  /***/
-  public static final IBuiltInSymbol NegativeLexicographic = initFinalSymbol(
-      "NegativeLexicographic", ID.NegativeLexicographic);
+  public static final IBuiltInSymbol NegativeDegreeReverseLexicographic =
+      initFinalSymbol(
+          "NegativeDegreeReverseLexicographic", ID.NegativeDegreeReverseLexicographic);
+
+  public static final IBuiltInSymbol NegativeLexicographic =
+      initFinalSymbol("NegativeLexicographic", ID.NegativeLexicographic);
 
   /**
    * Nest(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns the
    * final result.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Nest.md">Nest
+   * documentation</a>
    */
   public static final IBuiltInSymbol Nest = initFinalSymbol("Nest", ID.Nest);
   /**
    * NestList(f, expr, n) - starting with `expr`, iteratively applies `f` `n` times and returns a
    * list of all intermediate results.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/NestList.md">NestList
+   * documentation</a>
    */
   public static final IBuiltInSymbol NestList = initFinalSymbol("NestList", ID.NestList);
   /**
    * NestWhile(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until
    * applying `test` on the result no longer yields `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/NestWhile.md">NestWhile
+   * documentation</a>
    */
   public static final IBuiltInSymbol NestWhile = initFinalSymbol("NestWhile", ID.NestWhile);
   /**
    * NestWhileList(f, expr, test) - applies a function `f` repeatedly on an expression `expr`, until
    * applying `test` on the result no longer yields `True`. It returns a list of all intermediate
    * results.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/NestWhileList.md">NestWhileList
+   * documentation</a>
    */
   public static final IBuiltInSymbol NestWhileList = initFinalSymbol("NestWhileList",
       ID.NestWhileList);
@@ -2802,6 +3382,12 @@ public class F {
   public static final IBuiltInSymbol Part = initFinalSymbol("Part", ID.Part);
   /** Partition(list, n) - partitions `list` into sublists of length `n`. */
   public static final IBuiltInSymbol Partition = initFinalSymbol("Partition", ID.Partition);
+  public static final IBuiltInSymbol Permute = initFinalSymbol("Permute", ID.Permute);
+  public static final IBuiltInSymbol PermutationCycles = initFinalSymbol("PermutationCycles", ID.PermutationCycles);
+  public static final IBuiltInSymbol PermutationCyclesQ = initFinalSymbol("PermutationCyclesQ", ID.PermutationCyclesQ);
+  public static final IBuiltInSymbol PermutationList = initFinalSymbol("PermutationList", ID.PermutationList);
+  public static final IBuiltInSymbol PermutationListQ = initFinalSymbol("PermutationListQ", ID.PermutationListQ);
+  public static final IBuiltInSymbol PermutationReplace = initFinalSymbol("PermutationReplace", ID.PermutationReplace);
   /** PartitionsP(n) - gives the number of unrestricted partitions of the integer `n`. */
   public static final IBuiltInSymbol PartitionsP = initFinalSymbol("PartitionsP", ID.PartitionsP);
   /** PartitionsQ(n) - gives the number of partitions of the integer `n` into distinct parts */
@@ -3038,6 +3624,8 @@ public class F {
    */
   public static final IBuiltInSymbol QRDecomposition = initFinalSymbol("QRDecomposition",
       ID.QRDecomposition);
+  public static final IBuiltInSymbol QuadraticIrrationalQ = initFinalSymbol("QuadraticIrrationalQ",
+      ID.QuadraticIrrationalQ);
   /** Quantile(list, q) - returns the `q`-Quantile of `list`. */
   public static final IBuiltInSymbol Quantile = initFinalSymbol("Quantile", ID.Quantile);
   /** Quantity(value, unit) - returns the quantity for `value` and `unit` */
@@ -3127,6 +3715,8 @@ public class F {
   public static final IBuiltInSymbol Reap = initFinalSymbol("Reap", ID.Reap);
   /***/
   public static final IBuiltInSymbol Rectangle = initFinalSymbol("Rectangle", ID.Rectangle);
+  public static final IBuiltInSymbol RecordSeparators = initFinalSymbol("RecordSeparators",
+      ID.RecordSeparators);
   /***/
   public static final IBuiltInSymbol Red = initFinalSymbol("Red", ID.Red);
   /***/
@@ -3408,6 +3998,9 @@ public class F {
   public static final IBuiltInSymbol Span = initFinalSymbol("Span", ID.Span);
   /***/
   public static final IBuiltInSymbol SparseArray = initFinalSymbol("SparseArray", ID.SparseArray);
+
+  public static final IBuiltInSymbol Sphere = F.initFinalSymbol("Sphere", ID.Sphere);
+
   /** SphericalBesselJ(n, z) - spherical Bessel function `J(n, x)`. */
   public static final IBuiltInSymbol SphericalBesselJ = initFinalSymbol("SphericalBesselJ",
       ID.SphericalBesselJ);
@@ -3423,6 +4016,12 @@ public class F {
   /***/
   public static final IBuiltInSymbol SphericalHankelH2 = initFinalSymbol("SphericalHankelH2",
       ID.SphericalHankelH2);
+
+
+  public static final IBuiltInSymbol SphericalHarmonicY =
+      F.initFinalSymbol("SphericalHarmonicY", ID.SphericalHarmonicY);
+
+
   /** Split(list) - splits `list` into collections of consecutive identical elements. */
   public static final IBuiltInSymbol Split = initFinalSymbol("Split", ID.Split);
   /**
@@ -3670,59 +4269,148 @@ public class F {
    * all combinations of boolean `False` and `True` values for the `list-of-variables`.
    */
   public static final IBuiltInSymbol TautologyQ = initFinalSymbol("TautologyQ", ID.TautologyQ);
-  /***/
   public static final IBuiltInSymbol Taylor = initFinalSymbol("Taylor", ID.Taylor);
-  /** TeXForm(expr) - returns the TeX form of the evaluated `expr`. */
+  /**
+   * TeXForm(expr) - returns the TeX form of the evaluated `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TeXForm.md">TeXForm
+   * documentation</a>
+   */
   public static final IBuiltInSymbol TeXForm = initFinalSymbol("TeXForm", ID.TeXForm);
-  /***/
-  public static final IBuiltInSymbol TensorDimensions = initFinalSymbol("TensorDimensions",
-      ID.TensorDimensions);
-  /***/
-  public static final IBuiltInSymbol TensorProduct = initFinalSymbol("TensorProduct",
-      ID.TensorProduct);
-  /***/
+  /**
+   * TemplateApply(string, values) - renders a `StringTemplate` expression by replacing
+   * `TemplateSlot`s with mapped values.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TemplateApply.md">TemplateApply
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TemplateApply =
+      initFinalSymbol("TemplateApply", ID.TemplateApply);
+
+  public static final IBuiltInSymbol TemplateExpression =
+      initFinalSymbol("TemplateExpression", ID.TemplateExpression);
+
+  /**
+   * TemplateIf(condition-expression, true-expression, false-expression) - in `TemplateApply`
+   * evaluation insert `true-expression` if `condition-expression` evaluates to `true`, otherwise
+   * insert `false-expression`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TemplateImd">TemplateIf
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TemplateIf = initFinalSymbol("TemplateIf", ID.TemplateIf);
+
+  /**
+   * TemplateSlot(string) - gives a `TemplateSlot` expression with name `string`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TemplateSlot.md">TemplateSlot
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TemplateSlot =
+      initFinalSymbol("TemplateSlot", ID.TemplateSlot);
+
+  public static final IBuiltInSymbol TensorDimensions =
+      initFinalSymbol("TensorDimensions", ID.TensorDimensions);
+
+  /**
+   * TensorProduct(t1, t2, ...) - product of the tensors `t1, t2, ...`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TensorProduct.md">TensorProduct
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TensorProduct =
+      initFinalSymbol("TensorProduct", ID.TensorProduct);
   public static final IBuiltInSymbol TensorRank = initFinalSymbol("TensorRank", ID.TensorRank);
-  /***/
-  public static final IBuiltInSymbol TensorSymmetry = initFinalSymbol("TensorSymmetry",
-      ID.TensorSymmetry);
-  /***/
+  public static final IBuiltInSymbol TensorSymmetry =
+      initFinalSymbol("TensorSymmetry", ID.TensorSymmetry);
   public static final IBuiltInSymbol TestID = initFinalSymbol("TestID", ID.TestID);
 
-  /***/
+  /**
+   * TestReport("file-name-string") - load the unit tests from a `file-name-string` and print a
+   * summary of the `VerificationTest` included in the file.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TestReport.md">TestReport
+   * documentation</a>
+   */
   public static final IBuiltInSymbol TestReport = initFinalSymbol("TestReport", ID.TestReport);
 
-  /***/
-  public static final IBuiltInSymbol TestReportObject = initFinalSymbol("TestReportObject",
-      ID.TestReportObject);
+  public static final IBuiltInSymbol TestReportObject =
+      initFinalSymbol("TestReportObject", ID.TestReportObject);
 
-  /***/
-  public static final IBuiltInSymbol TestResultObject = initFinalSymbol("TestResultObject",
-      ID.TestResultObject);
-  /***/
+  /**
+   * TestResultObject( ... ) - is an association wrapped in a `TestResultObject`returned from
+   * `VerificationTest` which stores the results from executing a single unit test.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TestResultObject.md">TestResultObject
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TestResultObject =
+      initFinalSymbol("TestResultObject", ID.TestResultObject);
+
+  public static final IBuiltInSymbol Tetrahedron = initFinalSymbol("Tetrahedron", ID.Tetrahedron);
+
+  public static final IBuiltInSymbol Text = initFinalSymbol("Text", ID.Text);
   public static final IBuiltInSymbol TextCell = initFinalSymbol("TextCell", ID.TextCell);
   /***/
   public static final IBuiltInSymbol TextString = initFinalSymbol("TextString", ID.TextString);
 
-  /** Thread(f(args) - threads `f` over any lists that appear in `args`. */
+  public static final IBuiltInSymbol Thickness = initFinalSymbol("Thickness", ID.Thickness);
+
+  /**
+   * Thread(f(args) - threads `f` over any lists that appear in `args`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Thread.md">Thread
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Thread = initFinalSymbol("Thread", ID.Thread);
-  /** Through(p(f)[x]) - gives `p(f(x))`. */
+  /**
+   * Through(p(f)[x]) - gives `p(f(x))`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Through.md">Through
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Through = initFinalSymbol("Through", ID.Through);
-  /***/
   public static final IBuiltInSymbol Throw = initFinalSymbol("Throw", ID.Throw);
-  /***/
-  public static final IBuiltInSymbol TimeConstrained = initFinalSymbol("TimeConstrained",
-      ID.TimeConstrained);
-  /***/
+  /**
+   * TimeConstrained(expression, seconds) - stop evaluation of `expression` if time measurement of
+   * the evaluation exceeds `seconds` and return `$Aborted`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TimeConstrained.md">TimeConstrained
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol TimeConstrained =
+      initFinalSymbol("TimeConstrained", ID.TimeConstrained);
   public static final IBuiltInSymbol TimeObject = initFinalSymbol("TimeObject", ID.TimeObject);
-  /** TimeValue(p, i, n) - returns a time value calculation. */
+  public static final IBuiltInSymbol TimeRemaining =
+      initFinalSymbol("TimeRemaining", ID.TimeRemaining);
+
+  /**
+   * TimeValue(p, i, n) - returns a time value calculation.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TimeValue.md">TimeValue
+   * documentation</a>
+   */
   public static final IBuiltInSymbol TimeValue = initFinalSymbol("TimeValue", ID.TimeValue);
-  /** Times(a, b, ...) - represents the product of the terms `a, b, ...`. */
+  /**
+   * Times(a, b, ...) - represents the product of the terms `a, b, ...`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Times = initFinalSymbol("Times", ID.Times);
-  /** TimesBy(x, dx) - is equivalent to `x = x * dx`. */
+  /**
+   * TimesBy(x, dx) - is equivalent to `x = x * dx`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/TimesBy.md">TimesBy
+   * documentation</a>
+   */
   public static final IBuiltInSymbol TimesBy = initFinalSymbol("TimesBy", ID.TimesBy);
   /**
-   * Timing(x) - returns a list with the first entry containing the evaluation time of `x` and the
-   * second entry is the evaluation result of `x`.
+   * Timing(x) - returns a list with the first entry containing the evaluation CPU time of `x` and
+   * the second entry is the evaluation result of `x`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Timing.md">Timing
+   * documentation</a>
    */
   public static final IBuiltInSymbol Timing = initFinalSymbol("Timing", ID.Timing);
   /**
@@ -3881,88 +4569,181 @@ public class F {
   public static final IBuiltInSymbol VectorAngle = initFinalSymbol("VectorAngle", ID.VectorAngle);
   /** VectorQ(v) - returns `True` if `v` is a list of elements which are not themselves lists. */
   public static final IBuiltInSymbol VectorQ = initFinalSymbol("VectorQ", ID.VectorQ);
-  public static final IBuiltInSymbol Verbatim = F.initFinalSymbol("Verbatim", ID.Verbatim);
-  /***/
-  public static final IBuiltInSymbol VerificationTest = initFinalSymbol("VerificationTest",
-      ID.VerificationTest);
+  public static final IBuiltInSymbol Vectors = initFinalSymbol("Vectors", ID.Vectors);
+
+  /**
+   * Verbatim(expr) - prevents pattern constructs in `expr` from taking effect, allowing them to
+   * match themselves.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Verbatim.md">Verbatim
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol Verbatim = initFinalSymbol("Verbatim", ID.Verbatim);
+
+  /**
+   * VerificationTest(test-expr) - create a `TestResultObject` by testing if `test-expr` evaluates
+   * to `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/VerificationTest.md">VerificationTest
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol VerificationTest =
+      initFinalSymbol("VerificationTest", ID.VerificationTest);
   /**
    * VertexEccentricity(graph, vertex) - compute the eccentricity of `vertex` in the `graph`. It's
-   * the length of the longest shortest path from the `vertex` to every other vertex in the
-   * `graph`.
+   * the length of the longest shortest path from the `vertex` to every other vertex in the `graph`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/VertexEccentricity.md">VertexEccentricity
+   * documentation</a>
    */
-  public static final IBuiltInSymbol VertexEccentricity = initFinalSymbol("VertexEccentricity",
-      ID.VertexEccentricity);
+  public static final IBuiltInSymbol VertexEccentricity =
+      initFinalSymbol("VertexEccentricity", ID.VertexEccentricity);
 
-  /** VertexList(graph) - convert the `graph` into a list of vertices. */
+  public static final IBuiltInSymbol VertexLabels =
+      initFinalSymbol("VertexLabels", ID.VertexLabels);
+
+  /**
+   * VertexList(graph) - convert the `graph` into a list of vertices.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/VertexList.md">VertexList
+   * documentation</a>
+   */
   public static final IBuiltInSymbol VertexList = initFinalSymbol("VertexList", ID.VertexList);
 
-  /** VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object. */
+  /**
+   * VertexQ(graph, vertex) - test if `vertex` is a vertex in the `graph` object.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/VertexQ.md">VertexQ
+   * documentation</a>
+   */
   public static final IBuiltInSymbol VertexQ = initFinalSymbol("VertexQ", ID.VertexQ);
-  /***/
+  public static final IBuiltInSymbol VertexShapeFunction =
+      initFinalSymbol("VertexShapeFunction", ID.VertexShapeFunction);
+
+  public static final IBuiltInSymbol VertexSize = initFinalSymbol("VertexSize", ID.VertexSize);
+
+  public static final IBuiltInSymbol VertexStyle = initFinalSymbol("VertexStyle", ID.VertexStyle);
   public static final IBuiltInSymbol ViewPoint = initFinalSymbol("ViewPoint", ID.ViewPoint);
 
-  /** WeibullDistribution(a, b) - returns a Weibull distribution. */
-  public static final IBuiltInSymbol WeibullDistribution = initFinalSymbol("WeibullDistribution",
-      ID.WeibullDistribution);
+  public static final IBuiltInSymbol Volume = initFinalSymbol("Volume", ID.Volume);
 
-  /***/
-  public static final IBuiltInSymbol WeierstrassHalfPeriods = initFinalSymbol(
-      "WeierstrassHalfPeriods", ID.WeierstrassHalfPeriods);
+  /**
+   * WeibullDistribution(a, b) - returns a Weibull distribution.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WeibullDistribution.md">WeibullDistribution
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WeibullDistribution =
+      initFinalSymbol("WeibullDistribution", ID.WeibullDistribution);
 
-  /***/
-  public static final IBuiltInSymbol WeierstrassInvariants = initFinalSymbol(
-      "WeierstrassInvariants", ID.WeierstrassInvariants);
+  public static final IBuiltInSymbol WeierstrassHalfPeriods =
+      initFinalSymbol("WeierstrassHalfPeriods", ID.WeierstrassHalfPeriods);
 
-  /** WeierstrassP(expr, {n1, n2}) - Weierstrass elliptic function. */
-  public static final IBuiltInSymbol WeierstrassP = initFinalSymbol("WeierstrassP",
-      ID.WeierstrassP);
+  public static final IBuiltInSymbol WeierstrassInvariants =
+      initFinalSymbol("WeierstrassInvariants", ID.WeierstrassInvariants);
 
-  /***/
-  public static final IBuiltInSymbol WeierstrassPPrime = initFinalSymbol("WeierstrassPPrime",
-      ID.WeierstrassPPrime);
-  /***/
-  public static final IBuiltInSymbol WeightedAdjacencyMatrix = initFinalSymbol(
-      "WeightedAdjacencyMatrix",
-      ID.WeightedAdjacencyMatrix);
+  /**
+   * WeierstrassP(expr, {n1, n2}) - Weierstrass elliptic function.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WeierstrassP.md">WeierstrassP
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WeierstrassP =
+      initFinalSymbol("WeierstrassP", ID.WeierstrassP);
 
-  /***/
-  public static final IBuiltInSymbol WeightedData = initFinalSymbol("WeightedData",
-      ID.WeightedData);
+  public static final IBuiltInSymbol WeierstrassPPrime =
+      initFinalSymbol("WeierstrassPPrime", ID.WeierstrassPPrime);
+
+  /**
+   * WeightedAdjacencyMatrix(graph) - convert the `graph` into a weighted adjacency matrix in sparse
+   * array format.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WeightedAdjacencyMatrix.md">WeightedAdjacencyMatrix
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WeightedAdjacencyMatrix =
+      initFinalSymbol("WeightedAdjacencyMatrix", ID.WeightedAdjacencyMatrix);
+
+  public static final IBuiltInSymbol WeightedData =
+      initFinalSymbol("WeightedData", ID.WeightedData);
+
+  /**
+   * WeightedGraphQ(expr) - test if `expr` is an explicit weighted graph object.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WeightedGraphQ.md">WeightedGraphQ
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WeightedGraphQ =
+      initFinalSymbol("WeightedGraphQ", ID.WeightedGraphQ);
   /**
    * Which(cond1, expr1, cond2, expr2, ...) - yields `expr1` if `cond1` evaluates to `True`, `expr2`
    * if `cond2` evaluates to `True`, etc.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Which.md">Which
+   * documentation</a>
    */
   public static final IBuiltInSymbol Which = initFinalSymbol("Which", ID.Which);
-  /** While(test, body) - evaluates `body` as long as test evaluates to `True`. */
+  /**
+   * While(test, body) - evaluates `body` as long as test evaluates to `True`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/While.md">While
+   * documentation</a>
+   */
   public static final IBuiltInSymbol While = initFinalSymbol("While", ID.While);
-  /***/
   public static final IBuiltInSymbol White = initFinalSymbol("White", ID.White);
 
-  /***/
+  /**
+   * Whitespace - represents a sequence of whitespace characters.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Whitespace.md">Whitespace
+   * documentation</a>
+   */
   public static final IBuiltInSymbol Whitespace = initFinalSymbol("Whitespace", ID.Whitespace);
 
-  /***/
-  public static final IBuiltInSymbol WhitespaceCharacter = initFinalSymbol("WhitespaceCharacter",
-      ID.WhitespaceCharacter);
-  /***/
+  /**
+   * WhitespaceCharacter - represents a single whitespace character.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WhitespaceCharacter.md">WhitespaceCharacter
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WhitespaceCharacter =
+      initFinalSymbol("WhitespaceCharacter", ID.WhitespaceCharacter);
   public static final IBuiltInSymbol WhittakerM = initFinalSymbol("WhittakerM", ID.WhittakerM);
 
-  /***/
   public static final IBuiltInSymbol WhittakerW = initFinalSymbol("WhittakerW", ID.WhittakerW);
 
   /**
    * With({list_of_local_variables}, expr ) - evaluates `expr` for the `list_of_local_variables` by
    * replacing the local variables in `expr`.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/With.md">With
+   * documentation</a>
    */
   public static final IBuiltInSymbol With = initFinalSymbol("With", ID.With);
-  /***/
-  public static final IBuiltInSymbol WordBoundary = initFinalSymbol("WordBoundary",
-      ID.WordBoundary);
+  public static final IBuiltInSymbol Word = initFinalSymbol("Word", ID.Word);
 
-  /***/
-  public static final IBuiltInSymbol WordCharacter = initFinalSymbol("WordCharacter",
-      ID.WordCharacter);
-  /***/
+  /**
+   * WordBoundary - represents the boundary between words.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WordBoundary.md">WordBoundary
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WordBoundary =
+      initFinalSymbol("WordBoundary", ID.WordBoundary);
+
+  /**
+   * WordCharacter] - represents a single letter or digit character.
+   * @see <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/WordCharacter.md">WordCharacter
+   * documentation</a>
+   */
+  public static final IBuiltInSymbol WordCharacter =
+      initFinalSymbol("WordCharacter", ID.WordCharacter);
+
+  public static final IBuiltInSymbol WordSeparators =
+      initFinalSymbol("WordSeparators", ID.WordSeparators);
+
+  public static final IBuiltInSymbol Write = initFinalSymbol("Write", ID.Write);
   public static final IBuiltInSymbol WriteString = initFinalSymbol("WriteString", ID.WriteString);
   /**
    * Xor(arg1, arg2, ...) - Logical XOR (exclusive OR) function. Returns `True` if an odd number of
@@ -3982,6 +4763,9 @@ public class F {
   /***/
   public static final IBuiltInSymbol ZeroSymmetric = initFinalSymbol("ZeroSymmetric",
       ID.ZeroSymmetric);
+
+  public static final IBuiltInSymbol ZeroTest = F.initFinalSymbol("ZeroTest", ID.ZeroTest);
+
   /** Zeta(z) - returns the Riemann zeta function of `z`. */
   public static final IBuiltInSymbol Zeta = initFinalSymbol("Zeta", ID.Zeta);
 
@@ -4004,7 +4788,6 @@ public class F {
    * valid is the
    * <code>isPresent()</code> method. The method is similar to <code>java.util.Optional#isPresent()</code>.
    * </p>
-   *
    * @see java.util.Optional#isPresent
    */
   // Swift change: type is incompatible
@@ -4188,45 +4971,31 @@ public class F {
   /** Constant integer &quot;1&quot; */
   public static final IInteger C1 = AbstractIntegerSym.valueOf(1);
 
-  /** Constant integer &quot;1&quot; */
+  /** Constant integer &quot;2&quot; */
   public static final IInteger C2 = AbstractIntegerSym.valueOf(2);
 
-  /** Constant integer &quot;1&quot; */
+  /** Constant integer &quot;3&quot; */
   public static final IInteger C3 = AbstractIntegerSym.valueOf(3);
 
-  /**
-   * Constant integer &quot;4&quot;
-   */
+  /** Constant integer &quot;4&quot; */
   public static final IInteger C4 = AbstractIntegerSym.valueOf(4);
 
-  /**
-   * Constant integer &quot;5&quot;
-   */
+  /** Constant integer &quot;5&quot; */
   public static final IInteger C5 = AbstractIntegerSym.valueOf(5);
 
-  /**
-   * Constant integer &quot;6&quot;
-   */
+  /** Constant integer &quot;6&quot; */
   public static final IInteger C6 = AbstractIntegerSym.valueOf(6);
 
-  /**
-   * Constant integer &quot;7&quot;
-   */
+  /** Constant integer &quot;7&quot; */
   public static final IInteger C7 = AbstractIntegerSym.valueOf(7);
 
-  /**
-   * Constant integer &quot;8&quot;
-   */
+  /** Constant integer &quot;8&quot; */
   public static final IInteger C8 = AbstractIntegerSym.valueOf(8);
 
-  /**
-   * Constant integer &quot;9&quot;
-   */
+  /** Constant integer &quot;9&quot; */
   public static final IInteger C9 = AbstractIntegerSym.valueOf(9);
 
-  /**
-   * Constant integer &quot;10&quot;
-   */
+  /** Constant integer &quot;10&quot; */
   public static final IInteger C10 = AbstractIntegerSym.valueOf(10);
 
   /** Constant integer &quot;100&quot; */
@@ -4235,80 +5004,56 @@ public class F {
   /** Constant integer &quot;1000&quot; */
   public static final IInteger C1000 = AbstractIntegerSym.valueOf(1000);
   /**
-   * Complex imaginary unit. The parsed symbol &quot;I&quot; is converted on input to this
-   * constant.
+   * Complex imaginary unit. The parsed symbol &quot;I&quot; is converted on input to this constant.
    */
   public static final IComplex CI = ComplexSym.valueOf(0, 1, 1, 1);
 
-  /**
-   * Complex negative imaginary unit.
-   */
+  /** Complex negative imaginary unit. */
   public static final IComplex CNI = ComplexSym.valueOf(0, 1, -1, 1);
 
-  /**
-   * Constant fraction &quot;1/2&quot;
-   */
+  /** Constant fraction &quot;1/2&quot; */
   public static final IFraction C1D2 = AbstractFractionSym.valueOf(1, 2);
 
-  /**
-   * Constant fraction &quot;3/2&quot;
-   */
+  /** Constant fraction &quot;3/2&quot; */
   public static final IFraction C3D2 = AbstractFractionSym.valueOf(3, 2);
 
-  /**
-   * Constant fraction &quot;3/4&quot;
-   */
+  /** Constant fraction &quot;3/4&quot; */
   public static final IFraction C3D4 = AbstractFractionSym.valueOf(3, 4);
 
-  /**
-   * Constant fraction &quot;5/2&quot;
-   */
+  /** Constant fraction &quot;5/2&quot; */
   public static final IFraction C5D2 = AbstractFractionSym.valueOf(5, 2);
 
-  /**
-   * Constant fraction &quot;-1/2&quot;
-   */
+  /** Constant fraction &quot;-1/2&quot; */
   public static final IFraction CN1D2 = AbstractFractionSym.valueOf(-1, 2);
 
-  /**
-   * Constant fraction &quot;-3/2&quot;
-   */
+  /** Constant fraction &quot;-3/2&quot; */
   public static final IFraction CN3D2 = AbstractFractionSym.valueOf(-3, 2);
 
-  /**
-   * Constant fraction &quot;1/3&quot;
-   */
+  /** Constant fraction &quot;1/3&quot; */
   public static final IFraction C1D3 = AbstractFractionSym.valueOf(1, 3);
-  /**
-   * Constant fraction &quot;-1/3&quot;
-   */
+  /** Constant fraction &quot;-1/3&quot; */
   public static final IFraction CN1D3 = AbstractFractionSym.valueOf(-1, 3);
 
-  /**
-   * Constant fraction &quot;1/4&quot;
-   */
+  /** Constant fraction &quot;1/4&quot; */
   public static final IFraction C1D4 = AbstractFractionSym.valueOf(1, 4);
-  /**
-   * Constant fraction &quot;-1/4&quot;
-   */
+  /** Constant fraction &quot;-1/4&quot; */
   public static final IFraction CN1D4 = AbstractFractionSym.valueOf(-1, 4);
-  /**
-   * Constant double &quot;-1.0&quot;
-   */
+  /** Constant double &quot;-1.0&quot; */
   public static final Num CND1 = new Num(-1.0);
 
-  /**
-   * Constant double &quot;0.0&quot;
-   */
+  /** Constant double &quot;0.0&quot; */
   public static final Num CD0 = new Num(0.0);
 
-  /**
-   * Constant double &quot;1.0&quot;
-   */
+  /** Constant double &quot;1.0&quot; */
   public static final Num CD1 = new Num(1.0);
-  /**
-   * Represents the empty Smyja string <code>""</code>
-   */
+
+  /** Complex numerical imaginary unit. */
+  public static final IComplexNum CDI = ComplexNum.I;
+
+  /** Complex negative numerical imaginary unit. */
+  public static final IComplexNum CDNI = ComplexNum.NI;
+
+  /** Represents the empty Smyja string <code>""</code> */
   public static IStringX CEmptyString;
 
   /** Represents <code>Sequence()</code> (i.e. the constant empty list) */
@@ -4325,11 +5070,18 @@ public class F {
     }
   };
 
+
+  /** Represents <code>Missing("NotFound")</code> */
+  public static IAST CMissingNotFound;
+
   /** Represents <code>List(0)</code> */
   public static IAST CListC0;
   /** Represents <code>List(1)</code> */
   public static IAST CListC1;
-  /** Represents <code>List(-1)</code> */
+  /**
+   * Represents <code>List(-1)</code>. Can be used to specify the &quot;leaf&quot; {@link
+   * VisitorLevelSpecification} of an expression.
+   */
   public static IAST CListCN1;
   /** Represents <code>List(1,1)</code> */
   public static IAST CListC1C1;
@@ -4474,6 +5226,9 @@ public class F {
    * Represents <code>#3</code>
    */
   public static IAST Slot3;
+
+  public static final Field<IExpr> EXPR_FIELD = new ExprField();
+
   /**
    * Constant integer &quot;-1&quot;
    */
@@ -4561,6 +5316,7 @@ public class F {
       CEmptyList = headAST0(F.List);
       CEmptyString = $str("");
       CEmptySet = new HashSet<IExpr>();
+      CMissingNotFound = Missing("NotFound");
       CListC0 = new B1.List(C0);
       CListC1 = new B1.List(C1);
       CListC2 = new B1.List(C2);
@@ -4633,136 +5389,9 @@ public class F {
           s_DEFAULT,
           t_DEFAULT, u_DEFAULT, v_DEFAULT, w_DEFAULT, x_DEFAULT, y_DEFAULT, z_DEFAULT, A_DEFAULT,
           B_DEFAULT,
-          C_DEFAULT, F_DEFAULT, G_DEFAULT,
-          // start symbol strings
-            // Algebraics, Booleans, ComplexInfinity, Catalan, Complexes, Degree, EulerGamma, False,
-            // Flat,
-            // Glaisher, GoldenRatio, HoldAll, HoldFirst, HoldForm, HoldRest, Indeterminate,
-            // Infinity, Integer,
-            // Integers, Khinchin, Listable, Modulus, Null, NumericFunction, OneIdentity, Orderless,
-            // Pi, Primes,
-          // Rationals, Real, Reals, Slot, SlotSequence, String, F.Symbol, True,
-          // // start function strings
-            // Abs, AddTo, And, Alternatives, Apart, AppellF1, Append, AppendTo, Apply, ArcCos,
-            // ArcCosh, ArcCot,
-            // ArcCoth, ArcCsc, ArcCsch, ArcSec, ArcSech, ArcSin, ArcSinh, ArcTan, ArcTanh, Arg,
-            // Array,
-          // // ArrayDepth,
-          // ArrayQ, Assumptions, AtomQ, Attributes,
-          // // BernoulliB,
-          // Binomial, Blank, Block, Boole,
-          // // BooleanConvert,
-            // BooleanMinimize, Break, Cancel, CartesianProduct, Cases, CatalanNumber, Catch,
-            // Ceiling,
-          // CharacteristicPolynomial,
-          // // ChebyshevT,
-            // ChessboardDistance, Chop, Clear, ClearAll, Coefficient, CoefficientList, Collect,
-            // Complement,
-          // Complex,
-          // // ComplexExpand,
-            // ComplexInfinity, ComposeList, CompoundExpression, Condition, Conjugate,
-            // ConjugateTranspose,
-            // ConstantArray, Continue, ContinuedFraction, CoprimeQ, Cos, Cosh, CosIntegral,
-            // CoshIntegral, Cot,
-            // Coth, Count, Cross, Csc, Csch, Curl, Decrement, Default, Defer, Definition, Delete,
-            // DeleteCases,
-          // // DeleteDuplicates,
-            // Denominator, Depth, Derivative, Det, DiagonalMatrix, DigitQ, Dimensions,
-            // DirectedInfinity,
-          // Discriminant, Distribute, Div, DivideBy, Divisible,
-          // // Divisors,
-          // Do, Dot, Drop, Eigenvalues, Eigenvectors, Element,
-          // // Eliminate,
-            // EllipticE, EllipticF, EllipticPi, Equal, Equivalent, Erf, Erfc, Erfi,
-            // EuclideanDistance,
-          // // EulerE,
-            // EulerPhi, EvenQ, Exp, Expand, ExpandAll, ExpIntegralE, ExpIntegralEi, Exponent,
-            // ExtendedGCD,
-            // Extract, Factor, Factorial, Factorial2, FactorInteger, FactorSquareFree,
-            // FactorSquareFreeList,
-            // FactorTerms, Flatten, Fibonacci, FindRoot, First, Fit, FixedPoint, Floor, Fold,
-            // FoldList, For,
-          // FractionalPart, FreeQ, FresnelC, FresnelS, FrobeniusSolve, FromCharacterCode,
-          // FromContinuedFraction,
-            // FullForm, FullSimplify, Function, Gamma, GCD, GeometricMean, Graphics, Graphics3D,
-            // Graphics3D,
-          // Greater, GreaterEqual, GroebnerBasis, HarmonicNumber, Head,
-          // // HermiteH,
-          // HilbertMatrix, Hold, HoldForm, Horner,
-          // // HornerForm,
-            // HurwitzZeta, HypergeometricPFQ, Hypergeometric2F1, Identity, IdentityMatrix, If, Im,
-            // Implies,
-          // Increment, Inner, Insert, IntegerPart, IntegerPartitions, IntegerQ, Integrate,
-          // // InterpolatingFunction, InterpolatingPolynomial,
-            // Intersection, Inverse, InverseErf, InverseFunction, JacobiMatrix, JacobiSymbol,
-            // JavaForm, Join,
-          // KOrderlessPartitions, KPartitions, LaplaceTransform, Last, LCM, LeafCount,
-          // // LaguerreL, LegendreP,
-            // Length, Less, LessEqual, LetterQ, Level, Limit, Line, LinearProgramming, LinearSolve,
-            // List,
-          // ListQ,
-          // Log,
-          // // Log2, Log10,
-          // LogGamma,
-          // // LogicalExpand,
-            // LogIntegral, LowerCaseQ, LUDecomposition, ManhattanDistance, Map, MapAll, MapThread,
-            // MatchQ,
-          // MathMLForm,
-          // // MatrixForm,
-          // MatrixPower, MatrixQ,
-          // // MatrixRank,
-          // Max, Mean, Median, MemberQ, Min, Mod, Module, MoebiusMu,
-          // // MonomialList,
-            // Most, Multinomial, Nand, Negative, Nest, NestList, NestWhile, NestWhileList,
-            // NextPrime,
-          // NFourierTransform, NIntegrate,
-          // // NMaximize, NMinimize,
-          // NonCommutativeMultiply, NonNegative, Nor, Norm, Not, NRoots, NSolve,
-          // // NullSpace,
-            // NumberQ, Numerator, NumericQ, OddQ, Options, Or, Order, OrderedQ, Out, Outer,
-            // PadLeft, PadRight,
-          // // ParametricPlot,
-          // Part, Partition, Pattern, Permutations, Piecewise, Plot, Plot3D, Plus,
-          // // Pochhammer,
-          // PolyGamma, PolyLog, PolynomialExtendedGCD, PolynomialGCD, PolynomialLCM, PolynomialQ,
-            // PolynomialQuotient, PolynomialQuotientRemainder, PolynomialRemainder, Position,
-            // Positive,
-            // PossibleZeroQ, Power, PowerExpand, PowerMod, PreDecrement, PreIncrement, Prepend,
-            // PrependTo,
-          // // Prime,
-            // PrimeQ, PrimitiveRootList, Print, Product, ProductLog, Quiet, Quotient,
-            // RandomInteger,
-          // RandomReal,
-          // // RandomSample,
-            // Range, Rational, Rationalize, Re, Reap, Refine, ReplaceAll, ReplacePart,
-            // ReplaceRepeated, Rest,
-            // Resultant, Return, Reverse, Riffle, RootIntervals, RootOf, Roots, Surd, RotateLeft,
-            // RotateRight,
-          // Round,
-          // // RowReduce,
-            // Rule, RuleDelayed, SameQ, Scan, Sec, Sech, Select, Sequence, Set, SetAttributes,
-            // SetDelayed,
-          // Show,
-            // Sign, SignCmp, Simplify, Sin, Sinc, SingularValueDecomposition, Sinh, SinIntegral,
-            // SinhIntegral,
-            // Solve, Sort, Sow, Sqrt, SquaredEuclideanDistance, SquareFreeQ, StirlingS2,
-            // StringDrop,
-          // StringJoin,
-            // StringLength, StringTake, Subfactorial, Subscript, Subsuperscript, Subsets,
-            // SubtractFrom, Sum,
-            // Superscript, Switch, SyntaxLength, SyntaxQ, Table, Take, Tan, Tanh, Taylor, TeXForm,
-            // Thread,
-            // Through, Throw, TimeConstrained, Times, TimesBy, Timing, ToCharacterCode, Together,
-            // ToString,
-          // Total,
-          // ToUnicode, Tr, Trace, Transpose, TrigExpand, TrigReduce, TrigToExp, TrueQ,
-          // // Tuples,
-          // Unequal, Unevaluated, Union, Unique, UnitStep,
-          // // UnitVector,
-            // UnsameQ, UpperCaseQ, UpSet, UpSetDelayed, ValueQ, VandermondeMatrix, Variables,
-            // VectorQ, Which,
-          // While, Xor,
-          // // Zeta
+          C_DEFAULT,
+          F_DEFAULT,
+          G_DEFAULT
       };
       short exprID = EXPRID_MAX_BUILTIN_LENGTH;
       GLOBAL_IDS_MAP.defaultReturnValue((short) -1);
@@ -4796,6 +5425,7 @@ public class F {
       IOFunctions.initialize();
       Programming.initialize();
       PatternMatching.initialize();
+//      FileFunctions.initialize();
       Algebra.initialize();
       SimplifyFunctions.initialize();
       StructureFunctions.initialize();
@@ -4839,6 +5469,9 @@ public class F {
       SparseArrayFunctions.initialize();
 //			UnitTestingFunctions.initialize();
       NumericArrayFunctions.initialize();
+//      GraphicsFunctions.initialize();
+//      CompilerFunctions.initialize();
+//      JavaFunctions.initialize();
 
       ComputationalGeometryFunctions.initialize();
 
@@ -4934,7 +5567,6 @@ public class F {
    * set) and insert a new Symbol in the <code>PREDEFINED_SYMBOLS_MAP</code>. The symbol is created
    * using the given upper case string to use it as associated class name in package
    * org.matheclipse.core.reflection.system.
-   *
    * @param symbolName the predefined symbol name in upper-case form
    * @param ordinal
    * @return
@@ -4965,7 +5597,6 @@ public class F {
    * set) and insert a new Symbol in the <code>PREDEFINED_SYMBOLS_MAP</code>. The symbol is created
    * using the given upper case string to use it as associated class name in package
    * org.matheclipse.core.reflection.system.
-   *
    * @param symbolName the predefined symbol name in upper-case form
    * @return
    */
@@ -4977,7 +5608,6 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param head the header expression of the function. If the ast represents a function like
    *             <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type
    *             ISymbol.
@@ -4992,7 +5622,6 @@ public class F {
   /**
    * Create a <code>BlankSequence[condition]</code> pattern object for pattern-matching and term
    * rewriting
-   *
    * @param condition additional condition which should be checked in pattern-matching
    * @return IPattern
    */
@@ -5003,7 +5632,6 @@ public class F {
   /**
    * Create a <code>BlankNullSequence[condition]</code> pattern object for pattern-matching and term
    * rewriting
-   *
    * @param condition additional condition which should be checked in pattern-matching
    * @return IPattern
    */
@@ -5013,7 +5641,6 @@ public class F {
 
   /**
    * Create a <code>Blank[]</code> pattern object for pattern-matching and term rewriting
-   *
    * @return IPattern
    */
   public static IPattern $b() {
@@ -5022,7 +5649,6 @@ public class F {
 
   /**
    * Create a <code>Blank[condition]</code> pattern object for pattern-matching and term rewriting
-   *
    * @param condition additional condition which should be checked in pattern-matching
    * @return IPattern
    */
@@ -5032,7 +5658,6 @@ public class F {
 
   /**
    * Create a <code>Blank[condition]</code> pattern object for pattern-matching and term rewriting
-   *
    * @param condition additional condition which should be checked in pattern-matching
    * @param def       if <code>true</code> use a default value in pattern-matching if an argument is
    *                  optional
@@ -5045,7 +5670,6 @@ public class F {
 
   /**
    * Create a <code>Pattern[]</code> pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @return IPattern
    */
@@ -5055,7 +5679,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @param def    use a default value for this pattern if necessary
    * @return IPattern
@@ -5066,7 +5689,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @param check  additional condition which should be checked in pattern-matching
    * @return IPattern
@@ -5077,7 +5699,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @param check  additional condition which should be checked in pattern-matching
    * @param def    if <code>true</code>, the pattern can match to a default value associated with
@@ -5091,7 +5712,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbolName
    * @return IPattern
    */
@@ -5104,7 +5724,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbolName
    * @param def        use a default value for this pattern if necessary
    * @return IPattern
@@ -5115,7 +5734,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbolName
    * @param check      additional condition which should be checked in pattern-matching
    * @return IPattern
@@ -5129,7 +5747,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbolName
    * @param check      additional condition which should be checked in pattern-matching
    * @param def        use a default value for this pattern if necessary
@@ -5141,7 +5758,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @return IPattern
    */
@@ -5151,11 +5767,10 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @param check  additional condition which should be checked in pattern-matching
-   * @param def if <code>true</code>, the pattern can match to a default value associated with the
-   *     AST's head the pattern is used in.
+   * @param def    if <code>true</code>, the pattern can match to a default value associated with the
+   *               AST's head the pattern is used in.
    * @return IPattern
    */
   public static IPattern pattern(final ISymbol symbol, final IExpr check, final boolean def) {
@@ -5165,7 +5780,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbol
    * @return IPattern
    */
@@ -5174,8 +5788,10 @@ public class F {
   }
 
   /**
-   * @param symbol
-   * @param zeroArgsAllowed if <code>true</code> 0 argument sequences are allowed for this pattern
+   * Create a new PatternSequence <code>BlankSequence</code> or <code>BlankNullSequence</code>.
+   * @param symbol          the associated symbol of the pattern sequence. Maybe <code>null</code>.
+   * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
+   *                        args has to be >= 1.
    * @return
    */
   public static IPatternSequence $ps(final ISymbol symbol, boolean zeroArgsAllowed) {
@@ -5183,23 +5799,21 @@ public class F {
   }
 
   /**
-   * Create a pattern for pattern-matching and term rewriting
-   *
-   * @param symbol
-   * @param check  additional condition which should be checked in pattern-matching
-   * @return IPattern
+   * Create a new PatternSequence <code>BlankSequence</code> or <code>BlankNullSequence</code>.
+   * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
+   * @param check  a header check.Maybe <code>null</code>.
+   * @return IPatternSequence
    */
   public static IPatternSequence $ps(final ISymbol symbol, final IExpr check) {
     return PatternSequence.valueOf(symbol, check, false);
   }
 
   /**
-   * Create a pattern for pattern-matching and term rewriting
-   *
+   * Create a new PatternSequence <code>BlankSequence</code> or <code>BlankNullSequence</code>.
    * @param symbol
    * @param check           additional condition which should be checked in pattern-matching
-   * @param def             if <code>true</code>, the pattern can match to a default value
-   *                        associated with the AST's head the pattern is used in.
+   * @param def             if <code>true</code>, the pattern can match to a default value associated with the
+   *                        AST's head the pattern is used in.
    * @param zeroArgsAllowed if <code>true</code> 0 argument sequences are allowed for this pattern
    * @return IPattern
    */
@@ -5218,7 +5832,7 @@ public class F {
 
   /**
    * @param patternExpr
-   * @param min if <code>min==0</code> RepeatedNull is assumed
+   * @param min         if <code>min==0</code> RepeatedNull is assumed
    * @param max
    * @param engine
    * @return
@@ -5232,7 +5846,6 @@ public class F {
 
   /**
    * Create a pattern for pattern-matching and term rewriting
-   *
    * @param symbolName the name of the pattrn symbol
    * @return IPattern
    */
@@ -5246,7 +5859,6 @@ public class F {
    *
    * <p><b>Note:</b> user defined variables on the context path are defined with method <code>
    * userSymbol()</code>
-   *
    * @param symbolName the name of the symbol
    * @return
    */
@@ -5255,8 +5867,6 @@ public class F {
   }
 
   /**
-   *
-   *
    * <pre>
    * SymbolQ(x)
    * </pre>
@@ -5283,7 +5893,6 @@ public class F {
 
   /**
    * Full symmetry
-   *
    * @param a0
    * @return
    */
@@ -5304,41 +5913,72 @@ public class F {
    * <pre>
    * Java Object       -&gt; Symja object
    * -------------------------------------
-   * null object          F.Null symbol
-   * IExpr                IExpr type
-   * Boolean              True or False symbol
-   * BigInteger           Integer value
-   * BigDecimal           <code>Num</code> with doubleValue() value
-   * Double               <code>Num</code> with doubleValue() value
-   * Float                <code>Num</code> with doubleValue() value
-   * Integer              Symja Integer with longValue() value
-   * Long                 Symja Integer with longValue() value
-   * Number               Symja <code>Num</code> with doubleValue() value
+   * null object          {@link S#Null} symbol
+   * IExpr                {@link IExpr} type
+   * Boolean              {@link S#True} or {@link S#False} symbol
+   * BigInteger           {@link IInteger} value
+   * BigDecimal           {@link INum} with {@link Apfloat#Apfloat(java.math.BigDecimal)} value
+   * Double               {@link INum}  with doubleValue() value
+   * Float                {@link INum}  with doubleValue() value
+   * Integer              {@link IInteger} with intValue() value
+   * Long                 {@link IInteger} with longValue() value
+   * Number               {@link INum} with doubleValue() value
    * java.util.Collection list of elements
    *                      1..nth element of the list give the elements of the List()
    * Object[]             a list of converted objects
-   * int[]                a list of <code>IntegerSym</code> integer values
+   * int[]                a list of {@link IInteger} integer values
    * double[]             a vector ASTRealVector of <code>double</code> values
    * double[][]           a matrix ASTRealMatrix of <code>double</code> values
-   * Complex[]            a list of <code>ComplexNum</code> values
-   * boolean[]            a list of True or False symbols
+   * Complex[]            a list of {@link IComplexNum} values
+   * boolean[]            a list of {@link S#True} or {@link S#False} symbols
    *
    * </pre>
+   * @param object
+   * @return the <code>object</code> converted to a {@link IExpr}}
    */
   public static IExpr symjify(final Object object) {
     return symjify(object, true);
   }
 
+  /**
+   * Converts and evaluates arbitrary expressions to a Symja type.
+   *
+   * <pre>
+   * Java Object       -&gt; Symja object
+   * -------------------------------------
+   * null object          {@link S#Null} symbol
+   * IExpr                {@link IExpr} type
+   * Boolean              {@link S#True} or {@link S#False} symbol
+   * BigInteger           {@link IInteger} value
+   * BigDecimal           {@link INum} with {@link Apfloat#Apfloat(java.math.BigDecimal)} value
+   * Double               {@link INum}  with doubleValue() value
+   * Float                {@link INum}  with doubleValue() value
+   * Integer              {@link IInteger} with intValue() value
+   * Long                 {@link IInteger} with longValue() value
+   * Number               {@link INum} with doubleValue() value
+   * java.util.Collection list of elements
+   *                      1..nth element of the list give the elements of the List()
+   * Object[]             a list of converted objects
+   * int[]                a list of {@link IInteger} integer values
+   * double[]             a vector ASTRealVector of <code>double</code> values
+   * double[][]           a matrix ASTRealMatrix of <code>double</code> values
+   * Complex[]            a list of {@link IComplexNum} values
+   * boolean[]            a list of {@link S#True} or {@link S#False} symbols
+   *
+   * </pre>
+   * @param object
+   * @param evaluate if <code>true</code> evaluate the parsed string
+   * @return the <code>object</code> converted to a {@link IExpr}}
+   */
   public static IExpr symjify(final Object object, boolean evaluate) {
-    IExpr temp = Object2Expr.convert(object);
+    IExpr temp = Object2Expr.convert(object, true, false);
     return evaluate ? eval(temp) : temp;
   }
 
   /**
    * Parses and evaluates a Java string to a Symja expression. May throw an SyntaxError exception,
    * if the string couldn't be parsed.
-   *
-   * @param str the epression which should be parsed
+   * @param str the expression which should be parsed
    * @return
    * @throws SyntaxError
    */
@@ -5347,11 +5987,10 @@ public class F {
   }
 
   /**
-   * Parses a Java string to a Symja expression. May throw an SyntaxError exception, if the string
+   * Parses a Java string to a Symja expression. May throw a SyntaxError exception, if the string
    * couldn't be parsed.
-   *
-   * @param str      the epression which should be parsed
-   * @param evaluate if true evaluate the parsed string
+   * @param str      the expression which should be parsed
+   * @param evaluate if <code>true</code> evaluate the parsed string
    * @return
    * @throws SyntaxError
    */
@@ -5362,31 +6001,40 @@ public class F {
     return evaluate ? engine.evaluate(temp) : temp;
   }
 
-  public static IExpr symjify(final long value) {
+  /**
+   * @param value
+   * @return {@link IInteger} integer value
+   */
+  public static IInteger symjify(final long value) {
     return F.ZZ(value);
   }
 
-  public static IExpr symjify(final double value) {
+  /**
+   * @param value
+   * @return {@link INum} double wrapper
+   */
+  public static INum symjify(final double value) {
     return F.num(value);
   }
 
-  public static IExpr symjify(final boolean value) {
-    return value ? F.True : F.False;
+  /**
+   * Return {@link S#True} or {@link S#False} symbol
+   * @param value
+   * @return {@link S#True} or {@link S#False} symbol
+   */
+  public static IBuiltInSymbol symjify(final boolean value) {
+    return value ? S.True : S.False;
   }
 
   /**
-   * <p>
    * Get or create a global predefined symbol which is retrieved from the SYSTEM context map or
    * created or retrieved from the SYSTEM context variables map.
-   * </p>
-   * <p>
-   * <b>Note:</b> user defined variables on the context path are defined with method
-   * <code>userSymbol()</code>
-   * </p>
    *
+   * <p><b>Note:</b> user defined variables on the context path are defined with method <code>
+   * userSymbol()</code>
    * @param symbolName the name of the symbol
-   * @param setEval    if <code>true</code> determine and assign the built-in evaluator object to
-   *                   the symbol.
+   * @param setEval    if <code>true</code> determine and assign the built-in evaluator object to the
+   *                   symbol.
    * @return
    */
   private static ISymbol $s(final String symbolName, boolean setEval) {
@@ -5481,7 +6129,6 @@ public class F {
 
   /**
    * Create a string expression
-   *
    * @param str
    * @return
    */
@@ -5569,7 +6216,6 @@ public class F {
 
   /**
    * Operator <code>@@</code>
-   *
    * @param a0
    * @param a1
    * @return
@@ -5580,7 +6226,6 @@ public class F {
 
   /**
    * Operator <code>@@@</code>
-   *
    * @param a0
    * @param a1
    * @return
@@ -5607,6 +6252,18 @@ public class F {
 
   public static IAST Array(final IExpr a0, final IExpr a1) {
     return new AST2(Array, a0, a1);
+  }
+
+  public static IAST Arrays(final IExpr a0, final IExpr a1, final IExpr a2) {
+    return new AST3(Arrays, a0, a1, a2);
+  }
+
+  public static IAST Arrays(final IExpr a0, final IExpr a1) {
+    return new AST2(Arrays, a0, a1);
+  }
+
+  public static IAST Arrays(final IExpr a0) {
+    return new AST1(Arrays, a0);
   }
 
   public static IAST ArcCos(final IExpr a0) {
@@ -5715,17 +6372,15 @@ public class F {
 
   /**
    * The domain of arrays.
-   *
    * @param dimension
    * @return <code>Arrays(dimensions, Complexes, {})</code>.
    */
   public static IAST Arrays(final IAST dimension) {
-    return Arrays(dimension, F.Complexes, F.List());
+    return Arrays(dimension, S.Complexes, F.List());
   }
 
   /**
    * The domain of arrays.
-   *
    * @param dimension
    * @param domain
    * @return <code>Arrays(dimensions, domain, {})</code>.
@@ -5736,7 +6391,6 @@ public class F {
 
   /**
    * The domain of arrays.
-   *
    * @param dimension
    * @param domain
    * @param symmetry
@@ -5766,12 +6420,10 @@ public class F {
   }
 
   /**
-   * Creates a new AST from the given <code>ast</code> and <code>head</code>. if
-   * <code>include</code> is set to
-   * <code>true </code> all arguments from index first to last-1 are copied in the new list if
-   * <code>include</code> is
-   * set to <code> false </code> all arguments excluded from index first to last-1 are copied in the
-   * new list
+   * Creates a new AST from the given <code>ast</code> and <code>head</code>. if <code>include
+   * </code> is set to <code>true </code> all arguments from index first to last-1 are copied in the
+   * new list if <code>include</code> is set to <code> false </code> all arguments excluded from
+   * index first to last-1 are copied in the new list
    */
   public static IAST ast(final IAST f, final IExpr head, final boolean include, final int first,
       final int last) {
@@ -5800,7 +6452,6 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param head the header expression of the function. If the ast represents a function like
    *             <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type
    *             ISymbol.
@@ -5811,7 +6462,6 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param head            the header expression of the function. If the ast represents a function
    *                        like
    *                        <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an
@@ -5830,7 +6480,6 @@ public class F {
    * Create a new <code>List()</code> with <code>copies</code> number of arguments, which are set
    * to
    * <code>value</code>.
-   *
    * @param value  initialize all elements with <code>value</code>.
    * @param copies the initial capacity (i.e. number of arguments without the header element) of the
    *               list.
@@ -5843,12 +6492,11 @@ public class F {
   /**
    * Create a new abstract syntax tree (AST) with a <code>head</code> and <code>copies</code> number
    * of arguments, which are set to <code>value</code>.
-   *
-   * @param head the header expression of the function. If the ast represents a function like <code>
-   *     f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+   * @param head   the header expression of the function. If the ast represents a function like <code>
+   *               f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
    * @param value  initialize all elements with <code>value</code>.
    * @param copies the initial capacity (i.e. number of arguments without the header element) of the
-   *     list.
+   *               list.
    * @return
    */
   public static IASTAppendable constantArray(final IExpr head, final IExpr value,
@@ -5858,7 +6506,6 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param arr
    * @param head the header expression of the function. If the ast represents a function like
    *             <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type
@@ -5869,10 +6516,26 @@ public class F {
     return new AST(head, arr);
   }
 
+  /**
+   * Create a new function expression (AST - abstract syntax tree), where all arguments are Java
+   * <code>int</code> values.
+   * @param head the header expression of the function. If the ast represents a function like <code>
+   *             f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+   * @param arr  the integer arguments of the function expression
+   * @return
+   */
   public static IASTAppendable ast(final ISymbol head, final int[] arr) {
     return AST.newInstance(head, arr);
   }
 
+  /**
+   * Create a new function expression (AST - abstract syntax tree), where all arguments are Java
+   * <code>org.hipparchus.complex.Complex</code> values.
+   * @param head the header expression of the function. If the ast represents a function like <code>
+   *             f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+   * @param arr  the <code>org.hipparchus.complex.Complex</code> arguments of the function expression
+   * @return
+   */
   public static IASTAppendable ast(final ISymbol head, final org.hipparchus.complex.Complex[] arr) {
     return AST.newInstance(head, false, arr);
   }
@@ -5926,7 +6589,6 @@ public class F {
 
   /**
    * Bell number.
-   *
    * @param a0
    * @return
    */
@@ -5936,7 +6598,6 @@ public class F {
 
   /**
    * Bell polynomial.
-   *
    * @param a0
    * @param a1
    * @return
@@ -5963,7 +6624,6 @@ public class F {
 
   /**
    * Create a function <code>head(arg1, arg2)</code> with 2 arguments without evaluation.
-   *
    * @param head
    * @param arg1
    * @param arg2
@@ -5976,7 +6636,6 @@ public class F {
   /**
    * Create a function <code>head(arg1, arg2)</code> with 2 argument as an <code>AST2</code> mutable
    * object without evaluation.
-   *
    * @param head
    * @param arg1
    * @param arg2
@@ -6015,7 +6674,6 @@ public class F {
 
   /**
    * Gives symbols "True" or "False" (type ISymbol) depending on the boolean value.
-   *
    * @param value
    * @return
    */
@@ -6063,8 +6721,16 @@ public class F {
     return new AST1(BooleanQ, a);
   }
 
+  public static IAST BooleanMinimize(final IExpr a) {
+    return new AST1(BooleanMinimize, a);
+  }
+
   public static IAST BooleanTable(final IExpr a0, final IExpr a1) {
     return new AST2(BooleanTable, a0, a1);
+  }
+
+  public static IAST BooleanVariables(final IExpr a0) {
+    return new AST1(BooleanVariables, a0);
   }
 
   public static IAST BesselI(final IExpr a0, final IExpr a1) {
@@ -6131,6 +6797,7 @@ public class F {
   public static IAST CarlsonRG(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(CarlsonRG, a0, a1, a2);
   }
+
   public static IAST CarmichaelLambda(final IExpr a0) {
     return new AST1(CarmichaelLambda, a0);
   }
@@ -6159,12 +6826,11 @@ public class F {
    * boolean[]            a list of True or False symbols
    *
    * </pre>
-   *
    * @param obj
    * @return
    */
   public static IExpr cast(Object obj) {
-    return Object2Expr.convert(obj);
+    return Object2Expr.convert(obj, true, false);
   }
 
   public static IAST CatalanNumber(final IExpr a) {
@@ -6177,7 +6843,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param re
    * @return
    */
@@ -6187,7 +6852,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param re
    * @param im
    * @return
@@ -6198,7 +6862,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param real_numerator
    * @param real_denominator
    * @param imag_numerator
@@ -6249,7 +6912,6 @@ public class F {
   /**
    * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than a
    * delta.
-   *
    * @param arg   a numeric number
    * @param delta the delta for which the number should be set to zero
    * @return <code>arg</code> if the argument couldn't be chopped
@@ -6278,7 +6940,6 @@ public class F {
   /**
    * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than
    * <code>Config.DEFAULT_CHOP_DELTA</code>
-   *
    * @param arg a numeric number
    * @return <code>arg</code> if the argument couldn't be chopped
    */
@@ -6289,7 +6950,6 @@ public class F {
   /**
    * Set real or imaginary parts of a numeric argument to zero, those absolute value is less than a
    * delta.
-   *
    * @param arg   a numeric number
    * @param delta the delta for which the number should be set to zero
    * @return <code>arg</code> if the argument couldn't be chopped
@@ -6405,9 +7065,16 @@ public class F {
         "compareTo() - second argument could not be converted into a signed number.");
   }
 
+  public static IAST Compile(final IExpr a0, final IExpr a1) {
+    return new AST2(Compile, a0, a1);
+  }
+
+//  public static IAST CompilePrint(final IExpr a0, final IExpr a1) {
+//    return new AST2(CompilePrint, a0, a1);
+//  }
+
   /**
    * Create a symbolic complex number
-   *
    * @param realPart the real double value part which should be converted to a complex number
    * @param imagPart the imaginary double value part which should be converted to a complex number
    * @return IComplex
@@ -6419,7 +7086,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param realPart the real double value part which should be converted to a complex number
    * @param imagPart the imaginary double value part which should be converted to a complex number
    * @param epsilon
@@ -6433,7 +7099,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param re
    * @return
    */
@@ -6443,7 +7108,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param re
    * @param im
    * @return
@@ -6454,7 +7118,6 @@ public class F {
 
   /**
    * Create a symbolic complex number
-   *
    * @param real_numerator
    * @param real_denominator
    * @param imag_numerator
@@ -6469,7 +7132,6 @@ public class F {
 
   /**
    * Create a Complex(a, b) symbolic expression?
-   *
    * @param a0
    * @param a1
    * @return
@@ -6496,7 +7158,6 @@ public class F {
 
   /**
    * Create a complex numeric number with imaginary part = 0.0
-   *
    * @param r the real part of the number
    * @return
    */
@@ -6506,7 +7167,6 @@ public class F {
 
   /**
    * Create a complex numeric value
-   *
    * @param r real part
    * @param i imaginary part
    * @return
@@ -6558,14 +7218,12 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
-   * @param head the header symbol of the function. If the ast represents a function like
-   *             <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type
-   *             ISymbol.
+   * @param head the header symbol of the function. If the ast represents a function like <code>
+   *             f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
    * @param a
    * @return
    */
-  public static IAST function(IExpr head, final IExpr... a) {
+  public static IASTMutable function(IExpr head, final IExpr... a) {
     final int size = a.length;
     switch (size) {
       case 1:
@@ -6654,6 +7312,17 @@ public class F {
     return new AST1(Csch, a0);
   }
 
+//  public static IAST Cuboid(final IExpr a0, final IExpr a1) {
+//    return new AST2(Cuboid, a0, a1);
+//  }
+
+  public static IAST Cycles(final IExpr a0) {
+    return new AST1(Cycles, a0);
+  }
+
+//  public static IAST Cylinder(final IExpr a0) {
+//    return new AST1(Cylinder, a0);
+//  }
   public static IAST D() {
     return ast(D);
   }
@@ -6815,7 +7484,6 @@ public class F {
 
   /**
    * Create a <code>Distributed(x, &lt;distribution&gt;)</code> AST.
-   *
    * @param x
    * @param distribution
    * @return
@@ -6842,7 +7510,6 @@ public class F {
 
   /**
    * The division <code>arg1 / arg2</code> will be represented by <code>arg1 * arg2^(-1)</code>.
-   *
    * @param arg1 numerator
    * @param arg2 denominator
    * @return
@@ -6949,7 +7616,6 @@ public class F {
 
   /**
    * Evaluate an expression. If no evaluation was possible this method returns the given argument.
-   *
    * @param a the expression which should be evaluated
    * @return the evaluated expression
    * @see EvalEngine#evaluate(IExpr)
@@ -6960,7 +7626,6 @@ public class F {
 
   /**
    * Parse and evaluate a string expression.
-   *
    * @param str the string expression which should be parsed and evaluated
    * @return the evaluated expression
    * @see EvalEngine#evaluate(IExpr)
@@ -6971,7 +7636,6 @@ public class F {
 
   /**
    * Create a function with 1 argument and evaluate it.
-   *
    * @param head
    * @param a0
    * @return the evaluated object
@@ -6987,7 +7651,6 @@ public class F {
   /**
    * Evaluate <code>Expand()</code> for the given expression. Returns the evaluated expression or
    * the given argument.
-   *
    * @param expr the expression which should be evaluated
    * @return the evaluated expression
    * @see EvalEngine#evaluate(IExpr)
@@ -7010,7 +7673,6 @@ public class F {
   /**
    * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If
    * expanding wasn't possible this method returns the given argument.
-   *
    * @param a the expression which should be evaluated
    * @return the evaluated expression
    * @see EvalEngine#evaluate(IExpr)
@@ -7022,7 +7684,6 @@ public class F {
   /**
    * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If
    * expanding wasn't possible this method returns the given argument.
-   *
    * @param a the expression which should be evaluated
    * @return the evaluated expression
    * @see EvalEngine#evaluate(IExpr)
@@ -7033,7 +7694,6 @@ public class F {
 
   /**
    * Evaluate the given expression in numeric mode
-   *
    * @param a0
    * @return
    * @deprecated use EvalEngine.get().evalN() instead
@@ -7046,7 +7706,6 @@ public class F {
   /**
    * Evaluate an expression in &quot;quiet mode&quot;. If no evaluation was possible this method
    * returns the given argument. In &quot;quiet mode&quot; all warnings would be suppressed.
-   *
    * @param a the expression which should be evaluated
    * @return the evaluated expression
    * @see EvalEngine#evalQuiet(IExpr)
@@ -7060,7 +7719,6 @@ public class F {
   /**
    * Evaluate an expression in &quot;quiet mode&quot;. If evaluation is not possible return
    * <code>null</code>. In &quot;quiet mode&quot; all warnings would be suppressed.
-   *
    * @param a the expression which should be evaluated
    * @return the evaluated object or <code>F.NIL</code> if no evaluation was possible
    * @see EvalEngine#evalQuietNull(IExpr)
@@ -7073,7 +7731,6 @@ public class F {
 
   /**
    * Evaluate the given expression and test if the result equals the symbol <code>True</code>.
-   *
    * @param expr
    * @return
    * @deprecated use EvalEngine#evalTrue()
@@ -7153,19 +7810,18 @@ public class F {
   /**
    * depending on the derived class of the given {@link Number}, the value is encoded as {@link
    * IInteger}, {@link INum}
-   *
    * @param number non-null
    * @return scalar with best possible accuracy to encode given number
    * @throws Exception if number is null, or instance of an unsupported type
    */
   public static ISignedNumber expr(Number number) {
-		if (number instanceof Integer || //
-				number instanceof Long || //
-				number instanceof Short || //
-				number instanceof Byte) { return ZZ(number.longValue()); }
-		if (number instanceof Double || //
-				number instanceof Float) { return num(number.doubleValue()); }
-		if (number instanceof BigInteger) { return ZZ((BigInteger) number); }
+    if (number instanceof Integer || //
+        number instanceof Long || //
+        number instanceof Short || //
+        number instanceof Byte) { return ZZ(number.longValue()); }
+    if (number instanceof Double || //
+        number instanceof Float) { return num(number.doubleValue()); }
+    if (number instanceof BigInteger) { return ZZ((BigInteger) number); }
     throw new IllegalArgumentException(number.getClass().getName());
   }
 
@@ -7192,7 +7848,6 @@ public class F {
   /**
    * Apply <code>Expand()</code> to the given expression if it's an <code>IAST</code>. If expanding
    * wasn't possible this method returns the given argument.
-   *
    * @param a                    the expression which should be evaluated
    * @param expandNegativePowers TODO
    * @param distributePlus       TODO
@@ -7222,7 +7877,6 @@ public class F {
   /**
    * Apply <code>ExpandAll()</code> to the given expression if it's an <code>IAST</code>. If
    * expanding wasn't possible this method returns the given argument.
-   *
    * @param a                    the expression which should be evaluated
    * @param expandNegativePowers TODO
    * @param distributePlus       TODO
@@ -7233,7 +7887,8 @@ public class F {
     if (a.isAST()) {
       EvalEngine engine = EvalEngine.get();
       IAST ast = engine.evalFlatOrderlessAttributesRecursive((IAST) a).orElse((IAST) a);
-      return Algebra.expandAll(ast, null, expandNegativePowers, distributePlus, engine).orElse(ast);
+      return Algebra.expandAll(ast, null, expandNegativePowers, distributePlus, false, engine)
+          .orElse(ast);
     }
     return a;
   }
@@ -7268,6 +7923,10 @@ public class F {
     return new AST1(ExponentialDistribution, a0);
   }
 
+  public static IAST ExportString(final IExpr a0, final IExpr a1) {
+    return new AST2(ExportString, a0, a1);
+  }
+
   public static IAST Extract(final IExpr a0, final IExpr a1) {
     return new AST2(Extract, a0, a1);
   }
@@ -7290,6 +7949,10 @@ public class F {
 
   public static IAST Factorial2(final IExpr a0) {
     return new AST1(Factorial2, a0);
+  }
+
+  public static IAST FactorialPower(final IExpr a0, final IExpr a1) {
+    return new AST2(FactorialPower, a0, a1);
   }
 
   public static IAST FactorInteger(final IExpr a0) {
@@ -7366,7 +8029,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param value the rational value which should be converted to a fractional number
    * @return IFraction
    */
@@ -7376,7 +8038,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param numerator   numerator of the fractional number
    * @param denominator denumerator of the fractional number
    * @return IFraction
@@ -7387,7 +8048,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param value the double value which should be converted to a fractional number
    * @return IFraction
    */
@@ -7401,7 +8061,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param numerator   numerator of the fractional number
    * @param denominator denumerator of the fractional number
    * @return IFraction
@@ -7412,7 +8071,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param numerator   numerator of the fractional number
    * @param denominator denumerator of the fractional number
    * @return IFraction
@@ -7546,6 +8204,7 @@ public class F {
   public static IAST Graph(final IExpr a0) {
     return new AST1(Graph, a0);
   }
+
   public static IAST Graph(final IExpr a0, final IExpr a1) {
     return new AST2(Graph, a0, a1);
   }
@@ -7566,12 +8225,24 @@ public class F {
     return new B2.GreaterEqual(a0, a1);
   }
 
+  public static IAST Gudermannian(final IExpr a0) {
+    return new AST1(Gudermannian, a0);
+  }
+
   public static IAST GumbelDistribution() {
     return new AST0(GumbelDistribution);
   }
 
   public static IAST GumbelDistribution(final IExpr a0, final IExpr a1) {
     return new AST2(GumbelDistribution, a0, a1);
+  }
+
+  public static IAST HankelH1(final IExpr a0, final IExpr a1) {
+    return new AST2(HankelH1, a0, a1);
+  }
+
+  public static IAST HankelH2(final IExpr a0, final IExpr a1) {
+    return new AST2(HankelH2, a0, a1);
   }
 
   public static IAST HarmonicMean(final IExpr a0) {
@@ -7596,9 +8267,8 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param head the header expression of the function. If the ast represents a function like <code>
-   *     f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
+   *             f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
    */
   public static final IASTMutable headAST0(final IExpr head) {
     return new AST0(head);
@@ -7696,6 +8366,7 @@ public class F {
   public static IAST In(final IExpr a0) {
     return new AST1(In, a0);
   }
+
   public static IAST Increment(final IExpr a) {
     return new AST1(Increment, a);
   }
@@ -7771,9 +8442,8 @@ public class F {
 
   /**
    * Initialize the complete System
-   *
-   * @param fileName <code>null</code> or optional text filename, which includes the preloaded
-   *     system rules
+   * @param fileName         <code>null</code> or optional text filename, which includes the preloaded
+   *                         system rules
    * @param symbolObserver   the observer for newly created <code>ISymbols</code>
    * @param noPackageLoading don't load any package at start up
    */
@@ -7826,34 +8496,34 @@ public class F {
 
   /**
    * Create a large integer number.
-   *
    * @param integerValue
    * @return
    * @deprecated use ZZ()
    */
+  @Deprecated
   public static IInteger integer(final BigInteger integerValue) {
     return AbstractIntegerSym.valueOf(integerValue);
   }
 
   /**
    * Create a large integer number.
-   *
    * @param integerValue
    * @return
    * @deprecated use ZZ()
    */
+  @Deprecated
   public static IInteger integer(final long integerValue) {
     return AbstractIntegerSym.valueOf(integerValue);
   }
 
   /**
    * Create a large integer number.
-   *
    * @param integerString the integer number represented as a String
    * @param radix         the radix to be used while parsing
    * @return Object
    * @deprecated use ZZ()
    */
+  @Deprecated
   public static IInteger integer(final String integerString, final int radix) {
     return AbstractIntegerSym.valueOf(integerString, radix);
   }
@@ -7876,11 +8546,12 @@ public class F {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>expr</code> is an integer, and <code>False</code>
+   *
+   * <p>returns <code>True</code> if <code>expr</code> is an integer, and <code>False</code>
    * otherwise.
-   * </p>
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -7910,7 +8581,6 @@ public class F {
 
   /**
    * Create a new <code>List</code> with the given <code>capacity</code>.
-   *
    * @param capacity the assumed number of arguments (+ 1 for the header expression is added
    *                 internally).
    * @return
@@ -7921,7 +8591,6 @@ public class F {
 
   /**
    * Create an "interval" expression: <code>Interval(list)</code>.
-   *
    * @param list
    * @return
    */
@@ -7931,7 +8600,6 @@ public class F {
 
   /**
    * Create an "interval" expression: <code>Interval(List(from, to))</code>.
-   *
    * @param min minimum value of the interval
    * @param max maximum value of the interval
    * @return
@@ -7942,7 +8610,6 @@ public class F {
 
   /**
    * Iterate over an integer range <code>from <= i <= to</code> with the step <code>step/code>.
-   *
    * @param head     the header symbol of the result
    * @param function the function which should be applied on each iterator value
    * @param from
@@ -7983,13 +8650,11 @@ public class F {
     }
     return result;
   }
+
   /**
    * Iterate over an integer range <code>from <= i <= to</code> with the step <code>step/code>.
-   *
-   * @param head
-   *            the header symbol of the result
-   * @param function
-   *            the integer function which should be applied on each iterator value
+   * @param head     the header symbol of the result
+   * @param function the integer function which should be applied on each iterator value
    * @param from
    * @param to
    * @param step
@@ -8048,6 +8713,10 @@ public class F {
     return new AST3(InverseGammaRegularized, a0, a1, a2);
   }
 
+  public static IAST InverseGudermannian(final IExpr a0) {
+    return new AST1(InverseGudermannian, a0);
+  }
+
   public static IAST InverseHaversine(final IExpr a) {
     return new AST1(InverseHaversine, a);
   }
@@ -8060,7 +8729,6 @@ public class F {
    * Assign the evaluated <code>rhs</code> to the <code>lhs</code>.<br/>
    *
    * <b>Note:</b> this method returns <code>F.NIL</code>.
-   *
    * @param lhs left-hand-side of the assignment
    * @param rhs right-hand-side of the assignment
    * @return <code>F.NIL</code>
@@ -8077,7 +8745,6 @@ public class F {
    * Assign the unevaluated <code>rhs</code> to the <code>lhs</code>.<br/>
    *
    * <b>Note:</b> this method returns <code>F.NIL</code>.
-   *
    * @param lhs left-hand-side of the assignment
    * @param rhs right-hand-side of the assignment
    * @return <code>F.NIL</code>
@@ -8099,10 +8766,9 @@ public class F {
   }
 
   public static IExpr IIntegrate(int priority, final IAST lhs, final IExpr rhs) {
-    ((IAST) lhs).setEvalFlags(((IAST) lhs).getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
-    org.matheclipse.core.reflection.system.Integrate.INTEGRATE_RULES_DATA
-        .putDownRule(IPatternMatcher.SET_DELAYED,
-            false, lhs, rhs, priority);
+    lhs.setEvalFlags(lhs.getEvalFlags() | IAST.IS_FLATTENED_OR_SORTED_MASK);
+    org.matheclipse.core.reflection.system.Integrate.INTEGRATE_RULES_DATA.putDownRule(
+        IPatternMatcher.SET_DELAYED, false, lhs, rhs, priority);
     return F.NIL;
   }
 
@@ -8113,7 +8779,6 @@ public class F {
   /**
    * Test if <code>rational.doubleValue()</code> equals <code>value</code> within the tolerance
    * <code>Config.DOUBLE_TOLERANCE</code>.
-   *
    * @param value
    * @param rational
    * @return
@@ -8127,7 +8792,6 @@ public class F {
   /**
    * Test if the value is a Java <code>int</code> value within the tolerance
    * <code>Config.DOUBLE_TOLERANCE</code>.
-   *
    * @param value
    * @return
    */
@@ -8138,7 +8802,6 @@ public class F {
   /**
    * Test if the value is a Java <code>int</code> value within the given tolerance
    * <code>epsilon</code>.
-   *
    * @param value
    * @param epsilon the tolerance
    * @return
@@ -8161,7 +8824,6 @@ public class F {
    * -infinity == -infinity returns true
    * <p>
    * undefined == undefined returns false eg 0/0
-   *
    * @return whether x is equal to y
    */
   final public static boolean isEqual(double x, double y) {
@@ -8172,28 +8834,25 @@ public class F {
    * Returns {@code true} if {@code a} and {@code b} are within {@code tolerance} (exclusive) of
    * each other.
    *
-   * <p>
-   * Technically speaking, this is equivalent to {@code Math.abs(a - b) <= tolerance ||
+   * <p>Technically speaking, this is equivalent to {@code Math.abs(a - b) <= tolerance ||
    * Double.valueOf(a).equals(Double.valueOf(b))}.
    *
-   * <p>
-   * Notable special cases include:
+   * <p>Notable special cases include:
    *
    * <ul>
-   * <li>All NaNs are fuzzily equal.
-   * <li>If {@code a == b}, then {@code a} and {@code b} are always fuzzily equal.
-   * <li>Positive and negative zero are always fuzzily equal.
-   * <li>If {@code tolerance} is zero, and neither {@code a} nor {@code b} is NaN, then {@code a} and {@code b} are
-   * fuzzily equal if and only if {@code a == b}.
-   * <li>With {@link Double#POSITIVE_INFINITY} tolerance, all non-NaN values are fuzzily equal.
-   * <li>With finite tolerance, {@code Double.POSITIVE_INFINITY} and {@code
+   *   <li>All NaNs are fuzzily equal.
+   *   <li>If {@code a == b}, then {@code a} and {@code b} are always fuzzily equal.
+   *   <li>Positive and negative zero are always fuzzily equal.
+   *   <li>If {@code tolerance} is zero, and neither {@code a} nor {@code b} is NaN, then {@code a}
+   *       and {@code b} are fuzzily equal if and only if {@code a == b}.
+   *   <li>With {@link Double#POSITIVE_INFINITY} tolerance, all non-NaN values are fuzzily equal.
+   *   <li>With finite tolerance, {@code Double.POSITIVE_INFINITY} and {@code
    *       Double.NEGATIVE_INFINITY} are fuzzily equal only to themselves.
    * </ul>
    *
-   * <p>
-   * This is reflexive and symmetric, but <em>not</em> transitive, so it is <em>not</em> an equivalence relation and
-   * <em>not</em> suitable for use in {@link Object#equals} implementations.
-   *
+   * <p>This is reflexive and symmetric, but <em>not</em> transitive, so it is <em>not</em> an
+   * equivalence relation and <em>not</em> suitable for use in {@link Object#equals}
+   * implementations.
    * @throws IllegalArgumentException if {@code tolerance} is {@code < 0} or NaN
    */
   public static boolean isFuzzyEquals(double a, double b, double tolerance) {
@@ -8203,10 +8862,16 @@ public class F {
         || (Double.isNaN(a) && Double.isNaN(b));
   }
 
+
+  public static final boolean isFuzzyEquals(
+      org.hipparchus.complex.Complex x, org.hipparchus.complex.Complex y, double tolerance) {
+    return isFuzzyEquals(x.getReal(), y.getReal(), tolerance) //
+        && isFuzzyEquals(x.getImaginary(), y.getImaginary(), tolerance);
+  }
+
   /**
    * Calculate the relative difference between x and y. In case |x+y|/2 is zero the absolute
    * difference is returned.
-   *
    * @param x first value
    * @param y second value
    * @return relative error
@@ -8228,9 +8893,9 @@ public class F {
     }
     return error;
   }
+
   /**
    * Test if the absolute value is less <code>Config.DOUBLE_TOLERANCE</code>.
-   *
    * @param value
    * @return
    */
@@ -8242,7 +8907,6 @@ public class F {
 
   /**
    * Test if the absolute value is less <code>Config.DOUBLE_TOLERANCE</code>.
-   *
    * @param value
    * @return
    */
@@ -8255,7 +8919,6 @@ public class F {
 
   /**
    * Test if the absolute value is less than the given epsilon.
-   *
    * @param x
    * @param epsilon
    * @return
@@ -8267,7 +8930,6 @@ public class F {
 
   /**
    * Test if the absolute value is less <code>Config.MACHINE_EPSILON</code>.
-   *
    * @param x
    * @param epsilon
    * @return
@@ -8278,7 +8940,6 @@ public class F {
 
   /**
    * Create JavaScript form data in the given format.
-   *
    * @param plainJavaScript
    * @param format
    * @return
@@ -8301,6 +8962,10 @@ public class F {
 
   public static IAST JacobiDC(final IExpr a0, final IExpr a1) {
     return new AST2(JacobiDC, a0, a1);
+  }
+
+  public static IAST JacobiEpsilon(final IExpr a0, final IExpr a1) {
+    return new AST2(JacobiEpsilon, a0, a1);
   }
 
   public static IAST JacobiNC(final IExpr a0, final IExpr a1) {
@@ -8327,8 +8992,20 @@ public class F {
     return new AST2(JacobiSN, a0, a1);
   }
 
+  public static IAST JavaForm(final IExpr a0, final IExpr a1) {
+    return new AST2(JavaForm, a0, a1);
+  }
+
   public static IAST Join(final IExpr a0, final IExpr a1) {
     return new AST2(Join, a0, a1);
+  }
+
+  public static IAST KelvinBei(final IExpr a0, final IExpr a1) {
+    return new AST2(KelvinBei, a0, a1);
+  }
+
+  public static IAST KelvinBer(final IExpr a0, final IExpr a1) {
+    return new AST2(KelvinBer, a0, a1);
   }
 
   public static IAST Key(final IExpr a0) {
@@ -8462,8 +9139,125 @@ public class F {
   }
 
   /**
+   * Calulate the allocation size for a new {@link IAST} object. If <code>predicate#test()</code>
+   * returns <code>true</code> add the arguments {@link IAST#argSize()} to the <code>ast.argSize()
+   * </code>
+   * @param ast
+   * @param predicate
+   * @return
+   */
+  public static int allocLevel1(final IAST ast, Predicate<IExpr> predicate) {
+    int allocSize = ast.argSize();
+    for (int i = 1; i < ast.size(); i++) {
+      final IExpr arg = ast.get(i);
+      if (predicate.test(arg)) {
+        allocSize += arg.argSize();
+      }
+    }
+    return allocSize;
+  }
+
+  /**
+   * Determine the minimum of the <code>ast</code> {@link IAST#argSize()} and integer number 7
+   * @param ast
+   * @return
+   */
+  public static int allocMin8(IAST ast) {
+    return ast.argSize() < 7 ? ast.argSize() : 7;
+  }
+
+  /**
+   * Determine the minimum of the <code>size</code> and integer number 7
+   * @param size
+   * @return
+   */
+  public static int allocMin8(int size) {
+    return size < 7 ? size : 7;
+  }
+
+  /**
+   * Determine the minimum of the <code>ast</code> {@link IAST#argSize()} and integer number 15
+   * @param ast
+   * @return
+   */
+  public static int allocMin16(IAST ast) {
+    return ast.argSize() < 15 ? ast.argSize() : 15;
+  }
+
+  /**
+   * Determine the minimum of the <code>size</code> and integer number 15
+   * @param size
+   * @return
+   */
+  public static int allocMin16(int size) {
+    return size < 15 ? size : 15;
+  }
+
+  /**
+   * Determine the minimum of the <code>ast</code> {@link IAST#argSize()} and integer number 31,
+   * @param ast
+   * @return
+   */
+  public static int allocMin32(IAST ast) {
+    return ast.argSize() < 31 ? ast.argSize() : 31;
+  }
+
+  /**
+   * Determine the minimum of the <code>size</code> and integer number 31
+   * @param size
+   * @return
+   */
+  public static int allocMin32(int size) {
+    return size < 31 ? size : 31;
+  }
+
+  /**
+   * Determine the minimum of the <code>ast</code> {@link IAST#argSize()} and integer number 63,
+   * @param ast
+   * @return
+   */
+  public static int allocMin64(IAST ast) {
+    return ast.argSize() < 63 ? ast.argSize() : 63;
+  }
+
+  /**
+   * Determine the maximum of the <code>ast</code> {@link IAST#argSize()} and integer number 7,
+   * @param ast
+   * @return
+   */
+  public static int allocMax8(IAST ast) {
+    return ast.argSize() > 7 ? ast.argSize() : 7;
+  }
+
+  /**
+   * Determine the maximum of the <code>ast</code> {@link IAST#argSize()} and integer number 15,
+   * @param ast
+   * @return
+   */
+  public static int allocMax16(IAST ast) {
+    return ast.argSize() > 15 ? ast.argSize() : 15;
+  }
+
+  /**
+   * Determine the maximum of the <code>ast</code> {@link IAST#argSize()} and integer number 31,
+   * @param ast
+   * @return
+   */
+  public static int allocMax32(IAST ast) {
+    return ast.argSize() > 31 ? ast.argSize() : 31;
+  }
+
+  /**
+   * Determine the maximum of the <code>ast</code> {@link IAST#argSize()} and integer number 63,
+   * @param ast
+   * @return
+   */
+  public static int allocMax64(IAST ast) {
+    return ast.argSize() > 63 ? ast.argSize() : 63;
+  }
+
+  /**
    * Create an appendable list <code>{ }</code>.
-   *
    * @return
    * @see {@link #List()} to create an empty unmodifiable AST
    */
@@ -8473,7 +9267,6 @@ public class F {
 
   /**
    * Create a new <code>List</code> with the given <code>capacity</code>.
-   *
    * @param capacity the assumed number of arguments (+ 1 for the header expression is added
    *                 internally).
    * @return
@@ -8484,7 +9277,6 @@ public class F {
 
   /**
    * Create an appendable list <code>{ }</code>.
-   *
    * @param a
    * @return
    * @see {@link #List(final IExpr...)} to create an unmodifiable AST
@@ -8493,10 +9285,21 @@ public class F {
     return ast(a, List);
   }
 
+  public static IAST TemplateSlot(final IExpr a0) {
+    return new AST1(TemplateSlot, a0);
+  }
+
+  public static IAST TemplateSlot(final IExpr a0, final IExpr a1) {
+    return new AST2(TemplateSlot, a0, a1);
+  }
+
+  public static IAST TensorDimensions(final IExpr a0) {
+    return new AST1(TensorDimensions, a0);
+  }
+
   /**
    * For positive n, add the first n elements of <code>numbers</code> to the list.For negative n,
    * add the last n elements of <code>numbers</code> to the list.
-   *
    * @param n
    * @param numbers
    * @return
@@ -8540,9 +9343,16 @@ public class F {
     return function(List, a);
   }
 
+  public static IAST List(final String... strs) {
+    IStringX a[] = new IStringX[strs.length];
+    for (int i = 0; i < strs.length; i++) {
+      a[i] = F.stringx(strs[i]);
+    }
+    return function(List, a);
+  }
+
   /**
    * Create an empty immutable list <code>{ }</code> (i.e. <code>List()</code>).
-   *
    * @return
    * @see {@link #ListAlloc()} to create an appendable list
    */
@@ -8552,21 +9362,20 @@ public class F {
 
   /**
    * Create an immutable list <code>{ }</code> by converting the expressions into IExpr type.
-   *
-   * @param a
+   * @param objects the objects which should be converted, before adding them to the list
    * @return
    * @see {@link #ListAlloc(final IExpr...)} to create an appendable list
    */
   public static IAST list(final Object... objects) {
     IExpr[] a = new IExpr[objects.length];
     for (int i = 0; i < objects.length; i++) {
-      a[i] = Object2Expr.convert(objects[i]);
+      a[i] = Object2Expr.convert(objects[i], true, false);
     }
     return F.List(a);
   }
+
   /**
    * Create an immutable list <code>{ }</code>.
-   *
    * @param a
    * @return
    * @see {@link #ListAlloc(final IExpr...)} to create an appendable list
@@ -8615,36 +9424,34 @@ public class F {
 
   /**
    * Return a single of value as a <code>List()</code>
-   *
    * @param a
    * @return
    */
-  public static IAST single(final IExpr a) {
+  public static IAST list(final IExpr a) {
     return new B1.List(a);
   }
 
   /**
    * Return a pair of values as a <code>List()</code>
-   *
    * @param a0
    * @param a1
    * @return
    */
-  public static IAST pair(final IExpr a0, final IExpr a1) {
+  public static IAST list(final IExpr a0, final IExpr a1) {
     return new B2.List(a0, a1);
   }
 
   /**
    * Return a triple of values as a <code>List()</code>
-   *
    * @param a0
    * @param a1
    * @param a2
    * @return
    */
-  public static IAST triple(final IExpr a0, final IExpr a1, final IExpr a2) {
+  public static IAST list(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(List, a0, a1, a2);
   }
+
   public static IAST List(final long... numbers) {
     IInteger a[] = new IInteger[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
@@ -8653,7 +9460,7 @@ public class F {
     return List(a);
   }
 
-  public static IAST List(final int... numbers) {
+  public static IASTMutable List(final int... numbers) {
     IInteger a[] = new IInteger[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
       a[i] = ZZ(numbers[i]);
@@ -8675,9 +9482,9 @@ public class F {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * tests whether <code>expr</code> is a <code>List</code>.
-   * </p>
+   *
+   * <p>tests whether <code>expr</code> is a <code>List</code>.
+   *
    * </blockquote>
    * <h3>Examples</h3>
    *
@@ -8716,7 +9523,6 @@ public class F {
 
   /**
    * <code>Log[10, a0]</code>.
-   *
    * @param a0
    * @return <code>Log[10, a0]</code>.
    */
@@ -8820,6 +9626,18 @@ public class F {
     return new AST1(MathMLForm, a0);
   }
 
+  public static IAST MatrixD(final IExpr a0, final IExpr a1) {
+    return new AST2(MatrixD, a0, a1);
+  }
+
+  public static IAST MatrixExp(final IExpr a0) {
+    return new AST1(MatrixExp, a0);
+  }
+
+  public static IAST MatrixLog(final IExpr a0) {
+    return new AST1(MatrixLog, a0);
+  }
+
   public static IAST MatrixForm(final IExpr a0) {
     return new AST1(MatrixForm, a0);
   }
@@ -8876,6 +9694,7 @@ public class F {
   public static IAST MessageName(final ISymbol symbol, final String str) {
     return new AST2(MessageName, symbol, F.$str(str));
   }
+
   public static IASTAppendable Min() {
     return ast(Min);
   }
@@ -8930,10 +9749,11 @@ public class F {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>expr</code> is a <code>Missing()</code> expression.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>expr</code> is a <code>Missing()</code> expression.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -9003,7 +9823,6 @@ public class F {
 
   /**
    * Evaluate the given expression in numeric mode
-   *
    * @param a0
    * @return
    */
@@ -9015,12 +9834,15 @@ public class F {
     return new AST2(NakagamiDistribution, a0, a1);
   }
 
+  public static IAST Needs(final IExpr a0) {
+    return new AST1(Needs, a0);
+  }
+
   /**
    * Multiplies the given argument by <code>-1</code>. The <code>IExpr#negate()</code> method does
    * evaluations, which don't agree with pattern matching assumptions (in left-hand-sige
-   * expressions). so it is only called called for
-   * <code>INumber</code> objects, otherwis a <code>Times(CN1, x)</code> AST would be created.
-   *
+   * expressions). so it is only called called for <code>INumber</code> objects, otherwis a <code>
+   * Times(CN1, x)</code> AST would be created.
    * @param x the expression which should be negated.
    * @return
    */
@@ -9051,12 +9873,9 @@ public class F {
 
   /**
    * Create a new abstract syntax tree (AST).
-   *
    * @param intialArgumentsCapacity the initial capacity of arguments of the AST.
-   * @param head                    the header expression of the function. If the ast represents a
-   *                                function like
-   *                                <code>f[x,y], Sin[x],...</code>, the <code>head</code> will be
-   *                                an instance of type ISymbol.
+   * @param head                    the header expression of the function. If the ast represents a function like <code>
+   *                                f[x,y], Sin[x],...</code>, the <code>head</code> will be an instance of type ISymbol.
    * @return
    */
   public static IAST newInstance(final int intialArgumentsCapacity, final IExpr head) {
@@ -9109,7 +9928,6 @@ public class F {
 
   /**
    * Create a numeric value
-   *
    * @param d
    * @return
    */
@@ -9147,7 +9965,6 @@ public class F {
 
   /**
    * Create a numeric value from the input string.
-   *
    * @param valueString the numeric value represented as a string.
    * @return
    */
@@ -9198,11 +10015,12 @@ public class F {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>expr</code> is an explicit numeric expression, and
-   * <code>False</code> otherwise.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>expr</code> is an explicit numeric expression, and <code>
+   * False</code> otherwise.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -9227,10 +10045,11 @@ public class F {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns <code>True</code> if <code>x</code> is odd, and <code>False</code> otherwise.
-   * </p>
+   *
+   * <p>returns <code>True</code> if <code>x</code> is odd, and <code>False</code> otherwise.
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -9257,6 +10076,10 @@ public class F {
     return C1;
   }
 
+  public static IAST OptimizeExpression(final IExpr a0) {
+    return new AST1(OptimizeExpression, a0);
+  }
+
   public static IAST Optional(final IExpr a0, final IExpr a1) {
     return new AST2(Optional, a0, a1);
   }
@@ -9270,6 +10093,13 @@ public class F {
     return new AST1(Options, a0);
   }
 
+  public static IAST OptionValue(final IExpr a0, final IExpr a1) {
+    return new AST2(OptionValue, a0, a1);
+  }
+
+  public static IAST OptionValue(final IExpr a0) {
+    return new AST1(OptionValue, a0);
+  }
 
   public static IASTAppendable Or() {
     return ast(Or);
@@ -9291,26 +10121,54 @@ public class F {
     return new AST2(Order, a0, a1);
   }
 
+  public static IAST Ordering(final IExpr a) {
+    return new AST1(Ordering, a);
+  }
+
   public static IAST OrderedQ(final IExpr a) {
     return new AST1(OrderedQ, a);
   }
 
+  public static IAST Out(final IExpr a0) {
+    return new AST1(Out, a0);
+  }
+
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Part.md">Part</a>
+   */
   public static IASTAppendable Part() {
     return ast(Part);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Part.md">Part</a>
+   */
   public static IAST Part(final IExpr a0, final IExpr a1) {
     return new B2.Part(a0, a1);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Part.md">Part</a>
+   */
   public static IAST Part(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(Part, a0, a1, a2);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Part.md">Part</a>
+   */
   public static IASTAppendable Part(final IExpr... a) {
     return Part(0, a);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Part.md">Part</a>
+   */
   public static IASTAppendable Part(final int extraSize, final IExpr... a) {
     IASTAppendable part = F.ast(Part, a.length + extraSize + 1, false);
     for (int i = 0; i < a.length; i++) {
@@ -9335,24 +10193,45 @@ public class F {
     return new AST2(PatternTest, a0, a1);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/PDF.md">PDF</a>
+   */
   public static IAST PDF(final IExpr a0) {
     return new AST1(PDF, a0);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/PDF.md">PDF</a>
+   */
   public static IAST PDF(final IExpr a0, final IExpr a1) {
     return new AST2(PDF, a0, a1);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Piecewise.md">Piecewise</a>
+   */
   public static IAST Piecewise(final IExpr a0) {
     return new AST1(Piecewise, a0);
   }
 
-  public static IAST PiecewiseExpand(final IExpr a0) {
-    return new AST1(PiecewiseExpand, a0);
-  }
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Piecewise.md">Piecewise</a>
+   */
 
   public static IAST Piecewise(final IExpr a0, final IExpr a1) {
     return new AST2(Piecewise, a0, a1);
+  }
+
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/PiecewiseExpand.md">PiecewiseExpand</a>
+   */
+  public static IAST PiecewiseExpand(final IExpr a0) {
+    return new AST1(PiecewiseExpand, a0);
   }
 
   public static IAST Plot(final IExpr a0, final IExpr a1) {
@@ -9384,17 +10263,16 @@ public class F {
   }
 
   /**
-   * Create a Plus() function.
-   *
-   * @return
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
    */
   public static IASTAppendable Plus() {
     return ast(Plus);
   }
 
   /**
-   * Create a Plus() function with allocated space for size elements.
-   *
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
    * @param size
    * @return
    */
@@ -9402,25 +10280,46 @@ public class F {
     return ast(Plus, size, false);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
+   */
   public static IASTAppendable Plus(final IExpr a0) {
     return unary(Plus, a0);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
+   */
   public static IAST Plus(final IExpr... a) {
     return function(Plus, a);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
+   */
   public static IAST Plus(final IExpr a1, final IExpr a2) {
     if (a1 != null && a2 != null) {
+      // objc-changed
       return binaryASTOrderless(Predicates.isPlus, F.Plus, a1, a2);
     }
     return new B2.Plus(a1, a2);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
+   */
   public static IAST Plus(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(Plus, a0, a1, a2);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Plus.md">Plus</a>
+   */
   public static IAST Plus(final long num, final IExpr... a) {
     IASTAppendable ast = ast(Plus, a.length + 1, false);
     ast.append(ZZ(num));
@@ -9521,7 +10420,6 @@ public class F {
 
   /**
    * Create a "predefined" symbol for constants or function names.
-   *
    * @param symbolName
    * @return
    */
@@ -9554,14 +10452,16 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/PrimePi.md">PrimePi</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/PrimePi.md">PrimePi</a>
    */
   public static IAST PrimePi(final IExpr a0) {
     return new AST1(PrimePi, a0);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/PrimeQ.md">PrimeQ</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/PrimeQ.md">PrimeQ</a>
    */
   public static IAST PrimeQ(final IExpr a0) {
 
@@ -9579,7 +10479,6 @@ public class F {
   /**
    * Iterate over an integer range <code>from <= i <= to</code> and create a product of the created
    * values.
-   *
    * @param function the function which should be applied on each iterator value
    * @param from
    * @param to
@@ -9603,7 +10502,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param frac a big fractional number
    * @return IFraction
    */
@@ -9613,7 +10511,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param numerator   numerator of the fractional number
    * @param denominator denominator of the fractional number
    * @return IFraction
@@ -9624,7 +10521,6 @@ public class F {
 
   /**
    * Create a "fractional" number
-   *
    * @param numerator   numerator of the fractional number
    * @param denominator denominator of the fractional number
    * @return IFraction
@@ -9748,6 +10644,14 @@ public class F {
     return new AST2(Refine, a0, a1);
   }
 
+  public static IAST RegularExpression(final IExpr a0) {
+    return new AST1(RegularExpression, a0);
+  }
+
+  public static IAST RegularExpression(final String str) {
+    return new AST1(RegularExpression, F.$str(str));
+  }
+
   public static IAST Replace(final IExpr a0, final IExpr a1) {
     return new AST2(Replace, a0, a1);
   }
@@ -9768,6 +10672,10 @@ public class F {
     return new AST3(ReplacePart, a0, a1, a2);
   }
 
+  public static IAST ReplaceRepeated(final IExpr a0, final IExpr a1) {
+    return new AST2(ReplaceRepeated, a0, a1);
+  }
+
   public static IAST Rest(final IExpr a0) {
     return new AST1(Rest, a0);
   }
@@ -9783,7 +10691,6 @@ public class F {
   /**
    * Get or create a user defined symbol which is retrieved from the evaluation engines context
    * path.
-   *
    * @param symbolName the name of the symbol
    * @return the symbol object from the context path
    */
@@ -9794,7 +10701,6 @@ public class F {
   /**
    * Get or create a user defined symbol which is retrieved from the evaluation engines context
    * path.
-   *
    * @param symbolName the name of the symbol
    * @param engine     the evaluation engine
    * @return the symbol object from the context path
@@ -9806,13 +10712,10 @@ public class F {
   /**
    * Get or create a user defined symbol which is retrieved from the evaluation engines context
    * path. Additional set assumptions to the engines global assumptions. Use <code>#1</code> or
-   * {@link F#Slot1} in the
-   * <code>assumptionAST</code> expression for this symbol.
-   *
+   * {@link F#Slot1} in the <code>assumptionAST</code> expression for this symbol.
    * @param symbolName    the name of the symbol
    * @param assumptionAST the assumptions which should be set for the symbol. Use <code>#1</code> or
-   *                      {@link F#Slot1} in the
-   *                      <code>assumptionAST</code> expression for this symbol.
+   *                      {@link F#Slot1} in the <code>assumptionAST</code> expression for this symbol.
    * @return the symbol object from the context path
    */
   public static ISymbol symbol(final String symbolName, IAST assumptionAST) {
@@ -9822,13 +10725,10 @@ public class F {
   /**
    * Get or create a user defined symbol which is retrieved from the evaluation engines context
    * path. Additional set assumptions to the engines global assumptions. Use <code>#1</code> or
-   * {@link F#Slot1} in the
-   * <code>assumptionAST</code> expression for this symbol.
-   *
+   * {@link F#Slot1} in the <code>assumptionAST</code> expression for this symbol.
    * @param symbolName    the name of the symbol
    * @param assumptionAST the assumptions which should be set for the symbol. Use <code>#1</code> or
-   *                      {@link F#Slot1} in the
-   *                      <code>assumptionAST</code> expression for this symbol.
+   *                      {@link F#Slot1} in the <code>assumptionAST</code> expression for this symbol.
    * @param engine        the evaluation engine
    * @return the symbol object from the context path
    */
@@ -9877,33 +10777,37 @@ public class F {
     return symbol;
   }
 
+  public static ISymbol symbol(final Context context, final String symbolName, EvalEngine engine) {
+    ContextPath contextPath = engine.getContextPath();
+    return contextPath.getSymbol(symbolName, context, engine.isRelaxedSyntax());
+  }
+
   /**
    * Print the documentation for the given symbol.
-   *
    * @param head
    * @return
    */
-  public static final IStringX usage(final ISymbol head) {
+  public static final String usage(final ISymbol head) {
     return usage(head.toString());
   }
 
   /**
    * Print the documentation for the given symbol name.
-   *
    * @param symbolName
    * @return
    */
-  public static final IStringX usage(final String symbolName) {
+  public static final String usage(final String symbolName) {
     StringBuilder buf = new StringBuilder();
     Documentation.usageDocumentation(buf, symbolName);
-    return F.stringx(buf.toString());
+    return buf.toString();
   }
 
   /**
-   * Create a unique dummy symbol which is retrieved from the evaluation engines DUMMY context.
-   *
+   * Create a unique dummy symbol which is retrieved from the evaluation engines DUMMY context. A
+   * &quot;Dummy&quot; symbol is not known in string parsing.
    * @param symbolName the name of the symbol
    * @return the symbol object from the context path
+   * @see #symbol(String)
    */
   public static ISymbol Dummy(final String symbolName) {
     String name = symbolName;
@@ -9919,8 +10823,7 @@ public class F {
 
   /**
    * Create a unique dummy symbol with prefix "$", which is retrieved from the evaluation engines
-   * DUMMY context.
-   *
+   * DUMMY context. A &quot;Dummy&quot; symbol is not known in string parsing.
    * @param engine the evaluation engine
    * @return the symbol object from the context path
    */
@@ -9979,7 +10882,6 @@ public class F {
   /**
    * Remove a user-defined symbol from the eval engines context path. Doesn't remove predefined
    * names from the System Context.
-   *
    * @param symbolName the name of the symbol
    * @return the removed symbol or <code>null</code> if no symbol was found
    */
@@ -10036,6 +10938,10 @@ public class F {
 
   public static IAST Rule(final IExpr a0, final IExpr a1) {
     return new B2.Rule(a0, a1);
+  }
+
+  public static IAST Rule(final IExpr a0, final String str1) {
+    return new B2.Rule(a0, F.$str(str1));
   }
 
   public static IAST RuleDelayed(final IExpr a0, final IExpr a1) {
@@ -10177,6 +11083,44 @@ public class F {
     return new AST2(Solve, a0, a1);
   }
 
+  /**
+   * Solve an equation for a single variable.
+   *
+   * <p>Solve <code>100-x==0</code> for variable <code>x</code>
+   *
+   * <pre>
+   *   ISymbol x = F.Dummy(engine);
+   *   IExpr[] solutions = F.solve(F.Equal(F.Subtract(F.ZZ(100), x), F.C0), x);
+   * </pre>
+   * <p>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Solve.md">Solve</a>
+   * @param equations one single equation or a list of equations.
+   * @param variable
+   * @return
+   */
+  public static IExpr[] solve(final IAST equations, final ISymbol variable) {
+    IExpr solve = S.Solve.of(equations, variable);
+    if (!solve.isListOfLists()) {
+      return new IExpr[0];
+    }
+    IExpr[] result = new IExpr[solve.size() - 1];
+    int j = 0;
+    for (int i = 1; i < solve.size(); i++) {
+      IAST listRule = (IAST) solve.getAt(i);
+      if (listRule.first().isRule()) {
+        IAST rule = (IAST) listRule.first();
+        result[j++] = rule.second();
+      }
+    }
+    if (j < solve.size() - 1) {
+      IExpr[] newResult = new IExpr[j];
+      System.arraycopy(result, 0, newResult, 0, j);
+      return newResult;
+    }
+    return result;
+  }
+
   public static IAST Sort(final IExpr a0, final IExpr a1) {
     return new AST2(Sort, a0, a1);
   }
@@ -10189,9 +11133,17 @@ public class F {
     return function(Span, a);
   }
 
+  public static IAST Sphere(final IExpr a0, final IExpr a1) {
+    return new AST2(Sphere, a0, a1);
+  }
+
+  public static IAST SphericalHarmonicY(
+      final IExpr a0, final IExpr a1, final IExpr a2, final IExpr a3) {
+    return function(SphericalHarmonicY, a0, a1, a2, a3);
+  }
+
   /**
    * Create a "square" expression: <code>Power(x, 2)</code>.
-   *
    * @param x
    * @return
    */
@@ -10201,7 +11153,6 @@ public class F {
 
   /**
    * Create a "square root" expression: <code>Power(x, 1/2)</code>.
-   *
    * @param x
    * @return
    */
@@ -10247,29 +11198,26 @@ public class F {
 
   /**
    * Create a Symja string expression with mime type TEXT_PLAIN.
-   *
    * @param c
    * @return
    * @see IStringX#TEXT_PLAIN
    */
-  static final public IStringX stringx(final char c) {
+  public static final IStringX stringx(final char c) {
     return StringX.valueOf(c);
   }
 
   /**
    * Create a Symja string expression with mime type TEXT_PLAIN.
-   *
    * @param str
    * @return
    * @see IStringX#TEXT_PLAIN
    */
-  static final public IStringX stringx(final String str) {
+  public static final IStringX stringx(final String str) {
     return StringX.valueOf(str);
   }
 
   /**
    * reate a Symja string expression.
-   *
    * @param str
    * @param mimeType the mime type of the string
    * @return
@@ -10278,17 +11226,16 @@ public class F {
    * @see IStringX#TEXT_MATHML
    * @see IStringX#TEXT_HTML
    */
-  static final public IStringX stringx(final String str, final short mimeType) {
+  public static final IStringX stringx(final String str, final short mimeType) {
     return StringX.valueOf(str, mimeType);
   }
 
   /**
    * Create a string expression
-   *
    * @param str
    * @return
    */
-  static final public IStringX stringx(final StringBuilder str) {
+  public static final IStringX stringx(final StringBuilder str) {
     return StringX.valueOf(str);
   }
 
@@ -10331,7 +11278,6 @@ public class F {
   /**
    * Substitute all (sub-) expressions <code>x</code> with <code>y</code>. If no substitution
    * matches, the method returns the given <code>expr</code>.
-   *
    * @param expr the complete expresssion
    * @param x    the subexpression which should be replaced
    * @param y    the expression which replaces <code>x</code>
@@ -10345,7 +11291,6 @@ public class F {
   /**
    * Substitute all (sub-) expressions with the given unary function. If no substitution matches,
    * the method returns the given <code>expr</code>.
-   *
    * @param expr
    * @param function if the unary functions <code>apply()</code> method returns <code>F.NIL</code>
    *                 the expression isn't substituted.
@@ -10360,7 +11305,6 @@ public class F {
    * Substitute all (sub-) expressions with the given map. If no substitution matches, the method
    * returns the given
    * <code>expr</code>.
-   *
    * @param expr
    * @param map  if the maps <code>get()</code> method returns <code>null</code> the expression
    *             isn't substituted.
@@ -10374,7 +11318,6 @@ public class F {
   /**
    * Substitute all (sub-) expressions with the given rule set. If no substitution matches, the
    * method returns the given <code>expr</code>.
-   *
    * @param expr
    * @param astRules rules of the form <code>x-&gt;y</code> or <code>{a-&gt;b, c-&gt;d}</code>; the
    *                 left-hand-side of the rule can contain pattern objects.
@@ -10395,7 +11338,6 @@ public class F {
   /**
    * Substitute all (sub-) expressions with the given replacement expression. If no (sub-)
    * expression matches, the method returns the given <code>expr</code>.
-   *
    * @param expr
    * @param subExpr
    * @param replacementExpr
@@ -10409,7 +11351,6 @@ public class F {
 
   /**
    * Return <code>arg1 + (-1)*arg2</code>
-   *
    * @param arg1
    * @param arg2
    * @return
@@ -10437,7 +11378,6 @@ public class F {
 
   /**
    * Evaluate the sum from <code>iMin</code> to <code>iMax</code> and step <code>1</code>.
-   *
    * @param function
    * @param iMin
    * @param iMax
@@ -10453,7 +11393,6 @@ public class F {
 
   /**
    * Evaluate the sum from <code>iMin</code> to <code>iMax</code> and step <code>iStep</code>.
-   *
    * @param function
    * @param iMin
    * @param iMax
@@ -10494,21 +11433,24 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Take.md">Take</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Take.md">Take</a>
    */
   public static IAST Take(final IExpr a0, final IExpr a1) {
     return new AST2(Take, a0, a1);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Tan.md">Tan</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Tan.md">Tan</a>
    */
   public static IAST Tan(final IExpr a0) {
     return new B1.Tan(a0);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Tanh.md">Tanh</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Tanh.md">Tanh</a>
    */
   public static IAST Tanh(final IExpr a0) {
     return new AST1(Tanh, a0);
@@ -10516,6 +11458,10 @@ public class F {
 
   public static IAST Taylor(final IExpr a0, final IExpr a1) {
     return new AST2(Taylor, a0, a1);
+  }
+
+  public static IAST TensorRank(final IExpr a0) {
+    return new AST1(TensorRank, a0);
   }
 
   public static IAST TensorSymmetry(final IExpr a0) {
@@ -10527,7 +11473,8 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TeXForm.md">TeXForm</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TeXForm.md">TeXForm</a>
    */
   public static IAST TeXForm(final IExpr a0) {
     return new AST1(TeXForm, a0);
@@ -10541,7 +11488,6 @@ public class F {
   /**
    * Create a function <code>head(arg1, arg2, arg3)</code> with 3 argument as an <code>AST3</code>
    * mutable object without evaluation.
-   *
    * @param head
    * @param arg1
    * @param arg2
@@ -10554,14 +11500,16 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Thread.md">Thread</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Thread.md">Thread</a>
    */
   public static IAST Thread(final IExpr a0) {
     return new AST1(Thread, a0);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Throw.md">Throw</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Throw.md">Throw</a>
    */
   public static IAST Throw(final IExpr a) {
     if (a.isFalse()) {
@@ -10574,22 +11522,24 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TimeConstrained.md">TimeConstrained</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TimeConstrained.md">TimeConstrained</a>
    */
   public static IAST TimeConstrained(final IExpr a0, final IExpr a1) {
     return new AST2(TimeConstrained, a0, a1);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TimeConstrained.md">TimeConstrained</a>
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/TimeConstrained.md">TimeConstrained</a>
    */
   public static IAST TimeConstrained(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(TimeConstrained, a0, a1, a2);
   }
 
   /**
-   * Create a Times() function. See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>.
-   *
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    * @return
    */
   public static IASTAppendable Times() {
@@ -10597,9 +11547,8 @@ public class F {
   }
 
   /**
-   * Create a Times() function with allocated space for size elements. See <a href=
-   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>.
-   *
+   * Create a Times() function with allocated space for size elements. See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    * @param size
    * @return
    */
@@ -10608,31 +11557,36 @@ public class F {
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    */
   public static IASTAppendable Times(final IExpr a0) {
     return unary(Times, a0);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    */
   public static IAST Times(final IExpr... a) {
     return function(Times, a);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    */
   public static IASTMutable Times(final IExpr a1, final IExpr a2) {
     if (a1 != null && a2 != null) {
+      // objc-changed
       return binaryASTOrderless(Predicates.isTimes, F.Times, a1, a2);
     }
     return new B2.Times(a1, a2);
   }
 
   /**
-   * See <a href= "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Times.md">Times</a>
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
    */
   public static IASTMutable Times(final IExpr a0, final IExpr a1, final IExpr a2) {
     return new AST3(Times, a0, a1, a2);
@@ -10666,6 +11620,10 @@ public class F {
     return binaryAST2(symbol, a1, a2);
   }
 
+  /**
+   * See: <a
+   * href="https://raw.githubusercontent.com/axkr/symja_android_library/master/symja_android_library/doc/functions/Times.md">Times</a>
+   */
   public static IAST Times(final long num, final IExpr... a) {
     IASTAppendable ast = ast(Times, a.length + 1, false);
     ast.append(ZZ(num));
@@ -10673,10 +11631,18 @@ public class F {
     return ast;
   }
 
+  /**
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/ToExpression.md">ToExpression</a>
+   */
   public static IAST ToExpression(final IExpr a0) {
     return new AST1(ToExpression, a0);
   }
 
+  /**
+   * See <a href=
+   * "https://github.com/axkr/symja_android_library/blob/master/symja_android_library/doc/functions/Together.md">Together</a>
+   */
   public static IAST Together(final IExpr a0) {
     return new AST1(Together, a0);
   }
@@ -10715,7 +11681,6 @@ public class F {
 
   /**
    * Create a function <code>head(arg)</code> with 1 argument without evaluation.
-   *
    * @param head
    * @param arg
    * @return
@@ -10727,7 +11692,6 @@ public class F {
   /**
    * Create a function <code>head(arg)</code> with 1 argument as an <code>AST1</code> mutable object
    * without evaluation.
-   *
    * @param head
    * @param arg
    * @return
@@ -10788,6 +11752,10 @@ public class F {
     return new AST2(UpSetDelayed, a0, a1);
   }
 
+  public static IAST Variables(final IExpr a0) {
+    return new AST1(Variables, a0);
+  }
+
   public static IAST Variance(final IExpr a0) {
     return new AST1(Variance, a0);
   }
@@ -10818,7 +11786,6 @@ public class F {
 
   /**
    * Symmetry of a zero tensor.
-   *
    * @param a0
    * @return
    */
@@ -10836,7 +11803,6 @@ public class F {
 
   /**
    * Create a large integer number.
-   *
    * @param integerValue
    * @return
    */
@@ -10846,7 +11812,6 @@ public class F {
 
   /**
    * Create an integer number.
-   *
    * @param integerValue
    * @return
    */
@@ -10856,7 +11821,6 @@ public class F {
 
   /**
    * Create an integer number.
-   *
    * @param integerValue
    * @return
    */
@@ -10866,7 +11830,6 @@ public class F {
 
   /**
    * Create a large integer number.
-   *
    * @param integerString the integer number represented as a String
    * @param radix         the radix to be used while parsing
    * @return Object
@@ -10878,13 +11841,23 @@ public class F {
 
   /**
    * The operator form <code>op(f)[expr]</code> is transformed to <code>op(expr, f)</code>
-   *
    * @param ast1 an IAST with condition <code>ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
    * @return
    */
   public static IAST operatorForm1Append(final IAST ast1) {
-    if (ast1.head().isAST1() && ast1.isAST1()) {
-      return new AST2(ast1.topHead(), ast1.arg1(), ((IAST) ast1.head()).arg1());
+    if (ast1.isAST1() && ast1.head().isAST() && ast1.head().size() > 1) {
+      IAST head = (IAST) ast1.head();
+      switch (head.size()) {
+        case 2:
+          return new AST2(ast1.topHead(), ast1.arg1(), head.arg1());
+        case 3:
+          return new AST3(ast1.topHead(), ast1.arg1(), head.arg1(), head.arg2());
+        default:
+          IASTAppendable result = F.ast(ast1.topHead(), head.size() + 1, false);
+          result.append(ast1.arg1());
+          result.appendArgs(head);
+          return result;
+      }
     }
     return NIL;
   }
@@ -10892,7 +11865,6 @@ public class F {
   /**
    * The binary operator form <code>op(f, g)[expr]</code> is transformed to <code>op(expr, f, g)
    * </code>
-   *
    * @param astArg an IAST with condition <code>astArg.head().isAST2() && astArg.isAST1()</code>
    * @return
    */
@@ -10906,9 +11878,8 @@ public class F {
 
   /**
    * The operator form <code>op(f)[expr]</code> is transformed to <code>op(f, expr)</code>
-   *
    * @param ast1 an <code>IAST</code> with condition <code>
-   *     ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
+   *             ast1Arg.head().isAST1() && ast1Arg.isAST1()</code>
    * @return
    */
   public static IAST operatorForm2Prepend(final IAST ast1) {
@@ -10918,9 +11889,20 @@ public class F {
     return NIL;
   }
 
+  public static IAST Matrices(final IExpr a0, final IExpr a1, final IExpr a2) {
+    return new AST3(Matrices, a0, a1, a2);
+  }
+
+  public static IAST Matrices(final IExpr a0, final IExpr a1) {
+    return new AST2(Matrices, a0, a1);
+  }
+
+  public static IAST Matrices(final IExpr a0) {
+    return new AST1(Matrices, a0);
+  }
+
   /**
    * Generate a <code>n x m</code> matrix.
-   *
    * @param biFunction
    * @param n          the number of rows of the matrix.
    * @param m          the number of elements in one row
@@ -10948,7 +11930,6 @@ public class F {
 
   /**
    * Generate a vector with <code>n</code> elements.
-   *
    * @param iFunction
    * @param n         the number of elements of the vector.
    * @return
@@ -10962,10 +11943,18 @@ public class F {
     return matrix;
   }
 
+  public static IAST Vectors(final IExpr a0, final IExpr a1) {
+    return new AST2(Vectors, a0, a1);
+  }
+
+  public static IAST Vectors(final IExpr a0) {
+    return new AST1(Vectors, a0);
+  }
+
   /**
    * Parses a given string to an instance of {@link IExpr}
-   * <p>
-   * Examples:
+   *
+   * <p>Examples:
    *
    * <pre>
    * "7/9" -> RationalScalar.of(7, 9)
@@ -10976,9 +11965,8 @@ public class F {
    * <p>
    * If the parsing logic encounters an inconsistency, the return type is a {@link IStringX} that
    * holds the input string.
-   * <p>
-   * Scalar types that are not supported include {@link GaussScalar}.
    *
+   * <p>Scalar types that are not supported include {@link GaussScalar}.
    * @param string
    * @return scalar
    */
@@ -10995,57 +11983,71 @@ public class F {
    * Show the result in an HTML page with the help of the Java <code>Desktop.getDesktop().open()
    * </code> method. On some platforms the Desktop API may not be supported; use the <code>
    * isDesktopSupported()</code> method todetermine if the current desktop is supported.
-   *
    * @param expr
    * @return
    * @throws IOException
    */
   public static String show(IExpr expr) {
-    try {
-      if (expr.isSameHeadSizeGE(Show, 2)) {
-        IAST show = (IAST) expr;
-        if (show.size() > 1 && show.arg1().isSameHeadSizeGE(Graphics, 2)) {
-          return openSVGOnDesktop(show);
-        }
-      } else if (expr instanceof GraphExpr) {
-        String javaScriptStr = GraphFunctions.graphToJSForm((GraphExpr) expr);
-        if (javaScriptStr != null) {
-          String html = Config.VISJS_PAGE;
-          html = StringUtils.replace(html, "`1`", javaScriptStr);
-          html = StringUtils.replace(html, "`2`", "var options = {};");
-          return openHTMLOnDesktop(html);
-        }
-      } else if (expr.isAST(JSFormData, 3)) {
-        return printJSFormData(expr);
-      } else if (expr.isString()) {
-        IStringX str = (IStringX) expr;
-        if (str.getMimeType() == IStringX.TEXT_HTML) {
-          String htmlSnippet = str.toString();
-          String htmlPage = Config.HTML_PAGE;
-          htmlPage = StringUtils.replace(htmlPage, "`1`", htmlSnippet);
-          System.out.println(htmlPage);
-          return F.openHTMLOnDesktop(htmlPage);
-        }
-      } else if (expr.isList(new Predicate<IExpr>() {
-        @Override
-        public boolean test(IExpr x) {
-          return x.isAST(JSFormData, 3);
-        }
-      })) {
-        final StringBuilder buf = new StringBuilder();
-        ((IAST) expr).forEach(new Consumer<IExpr>() {
-          @Override
-          public void accept(IExpr x) {
-            buf.append(printJSFormData(x));
-          }
-        });
-        return buf.toString();
-      }
-    } catch (Exception ex) {
-      if (FEConfig.SHOW_STACKTRACE) {
-        ex.printStackTrace();
-      }
-    }
+//    try {
+//      if (expr.isSameHeadSizeGE(Show, 2)) {
+//        IAST show = (IAST) expr;
+//        if (show.size() > 1 && show.arg1().isSameHeadSizeGE(Graphics, 2)) {
+//          return openSVGOnDesktop(show);
+//        }
+//      } else if (expr.isAST(S.Graphics3D)) {
+//        IExpr expressionJSON =
+//            EvalEngine.get().evaluate(F.ExportString(F.N(expr), F.stringx("ExpressionJSON")));
+//        if (expressionJSON.isString()) {
+//          String jsonStr = expressionJSON.toString();
+//          try {
+//            String html = Config.GRAPHICS3D_PAGE;
+//            html = StringUtils.replace(html, "`1`", jsonStr);
+//            return openHTMLOnDesktop(html);
+//          } catch (Exception ex) {
+//            if (FEConfig.SHOW_STACKTRACE) {
+//              ex.printStackTrace();
+//            }
+//          }
+//        }
+//      } else if (expr instanceof GraphExpr) {
+//        String javaScriptStr = GraphFunctions.graphToJSForm((GraphExpr) expr);
+//        if (javaScriptStr != null) {
+//          String html = Config.VISJS_PAGE;
+//          html = StringUtils.replace(html, "`1`", javaScriptStr);
+//          html = StringUtils.replace(html, "`2`", "var options = {};");
+//          return openHTMLOnDesktop(html);
+//        }
+//      } else if (expr.isAST(JSFormData, 3)) {
+//        return printJSFormData(expr);
+//      } else if (expr.isString()) {
+//        IStringX str = (IStringX) expr;
+//        if (str.getMimeType() == IStringX.TEXT_HTML) {
+//          String htmlSnippet = str.toString();
+//          String htmlPage = Config.HTML_PAGE;
+//          htmlPage = StringUtils.replace(htmlPage, "`1`", htmlSnippet);
+//          System.out.println(htmlPage);
+//          return F.openHTMLOnDesktop(htmlPage);
+//        }
+//      } else if (expr.isList(new Predicate<IExpr>() {
+//        @Override
+//        public boolean test(IExpr x) {
+//          return x.isAST(JSFormData, 3);
+//        }
+//      })) {
+//        final StringBuilder buf = new StringBuilder();
+//        ((IAST) expr).forEach(new Consumer<IExpr>() {
+//          @Override
+//          public void accept(IExpr x) {
+//            buf.append(printJSFormData(x));
+//          }
+//        });
+//        return buf.toString();
+//      }
+//    } catch (Exception ex) {
+//      if (FEConfig.SHOW_STACKTRACE) {
+//        ex.printStackTrace();
+//      }
+//    }
     return null;
   }
 
@@ -11062,6 +12064,17 @@ public class F {
           ex.printStackTrace();
         }
       }
+      //    } else if (jsFormData.arg2().toString().equals("graphics3d")) {
+      //      try {
+      //        String graphics3dStr = jsFormData.arg1().toString();
+      //        String html = Config.GRAPHICS3D_PAGE;
+      //        html = StringUtils.replace(html, "`1`", graphics3dStr);
+      //        return openHTMLOnDesktop(html);
+      //      } catch (Exception ex) {
+      //        if (FEConfig.SHOW_STACKTRACE) {
+      //          ex.printStackTrace();
+      //        }
+      //      }
     } else if (jsFormData.arg2().toString().equals("jsxgraph")) {
       try {
         String manipulateStr = jsFormData.arg1().toString();
@@ -11089,26 +12102,29 @@ public class F {
         String manipulateStr = jsFormData.arg1().toString();
         String html = Config.VISJS_PAGE;
         html = StringUtils.replace(html, "`1`", manipulateStr);
-        html = StringUtils.replace(html, "`2`", //
-            "  var options = {\n" + //
-                "		  edges: {\n" + //
-                "              smooth: {\n" + //
-                "                  type: 'cubicBezier',\n" + //
-                "                  forceDirection:  'vertical',\n" + //
-                "                  roundness: 0.4\n" + //
-                "              }\n" + //
-                "          },\n" + //
-                "          layout: {\n" + //
-                "              hierarchical: {\n" + //
-                "                  direction: \"UD\"\n" + //
-                "              }\n" + //
-                "          },\n" + //
-                "          nodes: {\n" + //
-                "            shape: 'box'\n" + //
-                "          },\n" + //
-                "          physics:false\n" + //
-                "      }; "//
-        );
+        html =
+            StringUtils.replace(
+                html,
+                "`2`", //
+                "  var options = {\n"
+                    + "		  edges: {\n"
+                    + "              smooth: {\n"
+                    + "                  type: 'cubicBezier',\n"
+                    + "                  forceDirection:  'vertical',\n"
+                    + "                  roundness: 0.4\n"
+                    + "              }\n"
+                    + "          },\n"
+                    + "          layout: {\n"
+                    + "              hierarchical: {\n"
+                    + "                  direction: \"UD\"\n"
+                    + "              }\n"
+                    + "          },\n"
+                    + "          nodes: {\n"
+                    + "            shape: 'box'\n"
+                    + "          },\n"
+                    + "          physics:false\n"
+                    + "      }; " //
+            );
         return openHTMLOnDesktop(html);
       } catch (Exception ex) {
         if (FEConfig.SHOW_STACKTRACE) {
@@ -11133,7 +12149,7 @@ public class F {
   public static String openSVGOnDesktop(IAST show) throws IOException {
     StringBuilder stw = new StringBuilder();
     Show2SVG.graphicsToSVG(show.getAST(1), stw);
-    File temp = File.createTempFile("tempfile", ".svg");
+    File temp = java.io.File.createTempFile("tempfile", ".svg");
     BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
     bw.write(stw.toString());
     bw.close();
@@ -11162,4 +12178,75 @@ public class F {
   public static INum oneDouble() {
     return CD1;
   }
+
+  /**
+   * Iterate over the arguments of <code>list</code> and flatten the arguments of <code>
+   * Sequence(...)
+   * </code> expressions. (i.e. <code>{Sequence(a,b,...)}</code> is rewritten as <code>{a,b,...}
+   * </code>). If some of the elements is the symbol <code>Nothing</code> it's automatically removed
+   * from the arguments.
+   * @param list an AST which may contain <code>Sequence(...)</code> expressions or <code>Nothing
+   *             </code> symbols.
+   * @return <code>F.NIL</code> if no sequence is flattened
+   */
+  @ObjcMemoryIssue
+  public static IAST flattenSequence(final IAST list) {
+    if (list.isEvalFlagOn(IAST.SEQUENCE_FLATTENED)) {
+      return NIL;
+    }
+    int attr = list.topHead().getAttributes();
+    final IASTAppendable[] seqResult = new IASTAppendable[]{NIL};
+    // objc-changed, swift changed: memory issue
+    for (int i = 1; i < list.size(); i++) {
+      IExpr x = list.get(i);
+      boolean exit = false;
+      if (x.isSequence()) {
+        IAST seq = (IAST) x;
+        if (!seqResult[0].isPresent()) {
+          seqResult[0] = F.ast(list.head(), list.size() + seq.size(), false);
+          seqResult[0].appendArgs(list, i);
+        }
+        seqResult[0].appendArgs(seq);
+        exit = true;
+      } else if (x.equals(F.Nothing)) {
+        if ((ISymbol.HOLDALL & attr) == ISymbol.NOATTRIBUTE) {
+          if (!seqResult[0].isPresent()) {
+            seqResult[0] = F.ast(list.head(), list.size() - 1, false);
+            seqResult[0].appendArgs(list, i);
+          }
+          exit = true;
+        }
+      }
+      if (!exit) {
+        if (seqResult[0].isPresent()) {
+          seqResult[0].append(x);
+        }
+      }
+    }
+
+    if (seqResult[0].isPresent()) {
+      return seqResult[0];
+    }
+    list.addEvalFlags(IAST.SEQUENCE_FLATTENED);
+    return NIL;
+  }
+
+
+  /**
+   * Is the symbol <code>domain</code> one of the following predefined domain symbols: <code>
+   * Algebraics, Booleans, Complexes, Integers, Primes, Rationals, Reals</code>
+   * @param domain the symbol which can represent a predefined domain
+   * @return
+   */
+  public static boolean isDomain(ISymbol domain) {
+    return domain == Algebraics
+        || domain == Booleans
+        || domain == Complexes
+        || domain == Integers
+        || domain == Primes
+        || domain == Rationals
+        || domain == Reals;
+  }
+
+  ;
 }

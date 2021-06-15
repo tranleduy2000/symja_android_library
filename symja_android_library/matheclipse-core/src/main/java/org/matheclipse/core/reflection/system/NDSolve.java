@@ -92,7 +92,8 @@ public class NDSolve extends AbstractFunctionEvaluator {
         return F.NIL;
       }
       try {
-        final IAST listOfVariables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+        final IAST listOfVariables =
+            Validate.checkIsVariableOrVariableList(ast, 2, ast.topHead(), engine);
         if (!listOfVariables.isPresent()) {
           return F.NIL;
         }

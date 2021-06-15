@@ -5,6 +5,7 @@ import com.duy.lambda.Predicate;
 import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
@@ -17,16 +18,17 @@ import org.matheclipse.core.reflection.system.rules.LaplaceTransformRules;
  * </pre>
  * 
  * <blockquote>
- * <p>
- * returns the laplace transform.
- * </p>
+ *
+ * <p>returns the laplace transform.
+ *
  * </blockquote>
- * <p>
- * See:
- * </p>
+ *
+ * <p>See:
+ *
  * <ul>
- * <li><a href="https://en.wikipedia.org/wiki/Laplace_transform">Wikipedia - Laplace transform</a></li>
+ *   <li><a href="https://en.wikipedia.org/wiki/Laplace_transform">Wikipedia - Laplace transform</a>
  * </ul>
+ *
  * <h3>Examples</h3>
  * 
  * <pre>
@@ -82,7 +84,7 @@ public class LaplaceTransform extends AbstractFunctionEvaluator implements Lapla
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_3_3;
+    return IFunctionEvaluator.ARGS_3_3;
 	}
 	@Override
 	public IAST getRuleAST() {

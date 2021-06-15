@@ -223,8 +223,18 @@ public class AST extends HMArrayList implements Externalizable {
     return ast;
   }
 
-  public static AST newInstance(final ISymbol symbol, boolean evalComplex,
-      final org.hipparchus.complex.Complex... arr) {
+  /**
+   * Create a new function expression (AST - abstract syntax tree), where all arguments are Java
+   * {@link ComplexNum} values.
+   *
+   * @param symbol
+   * @param evalComplex if <code>true</code> test if the imaginary part of the complex number is
+   *     zero and insert a {@link Num} real value.
+   * @param arr the complex number arguments
+   * @return
+   */
+  public static AST newInstance(
+      final ISymbol symbol, boolean evalComplex, final org.hipparchus.complex.Complex... arr) {
     if (Config.MAX_AST_SIZE < arr.length) {
       ASTElementLimitExceeded.throwIt(arr.length);
     }
@@ -237,12 +247,12 @@ public class AST extends HMArrayList implements Externalizable {
         if (F.isZero(im)) {
           eArr[i] = Num.valueOf(arr[i - 1].getReal());
         } else {
-          eArr[i] = ComplexNum.valueOf(arr[i - 1].getReal(), arr[i - 1].getImaginary());
+          eArr[i] = ComplexNum.valueOf(arr[i - 1]);
         }
       }
     } else {
       for (int i = 1; i <= arr.length; i++) {
-        eArr[i] = ComplexNum.valueOf(arr[i - 1].getReal(), arr[i - 1].getImaginary());
+        eArr[i] = ComplexNum.valueOf(arr[i - 1]);
       }
     }
     return new AST(eArr);
@@ -284,7 +294,7 @@ public class AST extends HMArrayList implements Externalizable {
     IExpr[] eArr = new IExpr[matrix.length + 1];
     eArr[0] = symbol;
     for (int i = 1; i <= matrix.length; i++) {
-      eArr[i] = newInstance(F.List, matrix[i - 1]);
+      eArr[i] = newInstance(S.List, matrix[i - 1]);
     }
     return new AST(eArr);
   }

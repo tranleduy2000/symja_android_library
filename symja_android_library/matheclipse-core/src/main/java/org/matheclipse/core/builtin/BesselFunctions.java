@@ -7,6 +7,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
@@ -25,20 +26,20 @@ public class BesselFunctions {
   private static class Initializer {
 
     private static void init() {
-      F.AiryAi.setEvaluator(new AiryAi());
-      F.AiryAiPrime.setEvaluator(new AiryAiPrime());
-      F.AiryBi.setEvaluator(new AiryBi());
-      F.AiryBiPrime.setEvaluator(new AiryBiPrime());
-      F.BesselI.setEvaluator(new BesselI());
-      F.BesselJ.setEvaluator(new BesselJ());
-      F.BesselJZero.setEvaluator(new BesselJZero());
-      F.BesselK.setEvaluator(new BesselK());
-      F.BesselY.setEvaluator(new BesselY());
-      F.BesselYZero.setEvaluator(new BesselYZero());
-      F.HankelH1.setEvaluator(new HankelH1());
-      F.HankelH2.setEvaluator(new HankelH2());
-      F.SphericalBesselJ.setEvaluator(new SphericalBesselJ());
-      F.SphericalBesselY.setEvaluator(new SphericalBesselY());
+      S.AiryAi.setEvaluator(new AiryAi());
+      S.AiryAiPrime.setEvaluator(new AiryAiPrime());
+      S.AiryBi.setEvaluator(new AiryBi());
+      S.AiryBiPrime.setEvaluator(new AiryBiPrime());
+      S.BesselI.setEvaluator(new BesselI());
+      S.BesselJ.setEvaluator(new BesselJ());
+      S.BesselJZero.setEvaluator(new BesselJZero());
+      S.BesselK.setEvaluator(new BesselK());
+      S.BesselY.setEvaluator(new BesselY());
+      S.BesselYZero.setEvaluator(new BesselYZero());
+      S.HankelH1.setEvaluator(new HankelH1());
+      S.HankelH2.setEvaluator(new HankelH2());
+      S.SphericalBesselJ.setEvaluator(new SphericalBesselJ());
+      S.SphericalBesselY.setEvaluator(new SphericalBesselY());
     }
   }
 
@@ -88,7 +89,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class AiryAiPrime extends AbstractFunctionEvaluator {
+  private static final class AiryAiPrime extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -134,7 +135,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class AiryBi extends AbstractFunctionEvaluator {
+  private static final class AiryBi extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -179,7 +180,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class AiryBiPrime extends AbstractFunctionEvaluator {
+  private static final class AiryBiPrime extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -250,11 +251,10 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class BesselJ extends AbstractFunctionEvaluator {
+  private static final class BesselJ extends AbstractFunctionEvaluator {
 
     /**
      * Precondition <code> n - 1/2 </code> is an integer number.
-     *
      * @param n
      * @param z
      * @return
@@ -309,7 +309,7 @@ public class BesselFunctions {
           // Re(arg1) < 0 && !a.isInteger()
           return F.CComplexInfinity;
         } else if (a.isZero() && !n.isZero()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
 
       }
@@ -401,7 +401,7 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class BesselJZero extends AbstractFunctionEvaluator {
+  private static final class BesselJZero extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -467,7 +467,7 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class BesselI extends AbstractFunctionEvaluator implements BesselIRules {
+  private static final class BesselI extends AbstractFunctionEvaluator implements BesselIRules {
 
     @Override
     public IAST getRuleAST() {
@@ -494,7 +494,7 @@ public class BesselFunctions {
           return F.ComplexInfinity;
         }
         if (re.isZero() && n.isNumber() && !n.isZero()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
       }
       if (n.isNumber() && //
@@ -570,7 +570,7 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class BesselK extends AbstractFunctionEvaluator implements BesselKRules {
+  private static final class BesselK extends AbstractFunctionEvaluator implements BesselKRules {
 
     @Override
     public IAST getRuleAST() {
@@ -588,7 +588,7 @@ public class BesselFunctions {
         }
         IExpr re = n.re();
         if (re.isZero() && n.isNumber() && !n.isZero()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (re.isNumber() && !re.isZero()) {
           return F.ComplexInfinity;
@@ -666,7 +666,7 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class BesselY extends AbstractFunctionEvaluator implements BesselYRules {
+  private static final class BesselY extends AbstractFunctionEvaluator implements BesselYRules {
 
     @Override
     public IAST getRuleAST() {
@@ -683,12 +683,12 @@ public class BesselFunctions {
         if (n.isZero()) {
           return F.CNInfinity;
         }
-        IExpr re = F.Re.of(engine, n);
+        IExpr re = S.Re.of(engine, n);
         if (re.isZero() && n.isNumber() && !n.isZero()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         if (re.isNumber() && !re.isZero()) {
-          return F.ComplexInfinity;
+          return S.ComplexInfinity;
         }
       }
       if (n.isNumber() && //
@@ -738,7 +738,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class BesselYZero extends AbstractFunctionEvaluator {
+  private static final class BesselYZero extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -778,7 +778,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class HankelH1 extends AbstractFunctionEvaluator {
+  private static final class HankelH1 extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -824,7 +824,7 @@ public class BesselFunctions {
     }
   }
 
-  private final static class HankelH2 extends AbstractFunctionEvaluator {
+  private static final class HankelH2 extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -896,7 +896,7 @@ public class BesselFunctions {
    * </code>
    * </pre>
    */
-  private final static class SphericalBesselJ extends AbstractFunctionEvaluator {
+  private static final class SphericalBesselJ extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -982,7 +982,7 @@ public class BesselFunctions {
    * </ul>
    * <h3>Examples</h3>
    */
-  private final static class SphericalBesselY extends AbstractFunctionEvaluator {
+  private static final class SphericalBesselY extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {

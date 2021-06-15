@@ -121,7 +121,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
       if (fRightHandSide.isCondition()) {
         fRHSleafCountSimplify = fRightHandSide.second().leafCountSimplify();
       } else if (fRightHandSide.isModuleOrWithCondition()) {
-        IAST condition = (IAST) fRightHandSide.second();
+        IAST condition = (IAST) fRightHandSide.last();
         fRHSleafCountSimplify = condition.second().leafCountSimplify();
       }
     }
@@ -159,14 +159,14 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
         }
         return p1.compareTo(p2);
       } else if (patternExpr2.isModuleOrWithCondition()) {
-        p2 = patternExpr2.second().second();
+        p2 = patternExpr2.last().second();
         if (equivalent(p1, p2, pm1, pm2)) {
           return 0;
         }
         return p1.compareTo(p2);
       }
     } else if (patternExpr1.isModuleOrWithCondition()) {
-      p1 = patternExpr1.second().second();
+      p1 = patternExpr1.last().second();
       if (patternExpr2.isCondition()) {
         p2 = patternExpr2.second();
         if (equivalent(p1, p2, pm1, pm2)) {
@@ -174,7 +174,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
         }
         return p1.compareTo(p2);
       } else if (patternExpr2.isModuleOrWithCondition()) {
-        p2 = patternExpr2.second().second();
+        p2 = patternExpr2.last().second();
         if (equivalent(p1, p2, pm1, pm2)) {
           return 0;
         }
@@ -194,8 +194,8 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
   }
 
   /**
-   * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code> expressions
-   * evaluates to <code>true</code>.
+   * Check if the condition for the right-hand-sides <code>Module[], With[] or Condition[]</code>
+   * expressions evaluates to <code>true</code>.
    *
    * @return <code>true</code> if the right-hand-sides condition is fulfilled or not all patterns
    *     are assigned.
@@ -275,7 +275,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
       if (matchExpr(fLhsPatternExpr, leftHandSide, engine, new StackMatcher(engine))) {
 
         if (RulesData.showSteps) {
-          if (fLhsPatternExpr.head().equals(F.Integrate)) {
+          if (fLhsPatternExpr.head().equals(S.Integrate)) {
             IExpr rhs = fRightHandSide.orElse(S.Null);
             System.out.println(
                 "\nCOMPLEX: " + fLhsPatternExpr.toString() + " := " + rhs.toString());
@@ -286,12 +286,15 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
         if (fReturnResult.isPresent()) {
           return fReturnResult;
         }
-        IExpr result = patternMap.substituteSymbols(fRightHandSide, F.CEmptySequence);
-        if (evaluate) {
           engine.pushOptionsStack();
           try {
             engine.setOptionsPattern(fLhsPatternExpr.topHead(), patternMap);
+          IExpr result = patternMap.substituteSymbols(fRightHandSide, F.CEmptySequence);
+          if (evaluate) {
             return engine.evaluate(result);
+          } else {
+            return result;
+          }
           } catch (final ConditionException e) {
             if (FEConfig.SHOW_STACKTRACE) {
               logConditionFalse(leftHandSide, fLhsPatternExpr, fRightHandSide);
@@ -303,9 +306,6 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
             engine.popOptionsStack();
           }
 
-        } else {
-          return result;
-        }
       }
     }
 
@@ -344,13 +344,7 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
   public IAST getAsAST() {
     ISymbol setSymbol = getSetSymbol();
-    IExpr condition = getCondition();
-    IAST temp;
-    if (condition != null) {
-      temp = F.binaryAST2(setSymbol, getLHS(), F.Condition(getRHS(), condition));
-    } else {
-      temp = F.binaryAST2(setSymbol, getLHS(), getRHS());
-    }
+    IAST temp = F.binaryAST2(setSymbol, getLHS(), getRHS());
     if (isFlagOn(HOLDPATTERN)) {
       return F.HoldPattern(temp);
     }
@@ -367,22 +361,22 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
    */
   public ISymbol getSetSymbol() {
     if (isFlagOn(SET_DELAYED)) {
-      return F.SetDelayed;
+      return S.SetDelayed;
     }
     if (isFlagOn(SET)) {
-      return F.Set;
+      return S.Set;
     }
     if (isFlagOn(UPSET_DELAYED)) {
-      return F.UpSetDelayed;
+      return S.UpSetDelayed;
     }
     if (isFlagOn(UPSET)) {
-      return F.UpSet;
+      return S.UpSet;
     }
     if (isFlagOn(TAGSET_DELAYED)) {
-      return F.TagSetDelayed;
+      return S.TagSetDelayed;
     }
     if (isFlagOn(TAGSET)) {
-      return F.TagSet;
+      return S.TagSet;
     }
     return null;
   }
@@ -439,29 +433,18 @@ public class PatternMatcherAndEvaluator extends PatternMatcher implements Extern
 
   @Override
   public void writeExternal(ObjectOutput objectOutput) throws IOException {
-    short ordinal = (short) fSetFlags;
-    if (fPatternCondition == null) {
-      ordinal |= SERIALIZATION_MASK;
-    }
-    objectOutput.writeShort(ordinal);
+    objectOutput.writeShort((short) fSetFlags);
     objectOutput.writeObject(fLhsPatternExpr);
     objectOutput.writeObject(fRightHandSide);
-    if (fPatternCondition != null) {
-      objectOutput.writeObject(fPatternCondition);
-    }
   }
 
   @Override
   public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
-    short ordinal = objectInput.readShort();
-    fSetFlags = ordinal & 0x7FFF;
+    fSetFlags = objectInput.readShort();
     fLhsPatternExpr = (IExpr) objectInput.readObject();
     fRightHandSide = (IExpr) objectInput.readObject();
-    if ((ordinal & 0x8000) == 0x0000) {
-      fPatternCondition = (IExpr) objectInput.readObject();
-    }
     if (fLhsPatternExpr != null) {
-      int[] priority = new int[]{IPatternMapImpl.DEFAULT_RULE_PRIORITY};
+      int[] priority = new int[] {IPatternMapImpl.DEFAULT_RULE_PRIORITY};
       this.fPatternMap = IPatternMapStatic.determinePatterns(fLhsPatternExpr, priority, null);
     }
     initRHSleafCountSimplify();

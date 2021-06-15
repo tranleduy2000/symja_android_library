@@ -12,6 +12,36 @@ public abstract class IASTAppendableImpl extends AbstractAST implements IASTAppe
   }
 
   @Override
+  public boolean append(long value) {
+    return append(F.ZZ(value));
+  }
+
+  @Override
+  public boolean append(double value) {
+    return append(F.num(value));
+  }
+
+  @Override
+  public boolean append(String value) {
+    return append(F.stringx(value));
+  }
+
+  @Override
+  public boolean append(char value) {
+    return append(F.stringx(value));
+  }
+
+  @Override
+  public boolean append(boolean value) {
+    return append(F.bool(value));
+  }
+
+  @Override
+  public void append(int location, long value) {
+    append(location, F.ZZ(value));
+  }
+
+  @Override
   public void appendRule(IExpr expr) {
     append(expr);
   }

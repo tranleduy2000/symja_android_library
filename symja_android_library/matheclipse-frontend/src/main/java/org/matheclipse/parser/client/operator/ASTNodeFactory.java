@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.matheclipse.parser.client.FEConfig;
+import org.matheclipse.parser.client.Scanner;
 import org.matheclipse.parser.client.ast.ASTNode;
 import org.matheclipse.parser.client.ast.FloatNode;
 import org.matheclipse.parser.client.ast.FractionNode;
@@ -39,6 +40,7 @@ public class ASTNodeFactory implements INodeParserFactory {
   /** The matcher for characters, which could form an operator */
   public static String OPERATOR_CHARACTERS = null;
 
+  @Override
   public boolean isOperatorChar(char ch) {
     return OPERATOR_CHARACTERS != null && OPERATOR_CHARACTERS.indexOf(ch) >= 0;
   }
@@ -118,6 +120,40 @@ public class ASTNodeFactory implements INodeParserFactory {
     }
   }
 
+  private static class TildeOperator extends InfixOperator {
+
+    public TildeOperator(
+        final String oper, final String functionName, final int precedence, final int grouping) {
+      super(oper, functionName, precedence, grouping);
+    }
+
+    @Override
+    public ASTNode createFunction(
+        final INodeParserFactory factory, final ASTNode lhs, final ASTNode rhs) {
+      return factory.createFunction(factory.createSymbol("§TILDE§"), lhs, rhs);
+    }
+
+    @Override
+    public FunctionNode endFunction(
+        final INodeParserFactory factory, final FunctionNode function, final Scanner scanner) {
+      final int size = function.size();
+      if (size < 4 || (size & 0x01) != 0x00) {
+        scanner.throwSyntaxError("Operator ~ requires even number of arguments");
+      }
+
+      FunctionNode result = factory.createAST(function.get(2));
+      result.add(function.get(1));
+      result.add(function.get(3));
+      for (int i = 4; i < size; i += 2) {
+        FunctionNode temp = factory.createAST(function.get(i));
+        temp.add(result);
+        temp.add(function.get(i + 1));
+        result = temp;
+      }
+
+      return result;
+    }
+  }
   private static class MessageNameOperator extends InfixOperator {
 
     public MessageNameOperator(
@@ -193,7 +229,14 @@ public class ASTNodeFactory implements INodeParserFactory {
       "Composition",
       "StringExpression", "TwoWayRule", "TwoWayRule", "DirectedEdge", "UndirectedEdge", "CenterDot",
       "CircleDot",
-      "Element", "Intersection", "NotEqual", "Wedge"};
+    "CircleTimes",
+    "Element",
+    "Intersection",
+    "NotEqual",
+    "Wedge",
+    "TensorProduct",
+    "§TILDE§"
+  };
 
   static final String[] OPERATOR_STRINGS = {"::", "<<", "?", "//@", "*=", "+", "^=", ";", "@", "/@",
       "=.", "@@",
@@ -217,17 +260,30 @@ public class ASTNodeFactory implements INodeParserFactory {
       "^:=",
       "++",
       "&",
-      ">", "--", "-", ":=", "|", "+=", "..", "/.", "/:", "@*", "~~", //
+    ">",
+    "--",
+    "-",
+    ":=",
+    "|",
+    "+=",
+    "..",
+    "/.",
+    "/:",
+    "@*",
+    "~~", // StringExpression
       "<->", // TwoWayRule
       "\uF120", // TwoWayRule
       "\uF3D5", // DirectedEdge
       "\uF3D4", // UndirectedEdge
       "\u00B7", // CenterDot
-      "\u2299", // CircleDot0
+    "\u2299", // CircleDot
+    "\u2297", // CircleTimes
       "\u2208", // Element
       "\u22C2", // Intersection
       "\u2260", // NotEqual,
-      "\u22C0" // Wedge
+    "\u22C0", // Wedge
+    "\uF3DA", // TensorProduct
+    "~"
   };
 
   public static final ApplyOperator APPLY_HEAD_OPERATOR = new ApplyOperator("@", "Apply",
@@ -253,9 +309,7 @@ public class ASTNodeFactory implements INodeParserFactory {
   /** */
   private static Trie<String, Operator> fOperatorMap;
 
-  /**
-   *
-   */
+  /** */
   private static Trie<String, ArrayList<Operator>> fOperatorTokenStartSet;
 
   /**
@@ -354,13 +408,16 @@ public class ASTNodeFactory implements INodeParserFactory {
                   InfixOperator.RIGHT_ASSOCIATIVE),
               new InfixOperator("\u00B7", "CenterDot", Precedence.CENTERDOT, InfixOperator.NONE), //
               new InfixOperator("\u2299", "CircleDot", Precedence.CIRCLEDOT, InfixOperator.NONE), //
-              new InfixOperator("\u2208"/*∈*/, "Element", Precedence.ELEMENT, InfixOperator.NONE),
-              //
-              new InfixOperator("\u22C2", "Intersection", Precedence.INTERSECTION,
-                  InfixOperator.NONE),
-              //
+            new InfixOperator(
+                "\u2297", "CircleTimes", Precedence.CIRCLETIMES, InfixOperator.NONE), //
+            new InfixOperator("\u2208", "Element", Precedence.ELEMENT, InfixOperator.NONE), //
+            new InfixOperator(
+                "\u22C2", "Intersection", Precedence.INTERSECTION, InfixOperator.NONE), //
               new InfixOperator("\u2260", "Unequal", Precedence.UNEQUAL, InfixOperator.NONE), //
-              new InfixOperator("\u22C0", "Wedge", Precedence.WEDGE, InfixOperator.NONE)//
+            new InfixOperator("\u22C0", "Wedge", Precedence.WEDGE, InfixOperator.NONE), //
+            new InfixOperator(
+                "\uF3DA", "TensorProduct", Precedence.TENSORPRODUCT, InfixOperator.NONE),
+            new TildeOperator("~", "§TILDE§", Precedence.TILDE_OPERATOR, InfixOperator.NONE)
 
           };
       StringBuilder buf = new StringBuilder(BASIC_OPERATOR_CHARACTERS);
@@ -425,17 +482,13 @@ public class ASTNodeFactory implements INodeParserFactory {
     return fOperatorMap.get(identifier);
   }
 
-  /**
-   *
-   */
+  /** */
   @Override
   public Map<String, ArrayList<Operator>> getOperator2ListMap() {
     return fOperatorTokenStartSet;
   }
 
-  /**
-   *
-   */
+  /** */
   @Override
   public List<Operator> getOperatorList(final String key) {
     return fOperatorTokenStartSet.get(key);

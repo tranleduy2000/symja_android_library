@@ -1,20 +1,23 @@
 package org.matheclipse.core.expression;
 
+import static org.matheclipse.core.expression.NumberUtil.calculateApproximatelySizeOf;
+
 import com.duy.lambda.Function;
 import com.duy.math.BigIntegerUtils;
 import com.gx.common.math.BigIntegerMath;
-
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamException;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import org.hipparchus.fraction.BigFraction;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.basic.OperationSystem;
-import org.matheclipse.core.builtin.Combinatoric.Subsets;
-import org.matheclipse.core.builtin.Combinatoric.Subsets.KSubsetsList;
-import org.matheclipse.core.eval.exception.ASTElementLimitExceeded;
 import org.matheclipse.core.eval.exception.BigIntegerLimitExceeded;
 import org.matheclipse.core.eval.exception.LimitException;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.interfaces.IAST;
-import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IFraction;
 import org.matheclipse.core.interfaces.IInteger;
@@ -24,20 +27,8 @@ import org.matheclipse.core.interfaces.IRational;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.numbertheory.Primality;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static org.matheclipse.core.expression.NumberUtil.calculateApproximatelySizeOf;
-
 /**
  * IInteger implementation which delegates most of the methods to the BigInteger methods.
- *
  * @see AbstractIntegerSym
  * @see IntegerSym
  */
@@ -62,7 +53,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
       if (c == 1) {
         phi = phi.multiply(q.subtract(F.C1));
       } else {
-        phi = phi.multiply(q.subtract(F.C1).multiply(q.pow(c - 1)));
+        phi = phi.multiply(q.subtract(F.C1).multiply(q.powerRational(c - 1)));
       }
     }
     return phi.toBigNumerator();
@@ -113,7 +104,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
 
   public BigIntegerSym(byte[] bytes) {
     if (Config.MAX_BIT_LENGTH < bytes.length * 8) {
-      BigIntegerLimitExceeded.throwIt(((long) bytes.length) * 8L);
+      BigIntegerLimitExceeded.throwIt((bytes.length) * 8L);
     }
     fBigIntValue = new BigInteger(bytes);
   }
@@ -201,10 +192,6 @@ public class BigIntegerSym extends AbstractIntegerSym {
     return ComplexNum.valueOf(doubleValue());
   }
 
-  @Override
-  public int complexSign() {
-    return sign();
-  }
 
   /** {@inheritDoc} */
   @Override
@@ -264,9 +251,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
   }
 
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public double doubleValue() {
     return fBigIntValue.doubleValue();
@@ -311,7 +296,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
   @Override
   public IExpr exponent(IInteger base) {
     IInteger b = this;
-    if (sign() < 0) {
+    if (complexSign() < 0) {
       b = b.negate();
     } else if (b.isZero()) {
       return F.CInfinity;
@@ -459,7 +444,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
     return fBigIntValue.intValue();
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public IRational inverse() {
     if (isOne()) {
@@ -558,7 +543,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
     return fBigIntValue.equals(BigInteger.ZERO);
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public long longValue() {
     return fBigIntValue.longValue();
@@ -689,9 +674,9 @@ public class BigIntegerSym extends AbstractIntegerSym {
     if (n == 2) {
       return sqrt();
     }
-    if (sign() == 0) {
+    if (complexSign() == 0) {
       return F.C0;
-    } else if (sign() < 0) {
+    } else if (complexSign() < 0) {
       if (n % 2 == 0) {
         // even exponent n
         throw new ArithmeticException();
@@ -704,7 +689,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
       IInteger temp = this;
       do {
         result = temp;
-        temp = divideAndRemainder(temp.pow(((long) n) - 1))[0]
+        temp = divideAndRemainder(temp.powerRational(((long) n) - 1))[0]
             .add(temp.multiply(AbstractIntegerSym.valueOf(n - 1)))
             .divideAndRemainder(AbstractIntegerSym.valueOf(n))[0];
       } while (temp.compareTo(result) < 0);
@@ -766,7 +751,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
   }
 
   @Override
-  public IInteger round() {
+  public IInteger roundExpr() {
     return this;
   }
 
@@ -789,7 +774,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
   }
 
   @Override
-  public int sign() {
+  public int complexSign() {
     return fBigIntValue.signum();
   }
 
@@ -799,6 +784,7 @@ public class BigIntegerSym extends AbstractIntegerSym {
    * @return <code>k<code> such as <code>k^2 <= this < (k + 1)^2</code>. If this integer is negative or it's
    *         impossible to find a square root return <code>F.Sqrt(this)</code>.
    */
+  @Override
   public IExpr sqrt() {
     try {
       return valueOf(BigIntegerMath.sqrt(fBigIntValue, RoundingMode.UNNECESSARY));
@@ -846,6 +832,16 @@ public class BigIntegerSym extends AbstractIntegerSym {
       return defaultValue;
     }
   }
+
+  /** {@inheritDoc} */
+//  @Override
+//  public long toLongDefault(long defaultValue) {
+//    try {
+//      return fBigIntValue.longValueExact();
+//    } catch (java.lang.ArithmeticException aex) {
+//      return defaultValue;
+//    }
+//  }
 
   /** {@inheritDoc} */
   @Override

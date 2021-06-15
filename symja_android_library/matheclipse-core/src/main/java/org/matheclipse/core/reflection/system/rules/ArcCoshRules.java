@@ -29,16 +29,16 @@ public interface ArcCoshRules {
             // ArcCosh(-1/2)=2/3*I*Pi
             ISet(ArcCosh(CN1D2),
                     Times(CC(0L,1L,2L,3L),Pi)),
-            // ArcCosh(Sqrt(2)/2)=1/4*I*Pi
+    // ArcCosh(1/Sqrt(2))=1/4*I*Pi
             ISet(ArcCosh(C1DSqrt2),
                     Times(CC(0L,1L,1L,4L),Pi)),
-            // ArcCosh((-1)*1/2*Sqrt(2))=3/4*I*Pi
+    // ArcCosh(-1/Sqrt(2))=3/4*I*Pi
             ISet(ArcCosh(Negate(C1DSqrt2)),
                     Times(CC(0L,1L,3L,4L),Pi)),
             // ArcCosh(Sqrt(3)/2)=1/6*I*Pi
             ISet(ArcCosh(Times(C1D2,CSqrt3)),
                     Times(CC(0L,1L,1L,6L),Pi)),
-            // ArcCosh((-1)*1/2*Sqrt(3))=5/6*I*Pi
+    // ArcCosh(-Sqrt(3)/2)=5/6*I*Pi
             ISet(ArcCosh(Times(CN1D2,CSqrt3)),
                     Times(CC(0L,1L,5L,6L),Pi)),
             // ArcCosh(1)=0

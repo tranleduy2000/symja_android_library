@@ -5,6 +5,7 @@ import static org.matheclipse.core.expression.F.ComplexExpand;
 import static org.matheclipse.core.expression.F.D;
 import static org.matheclipse.core.expression.F.DSolve;
 import static org.matheclipse.core.expression.F.Derivative;
+import static org.matheclipse.core.expression.F.DifferenceDelta;
 import static org.matheclipse.core.expression.F.EasterSunday;
 import static org.matheclipse.core.expression.F.ElementData;
 import static org.matheclipse.core.expression.F.Eliminate;
@@ -53,23 +54,29 @@ import static org.matheclipse.core.expression.F.TrigToExp;
 
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.reflection.system.ExportString;
+import org.matheclipse.core.reflection.system.MatrixD;
+import org.matheclipse.core.reflection.system.Ramp;
 
 public final class FunctionDefinitions {
 
   /**
-   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
-   * initializer</a>
+   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation
+   * in static initializer</a>
    */
   private static class Initializer {
 
     private static void init() {
+//      Beep.setEvaluator(new org.matheclipse.core.reflection.system.Beep());
       ComplexExpand.setEvaluator(new org.matheclipse.core.reflection.system.ComplexExpand());
       D.setEvaluator(new org.matheclipse.core.reflection.system.D());
       Derivative.setEvaluator(new org.matheclipse.core.reflection.system.Derivative());
+      DifferenceDelta.setEvaluator(new org.matheclipse.core.reflection.system.DifferenceDelta());
       DSolve.setEvaluator(new org.matheclipse.core.reflection.system.DSolve());
       EasterSunday.setEvaluator(new org.matheclipse.core.reflection.system.EasterSunday());
       ElementData.setEvaluator(new org.matheclipse.core.data.ElementData());
       Eliminate.setEvaluator(new org.matheclipse.core.reflection.system.Eliminate());
+//      ExportString.setEvaluator(new org.matheclipse.core.reflection.system.ExportString());
       ExpToTrig.setEvaluator(new org.matheclipse.core.reflection.system.ExpToTrig());
       FindInstance.setEvaluator(new org.matheclipse.core.reflection.system.FindInstance());
       FindRoot.setEvaluator(new org.matheclipse.core.reflection.system.FindRoot());
@@ -78,6 +85,7 @@ public final class FunctionDefinitions {
       FunctionExpand.setEvaluator(new org.matheclipse.core.reflection.system.FunctionExpand());
       HeavisideTheta.setEvaluator(new org.matheclipse.core.reflection.system.HeavisideTheta());
       Horner.setEvaluator(new org.matheclipse.core.reflection.system.Horner());
+//      ImportString.setEvaluator(new org.matheclipse.core.reflection.system.ImportString());
       In.setEvaluator(new org.matheclipse.core.reflection.system.In());
       InterpolatingFunction.setEvaluator(
           new org.matheclipse.core.reflection.system.InterpolatingFunction());
@@ -94,6 +102,7 @@ public final class FunctionDefinitions {
       ListLinePlot.setEvaluator(new org.matheclipse.core.reflection.system.ListLinePlot());
       ListPlot.setEvaluator(new org.matheclipse.core.reflection.system.ListPlot());
       ListPlot3D.setEvaluator(new org.matheclipse.core.reflection.system.ListPlot3D());
+      F.MatrixD.setEvaluator(new org.matheclipse.core.reflection.system.MatrixD());
       ND.setEvaluator(new org.matheclipse.core.reflection.system.ND());
       NDSolve.setEvaluator(new org.matheclipse.core.reflection.system.NDSolve());
       NFourierTransform
@@ -118,10 +127,7 @@ public final class FunctionDefinitions {
       TrigReduce.setEvaluator(new org.matheclipse.core.reflection.system.TrigReduce());
       TrigToExp.setEvaluator(new org.matheclipse.core.reflection.system.TrigToExp());
       if (!Config.FUZZY_PARSER) {
-        //Compile.setEvaluator(new org.matheclipse.core.reflection.system.Compile());
-        //CreateDirectory.setEvaluator(new org.matheclipse.core.reflection.system.CreateDirectory());
         Export.setEvaluator(new org.matheclipse.core.reflection.system.Export());
-        F.ExportString.setEvaluator(new org.matheclipse.core.reflection.system.ExportString());
         OptimizeExpression
             .setEvaluator(new org.matheclipse.core.reflection.system.OptimizeExpression());
         Share.setEvaluator(new org.matheclipse.core.reflection.system.Share());

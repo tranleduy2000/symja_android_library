@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.util.MathArrays;
 
 /**
@@ -35,7 +35,7 @@ import org.hipparchus.util.MathArrays;
  * @see FieldODEStateAndDerivative
  */
 
-public class FieldODEState<T extends RealFieldElement<T>> {
+public class FieldODEState<T extends CalculusFieldElement<T>> {
 
     /**
      * Time.
@@ -60,7 +60,7 @@ public class FieldODEState<T extends RealFieldElement<T>> {
     /**
      * Simple constructor.
      * <p>Calling this constructor is equivalent to call {@link
-     * #FieldODEState(RealFieldElement, RealFieldElement[], RealFieldElement[][])
+     * #FieldODEState(CalculusFieldElement, CalculusFieldElement[], CalculusFieldElement[][])
      * FieldODEState(time, state, null)}.</p>
      *
      * @param time         time

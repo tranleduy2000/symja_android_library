@@ -11,6 +11,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.parser.client.math.MathException;
@@ -32,11 +33,11 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
 
   public QuantityImpl() {
 
-    super(F.Quantity, null);
+    super(S.Quantity, null);
   }
 
   /* package */ QuantityImpl(IExpr value, IUnit unit) {
-    super(F.Quantity, unit);
+    super(S.Quantity, unit);
     this.arg1 = value;
     this.fData = unit;
   }
@@ -49,22 +50,23 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
   public IExpr arcTan(IExpr x) {
     if (x instanceof IQuantity) {
       IQuantity quantity = (IQuantity) x;
-      if (fData.equals(quantity.unit())) return F.ArcTan.of(quantity.value(), arg1);
+      if (fData.equals(quantity.unit())) return S.ArcTan.of(quantity.value(), arg1);
     }
     throw MathException.of(x, this);
   }
 
   public IExpr arg() {
-    return F.Arg.of(arg1);
+    return S.Arg.of(arg1);
   }
 
   // @Override
+  @Override
   public String unitString() {
     return fData.toString();
   }
 
   public IExpr ceiling() {
-    return ofUnit(F.Ceiling.of(arg1));
+    return ofUnit(S.Ceiling.of(arg1));
   }
 
 
@@ -117,7 +119,11 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
   /** {@inheritDoc} */
   @Override
   public IExpr evaluate(EvalEngine engine) {
-    if (engine.isDoubleMode() && //
+    if (arg1.isIndeterminate()) {
+      return arg1;
+    }
+    if (engine.isDoubleMode()
+        && //
         !arg1.isInexactNumber()) {
       try {
         double qDouble = arg1.evalDouble();
@@ -130,11 +136,12 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
   }
 
   public IExpr floor() {
-    return ofUnit(F.Floor.of(arg1));
+    return ofUnit(S.Floor.of(arg1));
   }
 
   @Override
   public int hashCode() {
+    // objc-changed
     return DObjects.hash(arg1, fData);
   }
 
@@ -250,6 +257,19 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
 
   @Override
   public IExpr times(IExpr scalar) {
+    return times(scalar, false);
+    //    if (scalar instanceof IQuantity) {
+    //      IQuantity quantity = (IQuantity) scalar;
+    //      return of(arg1.times(quantity.value()), fData.add(quantity.unit()));
+    //    }
+    //    if (scalar.isReal()) {
+    //      return ofUnit(arg1.times(scalar));
+    //    }
+    //    return F.Times(this, scalar);
+  }
+
+  @Override
+  public IExpr times(IExpr scalar, boolean nilIfUnevaluated) {
     if (scalar instanceof IQuantity) {
       IQuantity quantity = (IQuantity) scalar;
       return of(arg1.times(quantity.value()), fData.add(quantity.unit()));
@@ -257,7 +277,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
     if (scalar.isReal()) {
     return ofUnit(arg1.times(scalar));
   }
-    return F.NIL;
+    return nilIfUnevaluated ? F.NIL : F.Times(this, scalar);
   }
 
   public IExpr n() {
@@ -276,6 +296,49 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
 
   @Override
   public IExpr plus(final IExpr scalar) {
+    return plus(scalar, false);
+    //    boolean azero = isZero();
+    //    boolean bzero = scalar.isZero();
+    //    if (azero && !bzero) {
+    //      return scalar; // 0[m] + X(X!=0) gives X(X!=0)
+    //    }
+    //    if (!azero && bzero) {
+    //      return this; // X(X!=0) + 0[m] gives X(X!=0)
+    //    }
+    //    /** at this point the implication holds: azero == bzero */
+    //    if (scalar instanceof IQuantity) {
+    //      IQuantity quantity = (IQuantity) scalar;
+    //      IUnit unit = quantity.unit();
+    //      if (!fData.equals(unit)) {
+    //        IExpr lhs = UnitSystem.SI().apply(this);
+    //        IExpr rhs = UnitSystem.SI().apply(quantity);
+    //        if (!this.equals(lhs) || !quantity.equals(rhs)) {
+    //          return lhs.plus(rhs);
+    //        }
+    //        String str =
+    //            IOFunctions.getMessage(
+    //                "compat", F.List(F.stringx(fData.toString()), F.stringx(unit.toString())));
+    //        throw new ArgumentTypeException(str);
+    //        // quantity = (IQuantity) UnitConvert.SI().to(unit).apply(quantity);
+    //      }
+    //      if (fData.equals(unit)) {
+    //        return ofUnit(arg1.plus(quantity.value())); // 0[m] + 0[m] gives 0[m]
+    //      } else if (azero) {
+    //        // explicit addition of zeros to ensure symmetry
+    //        // for instance when numeric precision is different
+    //        return arg1.plus(quantity.value()); // 0[m] + 0[s] gives 0
+    //      }
+    //    } else // <- scalar is not an instance of Quantity
+    //    if (azero) {
+    //      // return of value.add(scalar) is not required for symmetry
+    //      // precision of this.value prevails over given scalar
+    //      return this; // 0[kg] + 0 gives 0[kg]
+    //    }
+    //    return F.NIL;
+  }
+
+  @Override
+  public IExpr plus(final IExpr scalar, boolean nilIfUnevaluated) {
     boolean azero = isZero();
     boolean bzero = scalar.isZero();
     if (azero && !bzero) {
@@ -289,6 +352,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
       IQuantity quantity = (IQuantity) scalar;
       IUnit unit = quantity.unit();
       if (!fData.equals(unit)) {
+        // objc-changed
         IExpr lhs = UnitSystemStatic.SI().apply(this);
         IExpr rhs = UnitSystemStatic.SI().apply(quantity);
         if (!this.equals(lhs) || !quantity.equals(rhs)) {
@@ -313,7 +377,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
         // precision of this.value prevails over given scalar
         return this; // 0[kg] + 0 gives 0[kg]
       }
-    return F.NIL;
+    return nilIfUnevaluated ? F.NIL : F.Plus(this, scalar);
   }
 
   @Override
@@ -325,7 +389,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
     if (product == null) {
       return F.NIL;
     }
-    return of(F.Power.of(arg1, exponent), product);
+    return of(S.Power.of(arg1, exponent), product);
   }
 
   @Override
@@ -349,7 +413,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
   }
 
   public IExpr round() {
-    return ofUnit(F.Round.of(arg1));
+    return ofUnit(S.Round.of(arg1));
   }
 
 
@@ -359,7 +423,7 @@ public class QuantityImpl extends DataExpr<IUnit> implements IQuantity, External
     if (product == null) {
       return F.NIL;
     }
-    return of(F.Sqrt.of(arg1), product);
+    return of(S.Sqrt.of(arg1), product);
   }
 
   @Override

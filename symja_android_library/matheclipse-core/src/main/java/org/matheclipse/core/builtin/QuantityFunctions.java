@@ -5,6 +5,7 @@ import org.matheclipse.core.basic.ToggleFeature;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.tensor.qty.IQuantity;
@@ -29,9 +30,9 @@ public class QuantityFunctions {
 //
 //			F.TimeObject.setEvaluator(new TimeObject());
       if (ToggleFeature.QUANTITY) {
-        F.Quantity.setEvaluator(new Quantity());
-        F.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
-        F.UnitConvert.setEvaluator(new UnitConvert());
+        S.Quantity.setEvaluator(new Quantity());
+        S.QuantityMagnitude.setEvaluator(new QuantityMagnitude());
+        S.UnitConvert.setEvaluator(new UnitConvert());
       }
 
       // integers

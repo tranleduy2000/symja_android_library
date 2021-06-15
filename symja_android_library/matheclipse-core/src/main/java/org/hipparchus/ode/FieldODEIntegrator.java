@@ -17,7 +17,7 @@
 
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.solvers.BracketedRealFieldUnivariateSolver;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -39,7 +39,7 @@ import java.util.Collection;
  * @see FieldOrdinaryDifferentialEquation
  */
 
-public interface FieldODEIntegrator<T extends RealFieldElement<T>> {
+public interface FieldODEIntegrator<T extends CalculusFieldElement<T>> {
 
     /**
      * Get the name of the method.

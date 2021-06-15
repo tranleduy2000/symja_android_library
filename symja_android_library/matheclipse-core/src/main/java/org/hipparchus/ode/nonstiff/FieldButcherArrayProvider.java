@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode.nonstiff;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 
 /**
  * This interface represents an integrator  based on Butcher arrays.
@@ -32,7 +32,7 @@ import org.hipparchus.RealFieldElement;
  * @see EmbeddedRungeKuttaFieldIntegrator
  */
 
-public interface FieldButcherArrayProvider<T extends RealFieldElement<T>> {
+public interface FieldButcherArrayProvider<T extends CalculusFieldElement<T>> {
 
     /**
      * Get the time steps from Butcher array (without the first zero).

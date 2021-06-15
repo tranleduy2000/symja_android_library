@@ -18,6 +18,7 @@ import org.hipparchus.special.elliptic.jacobi.FieldCopolarN;
 import org.hipparchus.special.elliptic.jacobi.FieldJacobiElliptic;
 import org.hipparchus.special.elliptic.jacobi.JacobiElliptic;
 import org.hipparchus.special.elliptic.jacobi.JacobiEllipticBuilder;
+import org.matheclipse.core.expression.S;
 
 /**
  * Ported from JavaScript file <a href=
@@ -94,7 +95,7 @@ public class EllipticFunctionsJS {
           p = Math.pow(-1, i) * Math.pow(q, (i * i + i)) * Math.sin((2 * i + 1) * x);
           s += p;
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return new Complex(2 * Math.pow(q, 0.25) * s);
@@ -111,7 +112,7 @@ public class EllipticFunctionsJS {
           p = Math.pow(q, (i * i + i)) * Math.cos((2 * i + 1) * x);
           s += p;
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return new Complex(2 * Math.pow(q, 0.25) * s);
@@ -123,7 +124,7 @@ public class EllipticFunctionsJS {
           p = Math.pow(q, (i * i)) * Math.cos(2 * i * x);
           s += p;
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return new Complex(1 + 2 * s);
@@ -137,7 +138,7 @@ public class EllipticFunctionsJS {
           p = Math.pow(-q, (i * i)) * Math.cos(2 * i * x);
           s += p;
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
 
@@ -216,7 +217,7 @@ public class EllipticFunctionsJS {
           p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).sin()).multiply(Math.pow(-1, i));
           s = s.add(p);
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
 
@@ -226,7 +227,7 @@ public class EllipticFunctionsJS {
           p = q.pow(i * i + i).multiply(x.multiply(2 * i + 1).cos());
           s = s.add(p);
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return q.pow(0.25).multiply(s).multiply(2);
@@ -236,7 +237,7 @@ public class EllipticFunctionsJS {
           p = q.pow(i * i).multiply(x.multiply(2 * i).cos());
           s = s.add(p);
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return s.multiply(2.0).add(1.0);
@@ -246,7 +247,7 @@ public class EllipticFunctionsJS {
           p = q.negate().pow(i * i).multiply(x.multiply(2 * i).cos());
           s = s.add(p);
           if (i++ > iterationLimit && iterationLimit > 0) {
-            IterationLimitExceeded.throwIt(i, F.EllipticTheta);
+            IterationLimitExceeded.throwIt(i, S.EllipticTheta);
           }
         }
         return s.multiply(2.0).add(1.0);

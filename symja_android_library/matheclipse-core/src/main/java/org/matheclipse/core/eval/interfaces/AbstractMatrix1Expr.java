@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval.interfaces;
 
+import com.duy.lambda.Predicate;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
@@ -7,15 +8,25 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.LimitException;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
+import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.parser.client.FEConfig;
 
 public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
+  public final static PossibleZeroQTest POSSIBLE_ZEROQ_TEST = new PossibleZeroQTest();
 
-  public AbstractMatrix1Expr() {
+  public static class PossibleZeroQTest implements Predicate<IExpr> {
+    @Override
+    public boolean test(IExpr x) {
+      return x.isPossibleZero(false);
   }
+  }
+
+  public AbstractMatrix1Expr() {}
 
   /**
    * Check if <code>arg1</code> is a matrix.
@@ -37,7 +48,8 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
       if (dim != null) {
         matrix = Convert.list2Matrix(ast.arg1());
         if (matrix != null) {
-          return matrixEval(matrix);
+          Predicate<IExpr> zeroChecker = optionZeroTest(ast, 2, engine);
+          return matrixEval(matrix, zeroChecker);
         }
       }
 
@@ -58,16 +70,17 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
 
   @Override
   public int[] expectedArgSize(IAST ast) {
-    return IFunctionEvaluator.ARGS_1_1;
+    return IFunctionEvaluator.ARGS_1_2;
   }
 
   /**
    * Evaluate the symbolic matrix for this algorithm.
    *
    * @param matrix the matrix which contains symbolic values
+   * @param zeroChecker test if a calculation is <code>0</code>.
    * @return <code>F.NIL</code> if the evaluation isn't possible
    */
-  public abstract IExpr matrixEval(FieldMatrix<IExpr> matrix);
+  public abstract IExpr matrixEval(FieldMatrix<IExpr> matrix, Predicate<IExpr> zeroChecker);
 
   @Override
   public IExpr numericEval(final IAST ast, final EvalEngine engine) {
@@ -80,7 +93,8 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
         if (engine.isArbitraryMode()) {
           FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(arg1);
           if (fieldMatrix != null) {
-            return matrixEval(fieldMatrix);
+            Predicate<IExpr> zeroChecker = optionZeroTest(ast, 2, engine);
+            return matrixEval(fieldMatrix, zeroChecker);
           }
           return F.NIL;
         }
@@ -90,7 +104,8 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
         } else {
           FieldMatrix<IExpr> fieldMatrix = Convert.list2Matrix(arg1);
           if (fieldMatrix != null) {
-            return matrixEval(fieldMatrix);
+            Predicate<IExpr> zeroChecker = optionZeroTest(ast, 2, engine);
+            return matrixEval(fieldMatrix, zeroChecker);
           }
         }
       } catch (LimitException le) {
@@ -108,6 +123,19 @@ public abstract class AbstractMatrix1Expr extends AbstractFunctionEvaluator {
     return F.NIL;
   }
 
+  public static Predicate<IExpr> optionZeroTest(final IAST ast, int start, EvalEngine engine) {
+    Predicate<IExpr> zeroChecker = POSSIBLE_ZEROQ_TEST;
+    if (ast.size() > 1) {
+      final OptionArgs options = new OptionArgs(ast.topHead(), ast, start, ast.size(), engine);
+      IExpr zeroTest = options.getOption(S.ZeroTest);
+      if (zeroTest.isPresent()) {
+        if (!zeroTest.equals(S.Automatic)) {
+          zeroChecker = Predicates.isTrue(engine, zeroTest);
+        }
+      }
+    }
+    return zeroChecker;
+  }
   /**
    * Evaluate the numeric matrix for this algorithm.
    *

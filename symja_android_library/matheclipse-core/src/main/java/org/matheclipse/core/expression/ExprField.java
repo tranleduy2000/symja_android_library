@@ -8,8 +8,7 @@ import org.matheclipse.core.interfaces.IExpr;
  * 
  * @see ExprFieldElement
  */
-public class ExprField implements Field<IExpr> {
-	public final static ExprField CONST = new ExprField();
+/* package private*/ final class ExprField implements Field<IExpr> {
 
 	// public final static IExpr ONE = F.C1;
 	// public final static IExpr ZERO  =F.C0;
@@ -27,7 +26,7 @@ public class ExprField implements Field<IExpr> {
 
 	/** {@inheritDoc} */
 	@Override
-	public Class<? extends IExpr> getRuntimeClass() {
+  public Class<IExpr> getRuntimeClass() {
 		return IExpr.class;
 	}
 
@@ -48,7 +47,7 @@ public class ExprField implements Field<IExpr> {
 //			return null;
 //		}
 //
-//		final int rowSize = listVector.size() - 1;
+  //		final int rowSize = listVector.argSize();
 //
 //		final ExprFieldElement[] elements = new ExprFieldElement[rowSize];
 //		for (int i = 0; i < rowSize; i++) {
@@ -59,7 +58,7 @@ public class ExprField implements Field<IExpr> {
 //
 //	/**
 //	 * Returns a FieldMatrix if possible.
-//	 * 
+  //	 *
 //	 * @param listMatrix
 //	 * @return <code>null</code> if the <code>listMatrix</code> is no list
 //	 * @throws ClassCastException
@@ -80,8 +79,8 @@ public class ExprField implements Field<IExpr> {
 //			ExprFieldElement[][] array = new ExprFieldElement[0][0];
 //			return new BlockFieldMatrix<ExprFieldElement>(array);
 //		}
-//		final int rowSize = listMatrix.size() - 1;
-//		final int colSize = currInRow.size() - 1;
+  //		final int rowSize = listMatrix.argSize();
+  //		final int colSize = currInRow.argSize();
 //
 //		final ExprFieldElement[][] elements = new ExprFieldElement[rowSize][colSize];
 //		for (int i = 1; i < rowSize + 1; i++) {
@@ -98,7 +97,7 @@ public class ExprField implements Field<IExpr> {
 //
 //	/**
 //	 * Converts a FieldMatrix to the list expression representation.
-//	 * 
+  //	 *
 //	 * @param matrix
 //	 * @return
 //	 */
@@ -129,7 +128,7 @@ public class ExprField implements Field<IExpr> {
 //
 //	/**
 //	 * Convert a FieldVector to an IAST list.
-//	 * 
+  //	 *
 //	 * @param vector
 //	 * @return
 //	 */

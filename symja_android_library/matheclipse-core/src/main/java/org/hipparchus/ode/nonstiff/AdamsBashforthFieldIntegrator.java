@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.linear.Array2DRowFieldMatrix;
@@ -153,7 +153,7 @@ import org.hipparchus.util.MathArrays;
  *
  * @param <T> the type of the field elements
  */
-public class AdamsBashforthFieldIntegrator<T extends RealFieldElement<T>> extends AdamsFieldIntegrator<T> {
+public class AdamsBashforthFieldIntegrator<T extends CalculusFieldElement<T>> extends AdamsFieldIntegrator<T> {
 
     /**
      * Integrator method name.

@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.FieldEquationsMapper;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
 import org.hipparchus.util.MathArrays;
@@ -55,7 +55,7 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  */
 
-public class DormandPrince54FieldIntegrator<T extends RealFieldElement<T>>
+public class DormandPrince54FieldIntegrator<T extends CalculusFieldElement<T>>
         extends EmbeddedRungeKuttaFieldIntegrator<T> {
 
     /**

@@ -20,7 +20,7 @@ import static org.apfloat.spi.RadixConstants.LONG_PRECISION;
 /**
  * Various utility methods related to apfloats.
  *
- * @version 1.6.2
+ * @version 1.10.0
  * @author Mikko Tommila
  */
 
@@ -39,14 +39,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, boolean isInteger)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix, isInteger);
     }
 
     public static ApfloatImpl createApfloat(String value, long precision, int radix, boolean isInteger)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -70,14 +70,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(long value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(long value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? Apfloat.INFINITE : precision);
         checkPrecision(precision);
@@ -100,14 +100,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(float value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(float value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getFloatPrecision(radix) : precision);
         checkPrecision(precision);
@@ -123,14 +123,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(double value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(double value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         precision = (precision == Apfloat.DEFAULT ? getDoublePrecision(radix) : precision);
         checkPrecision(precision);
@@ -144,8 +144,22 @@ class ApfloatHelper
         return factory.createApfloat(value, precision, radix);
     }
 
+    public static ApfloatImpl createApfloat(PushbackReader in, boolean isInteger)
+        throws IOException, NumberFormatException, ApfloatRuntimeException
+    {
+        int radix = getDefaultRadix();
+        return implCreateApfloat(in, Apfloat.DEFAULT, radix, isInteger);
+    }
+
+    public static ApfloatImpl createApfloat(PushbackReader in, long precision, boolean isInteger)
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        int radix = getDefaultRadix();
+        return createApfloat(in, precision, radix, isInteger);
+    }
+
     public static ApfloatImpl createApfloat(PushbackReader in, long precision, int radix, boolean isInteger)
-        throws IOException, IllegalArgumentException, ApfloatRuntimeException
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -169,14 +183,14 @@ class ApfloatHelper
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int radix = getDefaultRadix();
         return createApfloat(value, precision, radix);
     }
 
     public static ApfloatImpl createApfloat(BigInteger value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         if (precision != Apfloat.DEFAULT)
         {
@@ -472,6 +486,24 @@ class ApfloatHelper
         return extendPrecision(precision, Apfloat.EXTRA_PRECISION);
     }
 
+    // Returns given precision reduced by specified amount
+    public static long reducePrecision(long precision, long extraPrecision)
+        throws ApfloatRuntimeException
+    {
+        precision = precision - extraPrecision;
+        if (precision <= 0)
+        {
+            throw new LossOfPrecisionException("Complete loss of precision");
+        }
+        return precision;
+    }
+
+    // Returns given precision reduced by Apfloat.EXTRA_PRECISION
+    public static long reducePrecision(long precision)
+        throws ApfloatRuntimeException
+    {
+        return reducePrecision(precision, Apfloat.EXTRA_PRECISION);
+    }
     // Returns x with precision extended by Apfloat.EXTRA_PRECISION
     public static Apfloat extendPrecision(Apfloat x)
         throws ApfloatRuntimeException
@@ -486,6 +518,19 @@ class ApfloatHelper
         return x.precision(extendPrecision(x.precision(), extraPrecision));
     }
 
+    // Returns x with precision reduced by Apfloat.EXTRA_PRECISION
+    public static Apfloat reducePrecision(Apfloat x)
+        throws ApfloatRuntimeException
+    {
+        return x.precision(reducePrecision(x.precision()));
+    }
+
+    // Returns x with precision reduced by specified amount
+    public static Apfloat reducePrecision(Apfloat x, long extraPrecision)
+        throws ApfloatRuntimeException
+    {
+        return x.precision(reducePrecision(x.precision(), extraPrecision));
+    }
     // Returns z with precision as specified
     public static Apcomplex setPrecision(Apcomplex z, long precision)
         throws ApfloatRuntimeException
@@ -529,32 +574,48 @@ class ApfloatHelper
     public static Apcomplex limitPrecision(Apcomplex z, long precision)
         throws ApfloatRuntimeException
     {
-        return new Apcomplex(z.real().precision(Math.min(z.real().precision(), precision)),
-                             z.imag().precision(Math.min(z.imag().precision(), precision)));
+        return new Apcomplex(limitPrecision(z.real(), precision),
+                             limitPrecision(z.imag(), precision));
     }
 
     // Returns z with precision at least as specified
     public static Apcomplex ensurePrecision(Apcomplex z, long precision)
         throws ApfloatRuntimeException
     {
-        return new Apcomplex(z.real().precision(Math.max(z.real().precision(), precision)),
-                             z.imag().precision(Math.max(z.imag().precision(), precision)));
+        return new Apcomplex(ensurePrecision(z.real(), precision),
+                             ensurePrecision(z.imag(), precision));
     }
 
     // Returns z with precision extended by Apfloat.EXTRA_PRECISION
     public static Apcomplex extendPrecision(Apcomplex z)
         throws ApfloatRuntimeException
     {
-        return new Apcomplex(z.real().precision(extendPrecision(z.real().precision())),
-                             z.imag().precision(extendPrecision(z.imag().precision())));
+        return new Apcomplex(extendPrecision(z.real()),
+                             extendPrecision(z.imag()));
     }
 
     // Returns z with precision extended by specified precision
     public static Apcomplex extendPrecision(Apcomplex z, long extraPrecision)
         throws ApfloatRuntimeException
     {
-        return new Apcomplex(z.real().precision(extendPrecision(z.real().precision(), extraPrecision)),
-                             z.imag().precision(extendPrecision(z.imag().precision(), extraPrecision)));
+        return new Apcomplex(extendPrecision(z.real(), extraPrecision),
+                             extendPrecision(z.imag(), extraPrecision));
+    }
+
+    // Returns z with precision reduced by Apfloat.EXTRA_PRECISION
+    public static Apcomplex reducePrecision(Apcomplex z)
+        throws ApfloatRuntimeException
+    {
+        return new Apcomplex(reducePrecision(z.real()),
+                             reducePrecision(z.imag()));
+    }
+
+    // Returns z with precision reduced by specified amount
+    public static Apcomplex reducePrecision(Apcomplex z, long extraPrecision)
+        throws ApfloatRuntimeException
+    {
+        return new Apcomplex(reducePrecision(z.real(), extraPrecision),
+                             reducePrecision(z.imag(), extraPrecision));
     }
 
     public static long size(Aprational x)

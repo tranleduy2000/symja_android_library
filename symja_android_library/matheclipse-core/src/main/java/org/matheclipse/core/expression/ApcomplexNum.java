@@ -1,5 +1,8 @@
 package org.matheclipse.core.expression;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
@@ -21,10 +24,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
+import org.matheclipse.parser.client.FEConfig;
 
 /**
  * <code>IComplexNum</code> implementation which wraps a <code>
@@ -46,7 +46,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   }
 
   public static ApcomplexNum valueOf(final double real, long precision) {
-    return valueOf(new Apcomplex(new Apfloat(new BigDecimal(real), precision), Apcomplex.ZERO));
+    return valueOf(new Apcomplex(new Apfloat(new BigDecimal(real), precision)));
   }
 
   public static ApcomplexNum valueOf(final double real, final double imaginary, long precision) {
@@ -60,8 +60,8 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   }
 
   /**
-   * Create a <code>ApcomplexNum</code> complex number from the real and imaginary
-   * <code>BigInteger</code> parts.
+   * Create a <code>ApcomplexNum</code> complex number from the real and imaginary <code>BigInteger
+   * </code> parts.
    *
    * @param realNumerator   the real numbers numerator part
    * @param realDenominator the real numbers denominator part
@@ -115,7 +115,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
     fApcomplex = new Apcomplex(real, imag);
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public double getImaginaryPart() {
     double temp = fApcomplex.imag().doubleValue();
@@ -132,6 +132,11 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   @Override
   public ApcomplexNum apcomplexNumValue(long precision) {
     return this;
+  }
+
+  @Override
+  public Apcomplex apcomplexValue(long precision) {
+    return fApcomplex;
   }
 
   @Override
@@ -157,7 +162,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
     return add(ONE);
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public double getRealPart() {
     double temp = fApcomplex.real().doubleValue();
@@ -169,7 +174,8 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
   @Override
   public boolean isZero() {
-    return fApcomplex.equals(Apcomplex.ZERO);
+    return fApcomplex.real().signum() == 0 //
+        && fApcomplex.imag().signum() == 0;
   }
 
   @Override
@@ -205,7 +211,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
     return fApcomplex.add(that);
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public IComplexNum conjugate() {
     return valueOf(fApcomplex.conj());
@@ -324,7 +330,7 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   // return fComplex.export();
   // }
 
-  /** @return */
+  /** @return  */
   // public float floatValue() {
   // return fComplex.floatValue();
   // }
@@ -356,13 +362,13 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
     return valueOf(fApcomplex.multiply(that.fApcomplex));
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public ApcomplexNum negate() {
     return valueOf(fApcomplex.negate());
   }
 
-  /** @return */
+  /** @return  */
   @Override
   public INumber opposite() {
     return valueOf(fApcomplex.negate());
@@ -445,6 +451,9 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   @Override
   public String toString() {
     String str = fApcomplex.toString();
+    if (FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      return str.replace("e", "E");
+    }
     int index = str.indexOf('e');
     if (index > 0) {
       String exponentStr1 = str.substring(++index);
@@ -557,13 +566,14 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
 
   /** {@inheritDoc} */
   @Override
-  public INumber round() {
+  public INumber roundExpr() {
     Apfloat re = ApfloatMath.round(fApcomplex.real(), 1, RoundingMode.HALF_EVEN);
     Apfloat im = ApfloatMath.round(fApcomplex.imag(), 1, RoundingMode.HALF_EVEN);
     return F.complex(F.ZZ(ApfloatMath.floor(re).toBigInteger()),
         F.ZZ(ApfloatMath.floor(im).toBigInteger()));
   }
 
+  @Override
   public IExpr sqrt() {
     return valueOf(ApcomplexMath.sqrt(fApcomplex));
   }
@@ -584,6 +594,40 @@ public class ApcomplexNum extends IComplexNumImpl implements IComplexNum {
   public INumber floorFraction() throws ArithmeticException {
     return F.complex(F.ZZ(ApfloatMath.floor(fApcomplex.real()).toBigInteger()),
         F.ZZ(ApfloatMath.floor(fApcomplex.imag()).toBigInteger()));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String fullFormString() {
+    StringBuilder buf = new StringBuilder();
+    long precision = fApcomplex.precision();
+    String str = fApcomplex.real().toString();
+    if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      int indx = str.indexOf("e");
+      if (indx > 0) {
+        str = str.substring(0, indx) + "`" + precision + "*^" + str.substring(indx + 1);
+      } else {
+        str = str + "`" + precision;
+      }
+    }
+    buf.append(str);
+    buf.append(',');
+    str = fApcomplex.imag().toString();
+    if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      int indx = str.indexOf("e");
+      if (indx > 0) {
+        str = str.substring(0, indx) + "``" + precision + "*^" + str.substring(indx + 1);
+      } else {
+        str = str + "`" + precision;
+      }
+    }
+    buf.append(str);
+    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+      buf.append(')');
+    } else {
+      buf.append(']');
+    }
+    return buf.toString();
   }
 
   /** {@inheritDoc} */

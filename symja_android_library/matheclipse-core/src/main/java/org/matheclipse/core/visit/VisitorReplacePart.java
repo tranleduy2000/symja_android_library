@@ -1,79 +1,192 @@
 package org.matheclipse.core.visit;
 
-import org.matheclipse.core.eval.exception.Validate;
+import java.util.ArrayList;
+
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ReturnException;
+import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExpr_COMPARE_TERNARY;
+import org.matheclipse.core.patternmatching.IPatternMatcher;
 
-import java.util.ArrayList;
-
-/**
- *  
- */
+/** Visitor for the <code>ReplacePart()</code> function */
 public class VisitorReplacePart extends AbstractVisitor {
-	
-	final IExpr fReplaceExpr;
-	
-	final ArrayList<int[]> fList;
 
-	public VisitorReplacePart(IAST rule) {
+	int offset;
+	final IExpr fReplaceExpr;
+	ArrayList<int[]> fPositionList;
+
+	ArrayList<IPatternMatcher> fPatternList;
+	int fPatternListSize;
+	EvalEngine engine;
+
+	/**
+	 * Create a new visitor which replaces parts of an expression.
+	 *
+	 * @param rule a rule or list-of-rules
+	 * @param heads if <code>TRUE</code> also replace the heads of expressions
+	 */
+	public VisitorReplacePart(IAST rule, IExpr_COMPARE_TERNARY heads) {
 		super();
+
 		IExpr fromPositions = rule.arg1();
 		this.fReplaceExpr = rule.arg2();
-		if (fromPositions.isList()) {
-			IAST list = (IAST) fromPositions;
-			if (list.isListOfLists()) {
-				fList = new ArrayList<int[]>(list.size());
-				for (int j = 1; j < list.size(); j++) {
-					IAST subList = list.getAST(j);
-					int[] fPositions = new int[subList.argSize()];
-					for (int k = 1; k < subList.size(); k++) {
-						fPositions[k - 1] = Validate.checkIntType(subList, k, Integer.MIN_VALUE);
+		try {
+			// try extracting an integer list of expressions
+			offset = heads == IExpr_COMPARE_TERNARY.FALSE ? 1 : 0;
+			if (fromPositions.isList()) {
+				IAST list = (IAST) fromPositions;
+				if (list.isListOfLists()) {
+					fPositionList = new ArrayList<int[]>(list.size());
+					for (int j = 1; j < list.size(); j++) {
+						IAST subList = list.getAST(j);
+						int[] fPositions = new int[subList.argSize()];
+						for (int k = 1; k < subList.size(); k++) {
+							fPositions[k - 1] = subList.get(k).toIntDefault();
+							if (fPositions[k - 1] == Integer.MIN_VALUE) {
+								throw ReturnException.RETURN_FALSE;
+							}
+						}
+						fPositionList.add(fPositions);
 					}
-					fList.add(fPositions);
+				} else {
+					int[] fPositions = new int[list.argSize()];
+					fPositionList = new ArrayList<int[]>(1);
+					for (int j = 1; j < list.size(); j++) {
+						fPositions[j - 1] = list.get(j).toIntDefault();
+						if (fPositions[j - 1] == Integer.MIN_VALUE) {
+							throw ReturnException.RETURN_FALSE;
+						}
+					}
+					fPositionList.add(fPositions);
 				}
-			} else {
-				int[] fPositions = new int[list.argSize()];
-				fList = new ArrayList<int[]>(1);
-				for (int j = 1; j < list.size(); j++) {
-					fPositions[j - 1] = Validate.checkIntType(list, j, Integer.MIN_VALUE);
-				}
-				fList.add(fPositions);
-			}
 
-		} else {
-			fList = new ArrayList<int[]>(1);
-			int[] fPositions = new int[1];
-			fPositions[0] = Validate.checkIntType(rule, 1, Integer.MIN_VALUE);
-			fList.add(fPositions);
+			} else {
+				fPositionList = new ArrayList<int[]>(1);
+				int[] fPositions = new int[1];
+				fPositions[0] = rule.arg1().toIntDefault();
+				if (fPositions[0] == Integer.MIN_VALUE) {
+					throw ReturnException.RETURN_FALSE;
+				}
+				fPositionList.add(fPositions);
+			}
+		} catch (ReturnException rex) {
+			// use pattern-matching
+			offset = heads == IExpr_COMPARE_TERNARY.TRUE ? 0 : 1;
+			fPositionList = null;
+			engine = EvalEngine.get();
+			if (fromPositions.isList()) {
+				IAST list = (IAST) fromPositions;
+				fPatternList = new ArrayList<IPatternMatcher>(1);
+				fPatternList.add(engine.evalPatternMatcher(list, fReplaceExpr));
+				fPatternListSize = list.argSize();
+			} else {
+				fPatternList = new ArrayList<IPatternMatcher>(1);
+				fPatternList.add(engine.evalPatternMatcher(fromPositions, fReplaceExpr));
+				fPatternListSize = -1;
+			}
 		}
 	}
 
-	private IExpr visitIndex(IAST ast, final int index) {
+	private IExpr visitPositionIndex(IAST ast, final int index) {
 		int[] fPositions;
-		IASTAppendable result = ast.copyAppendable();
-		for (int i = 0; i < fList.size(); i++) {
-			fPositions = fList.get(i);
+		IASTMutable result = F.NIL;
+
+		for (int i = 0; i < fPositionList.size(); i++) {
+			fPositions = fPositionList.get(i);
 			if (index >= fPositions.length) {
 				continue;
 			}
-			
+
 			int position = fPositions[index];
 			if (position < 0) {
 				position = ast.size() + position;
 			}
-			if (position >= ast.size() || position < 0) {
+			if (position >= ast.size() || position < offset) {
 				continue;
 			}
 
 			if (index == fPositions.length - 1) {
-				result.set(position, fReplaceExpr);
-			} else {
-				IExpr arg = result.get(position);
-				if (arg.isAST()) {
-					result.set(position, visitIndex((IAST) arg, index + 1));
+				if (!result.isPresent()) {
+					result = ast.copyAppendable();
 				}
+				if (position == 0 && result.isAssociation()) {
+					result = result.copyAST();
+				}
+				result.setValue(position, fReplaceExpr);
+			} else {
+				IExpr arg = ast.get(position);
+				if (arg.isASTOrAssociation()) {
+					IExpr temp = visitPositionIndex((IAST) arg, index + 1);
+					if (temp.isPresent()) {
+						if (!result.isPresent()) {
+							result = ast.copyAppendable();
+						}
+						if (position == 0 && result.isAssociation()) {
+							result = result.copyAST();
+						}
+						result.setValue(position, temp);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private IExpr visitPatternIndex(IAST ast) {
+
+		IASTAppendable result = F.NIL;
+
+		for (int i = offset; i < ast.size(); i++) {
+			for (int j = 0; j < fPatternList.size(); j++) {
+				IPatternMatcher matcher = fPatternList.get(j);
+				IExpr temp = matcher.eval(F.ZZ(i), engine);
+				if (temp.isPresent()) {
+					if (!result.isPresent()) {
+						result = ast.copyAppendable();
+					}
+					result.setValue(i, temp);
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private IExpr visitPatternIndexList(IAST ast, IASTAppendable matchedPos, final int index) {
+		IASTAppendable result = F.NIL;
+
+		for (int i = offset; i < ast.size(); i++) {
+			try {
+				matchedPos.append(i);
+				for (int j = 0; j < fPatternList.size(); j++) {
+					IPatternMatcher matcher = fPatternList.get(j);
+					IExpr temp = matcher.eval(matchedPos, engine);
+					if (temp.isPresent()) {
+						if (!result.isPresent()) {
+							result = ast.copyAppendable();
+						}
+						result.setValue(i, temp);
+						break;
+					} else {
+						if (ast.get(i).isASTOrAssociation()) {
+							temp = visitPatternIndexList((IAST) ast.get(i), matchedPos, index + 1);
+							if (temp.isPresent()) {
+								if (!result.isPresent()) {
+									result = ast.copyAppendable();
+								}
+								result.setValue(i, temp);
+							}
+						}
+					}
+				}
+			} finally {
+				matchedPos.remove(matchedPos.size() - 1);
 			}
 		}
 
@@ -82,7 +195,14 @@ public class VisitorReplacePart extends AbstractVisitor {
 
 	@Override
 	public IExpr visit(IASTMutable ast) {
-		return visitIndex(ast, 0);
+		if (fPositionList != null) {
+			return visitPositionIndex(ast, 0);
+		}
+		if (fPatternListSize < 0) {
+			return visitPatternIndex(ast);
+		} else {
+			IASTAppendable matchedPos = F.ListAlloc();
+			return visitPatternIndexList(ast, matchedPos, 0);
+		}
 	}
-
 }

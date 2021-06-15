@@ -1,5 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2002-2021 Mikko Tommila
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.apfloat;
 
+import java.io.PushbackReader;
 import org.apfloat.spi.ApfloatImpl;
 
 import java.io.IOException;
@@ -19,7 +43,7 @@ import static org.apfloat.spi.RadixConstants.RADIX_FACTORS;
  * @see Apint
  * @see AprationalMath
  *
- * @version 1.8.0
+ * @version 1.10.0
  * @author Mikko Tommila
  */
 
@@ -82,7 +106,7 @@ public class Aprational
      */
 
     public Aprational(String value)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(value, ApfloatContext.getContext().getDefaultRadix());
     }
@@ -103,7 +127,7 @@ public class Aprational
      */
 
     public Aprational(String value, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         int index = value.indexOf('/');
         if (index < 0)
@@ -122,6 +146,63 @@ public class Aprational
     }
 
     /**
+     * Reads an aprational from a reader. The default radix is used. The constructor
+     * stops reading at the first character it doesn't understand. The reader must
+     * thus be a <code>PushbackReader</code> so that the invalid character can be
+     * returned back to the stream.<p>
+     *
+     * The input must be of one of the formats<p>
+     *
+     * <code>integer [whitespace]</code><br>
+     * <code>numerator [whitespace] "/" [whitespace] denominator</code><br>
+     *
+     * @param in The input stream.
+     *
+     * @exception java.io.IOException In case of I/O error reading the stream.
+     * @exception java.lang.NumberFormatException In case the number is invalid.
+     * @exception java.lang.IllegalArgumentException In case the denominator is zero.
+     */
+
+    public Aprational(PushbackReader in)
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        this(in, ApfloatContext.getContext().getDefaultRadix());
+    }
+
+    /**
+     * Reads an aprational from a reader. The specified radix is used.
+     *
+     * @param in The input stream.
+     * @param radix The radix to be used.
+     *
+     * @exception java.io.IOException In case of I/O error reading the stream.
+     * @exception java.lang.NumberFormatException In case the number is invalid.
+     * @exception java.lang.IllegalArgumentException In case the denominator is zero.
+     *
+     * @see #Aprational(PushbackReader)
+     */
+
+    public Aprational(PushbackReader in, int radix)
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        this.numerator = new Apint(in, radix);
+
+        ApfloatHelper.extractWhitespace(in);
+
+        if (!ApfloatHelper.readMatch(in, '/'))
+        {
+            this.denominator = ONES[radix];
+            return;
+        }
+
+        ApfloatHelper.extractWhitespace(in);
+        this.denominator = new Apint(in, radix);
+
+        checkDenominator();
+
+        reduce();
+    }
+    /**
      * Constructs an aprational from a <code>BigInteger</code>.
      * The default radix is used.
      *
@@ -135,6 +216,92 @@ public class Aprational
         this.denominator = ONE;
     }
 
+    /**
+     * Constructs an aprational from a <code>BigInteger</code> using the specified radix.
+     *
+     * @param value The numerator of the number.
+     * @param radix The radix of the number.
+     */
+
+    public Aprational(BigInteger value, int radix)
+        throws ApfloatRuntimeException
+    {
+        this.numerator = new Apint(value, radix);
+        this.denominator = ONES[radix];
+    }
+
+    /**
+     * Constructs an aprational from a <code>double</code>.
+     * The exact value represented by the <code>double</code> is used.
+     * The default radix is used.<p>
+     *
+     * Note that <code>double</code>s are presented as an integer multiplied by
+     * a power of two (positive or negative). Many numbers can't be represented
+     * exactly this way, e.g. <code>new Aprational(0.1)</code> won't result
+     * in <code>1/10</code> but in <code>3602879701896397/36028797018963968</code>.
+     *
+     * @param value The numerator of the number.
+     */
+
+    public Aprational(double value)
+        throws ApfloatRuntimeException
+    {
+        this(value, ApfloatContext.getContext().getDefaultRadix());
+    }
+
+    /**
+     * Constructs an aprational from a <code>double</code> using the specified radix.
+     * The exact value represented by the <code>double</code> is used.<p>
+     *
+     * Note that <code>double</code>s are presented as an integer multiplied by
+     * a power of two (positive or negative). Many numbers can't be represented
+     * exactly this way, e.g. <code>new Aprational(0.1)</code> won't result
+     * in <code>1/10</code> but in <code>3602879701896397/36028797018963968</code>.
+     *
+     * @param value The numerator of the number.
+     * @param radix The radix of the number.
+     */
+
+    public Aprational(double value, int radix)
+        throws ApfloatRuntimeException
+    {
+        if (Double.isInfinite(value) || Double.isNaN(value))
+        {
+            throw new NumberFormatException(value + " is not a valid number");
+        }
+        long bits = Double.doubleToLongBits(value),
+             sign = ((bits >> 63) == 0 ? 1 : -1),
+             exponent = (bits >> 52) & 0x7FFL,
+             significand = (exponent == 0 ? (bits & ((1L << 52) - 1)) << 1 : (bits & ((1L << 52) - 1)) | (1L << 52));
+        exponent -= 1075;
+        // At this point, value == sign * significand * 2^exponent
+
+        if (significand == 0) // Zero
+        {
+            this.numerator = new Apint(0, radix);
+            this.denominator = ONES[radix];
+            return;
+        }
+        // Normalize so that the significand does not have a factor of two
+        while ((significand & 1) == 0) // i.e. the significand is even
+        {
+            significand >>= 1;
+            exponent++;
+        }
+        this.numerator = new Apint(sign * significand, radix);
+        Apint powerOfTwo = ApintMath.pow(new Apint(2, radix), Math.abs(exponent));
+        if (exponent >= 0)
+        {
+            this.numerator = this.numerator.multiply(powerOfTwo);
+            this.denominator = ONES[radix];
+            // No need to reduce as the value is an integer
+        }
+        else
+        {
+            this.denominator = powerOfTwo;
+            // No need to reduce as the denominator is a power of two and the numerator does not have a factor of two
+        }
+    }
     /**
      * Numerator of this aprational.
      *
@@ -163,6 +330,7 @@ public class Aprational
      * @return Radix of this aprational.
      */
 
+    @Override
     public int radix()
     {
         return (numerator() == ONE ? denominator().radix() : numerator().radix());
@@ -174,6 +342,7 @@ public class Aprational
      * @return <code>INFINITE</code>
      */
 
+    @Override
     public long precision()
         throws ApfloatRuntimeException
     {
@@ -190,6 +359,7 @@ public class Aprational
      * @see Apfloat#scale()
      */
 
+    @Override
     public long scale()
         throws ApfloatRuntimeException
     {
@@ -232,12 +402,17 @@ public class Aprational
      * @since 1.6
      */
 
+    @Override
     public long size()
         throws ApfloatRuntimeException
     {
         if (signum() == 0)
         {
             return 0;
+        }
+        if (denominator().equals(ONE))
+        {
+            return numerator().size();
         }
 
         if (this.size == 0)
@@ -287,6 +462,7 @@ public class Aprational
      * @return -1, 0 or 1 as the value of this aprational is negative, zero or positive.
      */
 
+    @Override
     public int signum()
     {
         return numerator().signum();
@@ -300,6 +476,7 @@ public class Aprational
      * @see Apfloat#isShort()
      */
 
+    @Override
     public boolean isShort()
         throws ApfloatRuntimeException
     {
@@ -332,6 +509,7 @@ public class Aprational
      * @since 1.1
      */
 
+    @Override
     public Aprational negate()
         throws ApfloatRuntimeException
     {
@@ -456,6 +634,7 @@ public class Aprational
      * @return This aprational rounded towards negative infinity.
      */
 
+    @Override
     public Apint floor()
         throws ApfloatRuntimeException
     {
@@ -476,6 +655,7 @@ public class Aprational
      * @return This aprational rounded towards positive infinity.
      */
 
+    @Override
     public Apint ceil()
         throws ApfloatRuntimeException
     {
@@ -495,6 +675,7 @@ public class Aprational
      * @return This aprational rounded towards zero.
      */
 
+    @Override
     public Apint truncate()
         throws ApfloatRuntimeException
     {
@@ -502,7 +683,7 @@ public class Aprational
     }
 
     /**
-     * Returns the fractional part. The fractional part is always <code>0 <= abs(x.frac()) < 1</code>.
+     * Returns the fractional part. The fractional part is always <code>0 &lt;= abs(x.frac()) &lt; 1</code>.
      * The fractional part has the same sign as the number. For the fractional and integer parts, this always holds:<p>
      *
      * <code>x = x.truncate() + x.frac()</code>
@@ -512,6 +693,7 @@ public class Aprational
      * @since 1.7.0
      */
 
+    @Override
     public Aprational frac()
         throws ApfloatRuntimeException
     {
@@ -528,6 +710,7 @@ public class Aprational
      * @since 1.2
      */
 
+    @Override
     public Aprational toRadix(int radix)
         throws NumberFormatException, ApfloatRuntimeException
     {
@@ -558,6 +741,7 @@ public class Aprational
      * @return -1, 0 or 1 as this aprational is numerically less than, equal to, or greater than <code>x</code>.
      */
 
+    @Override
     public int compareTo(Apfloat x)
     {
         if (x instanceof Aprational)
@@ -574,6 +758,7 @@ public class Aprational
         }
     }
 
+    @Override
     public boolean preferCompare(Apfloat x)
     {
         return !(x instanceof Aprational);
@@ -591,6 +776,7 @@ public class Aprational
      * @return <code>true</code> if the objects are the same; <code>false</code> otherwise.
      */
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -619,6 +805,38 @@ public class Aprational
         }
     }
 
+    /**
+     * Tests two aprational numbers for equality.
+     * Returns <code>false</code> if the numbers are definitely known to be not equal.
+     * If <code>true</code> is returned, equality is unknown and should be verified by
+     * calling {@link #equals(Object)}.
+     * This method is usually significantly faster than calling <code>equals(Object)</code>.
+     *
+     * @param x The number to test against.
+     *
+     * @return <code>false</code> if the numbers are definitely not equal, <code>true</code> if unknown.
+     *
+     * @since 1.10.0
+     */
+
+    public boolean test(Aprational x)
+    {
+        return numerator().test(x.numerator()) && denominator().test(x.denominator());
+    }
+
+    @Override
+    public boolean test(Apfloat x)
+        throws ApfloatRuntimeException
+    {
+        if (x instanceof Aprational)
+        {
+            return test((Aprational) x);
+        }
+        else
+        {
+            return !isInteger() || numerator().test(x);
+        }
+    }
     /**
      * Returns a hash code for this aprational.
      *
@@ -702,6 +920,7 @@ public class Aprational
      * @since 1.3
      */
 
+    @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision)
     {
         if (denominator().equals(ONE))
@@ -745,6 +964,7 @@ public class Aprational
      * @return An <code>ApfloatImpl</code> representing this object to the requested precision.
      */
 
+    @Override
     protected ApfloatImpl getImpl(long precision)
         throws ApfloatRuntimeException
     {
@@ -752,6 +972,7 @@ public class Aprational
     }
 
     // Round away from zero i.e. opposite direction of rounding than in truncate()
+    @Override
     Apint roundAway()
         throws ApfloatRuntimeException
     {
@@ -769,16 +990,19 @@ public class Aprational
         }
     }
 
+    @Override
     Aprational scale(long scale)
     {
         return AprationalMath.scale(this, scale);
     }
 
+    @Override
     Aprational abs()
     {
         return AprationalMath.abs(this);
     }
 
+    @Override
     int compareToHalf()
     {
         return RoundingHelper.compareToHalf(this);
@@ -870,7 +1094,7 @@ public class Aprational
 
     private void setApprox(Apfloat approx)
     {
-        this.approx = new SoftReference<Apfloat>(approx);
+        this.approx = new SoftReference<>(approx);
     }
 
     private Apfloat getInverseDen()
@@ -880,7 +1104,7 @@ public class Aprational
 
     private void setInverseDen(Apfloat inverseDen)
     {
-        this.inverseDen = new SoftReference<Apfloat>(inverseDen);
+        this.inverseDen = new SoftReference<>(inverseDen);
     }
 
     private static final long serialVersionUID = -224128535732558313L;

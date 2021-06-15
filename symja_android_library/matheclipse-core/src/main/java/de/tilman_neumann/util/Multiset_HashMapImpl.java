@@ -13,7 +13,7 @@
  */
 package de.tilman_neumann.util;
 
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,16 +38,14 @@ import java.util.Map;
  * 
  * @author Tilman Neumann
  * 
- * @param T element class, must have consistent equals() and hashCode() methods
+ * @param <T> element class, must have consistent equals() and hashCode() methods
  */
 public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Multiset<T> {
 	
 	private static final long serialVersionUID = -6604624351619809213L;
 	
 	@SuppressWarnings("unused")
-//	private static final Logger LOG = Logger.getLogger(Multiset_HashMapImpl.class);
-
-	private int totalCount = 0;
+	private static final Logger LOG = Logger.getLogger(Multiset_HashMapImpl.class);
 	
 	/**
 	 * Constructor for an empty multiset.
@@ -90,7 +88,6 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		int oldMult = (myMult!=null) ? myMult.intValue() : 0;
 		int newMult = oldMult+1;
 		super.put(entry, Integer.valueOf(newMult));
-		totalCount++;
 		return oldMult;
 	}
 
@@ -101,7 +98,6 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		if (mult > 0) {
 			int newMult = oldMult + mult;
 			super.put(entry, Integer.valueOf(newMult));
-			totalCount += mult;
 		}
 		return oldMult;
 	}
@@ -110,7 +106,7 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		if (other!=null) {
 			// we need to recreate the entries of the internal set to avoid
 			// that changes in the copy affect the old original
-			for (Map.Entry<T, Integer> entry : other.entrySet()) {
+			for (Entry<T, Integer> entry : other.entrySet()) {
 				this.add(entry.getKey(), entry.getValue().intValue());
 			}
 		}
@@ -124,6 +120,14 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		}
 	}
 	
+	public void addAll(T[] values) {
+		if (values != null) {
+			for (T value : values) {
+				this.add(value);
+			}
+		}
+	}
+
 	public Integer remove(Object key) {
 		Integer oldMult = super.get(key);
 		if (oldMult!=null) {
@@ -131,12 +135,11 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 			if (imult>1) {
 				// the cast works if we only put T-type keys into the map
 				// which should be guaranteed in the add-methods
-				super.put((T)key, Integer.valueOf(imult-1));
-				this.totalCount--;
+				@SuppressWarnings("unchecked") T castedKey = (T) key;
+				super.put(castedKey, Integer.valueOf(imult-1));
 			} else if (imult==1) {
 				// delete entry from internal map
 				super.remove(key);
-				this.totalCount--;
 			}
 		}
 		return oldMult;
@@ -147,7 +150,6 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		int oldMult = (myMult!=null) ? myMult.intValue() : 0;
 		if (oldMult>0) {
 			int newMult = Math.max(0, oldMult - mult);
-			totalCount += (newMult-oldMult);
 			if (newMult>0) {
 				super.put(key, Integer.valueOf(newMult));
 				return oldMult;
@@ -165,7 +167,6 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 			if (imult>0) {
 				// delete entry from internal map
 				super.remove(key);
-				this.totalCount -= imult;
 			}
 			return imult;
 		}
@@ -175,7 +176,7 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 	public Multiset<T> intersect(Multiset<T> other) {
 		Multiset<T> resultset = new Multiset_HashMapImpl<T>();
 		if (other != null) {
-			for (Map.Entry<T, Integer> myEntry: this.entrySet()) {
+			for (Entry<T, Integer> myEntry: this.entrySet()) {
 				int myMult = myEntry.getValue().intValue();
 				if (myMult > 0) {
 					T myKey = myEntry.getKey();
@@ -192,17 +193,17 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		return resultset;
 	}
 	
-	public int keyCount() {
-		return this.size();
-	}
-	
 	public int totalCount() {
-		return this.totalCount;
+		int sum = 0;
+		for (Integer mult : this.values()) {
+			sum += mult;
+		}
+		return sum;
 	}
 	
 	public List<T> toList() {
-		List<T> flatList = new ArrayList<T>(totalCount);
-		for (Map.Entry<T, Integer> entry : this.entrySet()) {
+		List<T> flatList = new ArrayList<T>(totalCount());
+		for (Entry<T, Integer> entry : this.entrySet()) {
 			T value = entry.getKey();
 			int multiplicity = entry.getValue().intValue();
 			for (int i=0; i<multiplicity; i++) {
@@ -220,7 +221,7 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		if (this.size()>0) {
 			// Implementation note: Is faster with String than with StringBuffer!
 			String factorStr = "{";
-			for (Map.Entry<T, Integer> entry : this.entrySet()) {
+			for (Entry<T, Integer> entry : this.entrySet()) {
 				factorStr += entry.getKey();
 				Integer multiplicity = entry.getValue();
 				if (multiplicity.intValue() > 1) {
@@ -243,10 +244,9 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 	 */
 	public boolean equals(Object o) {
 		if (o!=null && o instanceof Multiset) {
-			Multiset<T> other = (Multiset<T>) o;
-			if (this.totalCount != other.totalCount()) return false;
-			if (this.keyCount() != other.keyCount()) return false;
-			for (Map.Entry<T, Integer> myEntry : this.entrySet()) {
+			@SuppressWarnings("unchecked") Multiset<T> other = (Multiset<T>) o;
+			if (this.size() != other.size()) return false;
+			for (Entry<T, Integer> myEntry : this.entrySet()) {
 				// get multiplicities of this and other for the same key
 				Integer myMult = myEntry.getValue();
 				Integer otherMult = other.get(myEntry.getKey());
@@ -258,6 +258,7 @@ public class Multiset_HashMapImpl<T> extends HashMap<T, Integer> implements Mult
 		}
 		return false;
 	}
+	
 	@Override
 	public int hashCode() {
 		throw new IllegalStateException("SortedMultisets are not ready to be used in hash structures");

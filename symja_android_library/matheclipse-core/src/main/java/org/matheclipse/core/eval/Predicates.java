@@ -13,7 +13,7 @@ public class Predicates {
   public static final Predicate<IExpr> isASTUnevaluated2 = new Predicate<IExpr>() {
     @Override
     public boolean test(IExpr x) {
-      return x.isAST(F.Unevaluated, 2);
+      return x.isAST(S.Unevaluated, 2);
     }
   };
 

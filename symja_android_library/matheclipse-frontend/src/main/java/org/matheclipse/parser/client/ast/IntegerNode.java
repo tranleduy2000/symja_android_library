@@ -15,15 +15,13 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * A node for a parsed integer string
- * 
- */
-final public class IntegerNode extends NumberNode {
-	/**
-	 * IntegerNode representing one.
-	 */
-	public final static IntegerNode C1 = new IntegerNode("1", 10);
+/** A node for a parsed integer string */
+public final class IntegerNode extends NumberNode {
+  /** IntegerNode representing one. */
+  public static final IntegerNode C1 = new IntegerNode("1", 10);
+
+  /** IntegerNode representing minus one. */
+  public static final IntegerNode CN1 = new IntegerNode("-1", 10);
 
 	private final int fNumberFormat; 
 

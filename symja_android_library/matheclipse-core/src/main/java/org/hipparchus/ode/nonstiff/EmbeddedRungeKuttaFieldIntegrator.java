@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
 import org.hipparchus.ode.FieldEquationsMapper;
@@ -69,7 +69,7 @@ import org.hipparchus.util.MathUtils;
  * @param <T> the type of the field elements
  */
 
-public abstract class EmbeddedRungeKuttaFieldIntegrator<T extends RealFieldElement<T>>
+public abstract class EmbeddedRungeKuttaFieldIntegrator<T extends CalculusFieldElement<T>>
         extends AdaptiveStepsizeFieldIntegrator<T>
         implements FieldButcherArrayProvider<T> {
 

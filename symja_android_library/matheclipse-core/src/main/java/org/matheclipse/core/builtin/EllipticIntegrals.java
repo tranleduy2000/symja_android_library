@@ -1,6 +1,7 @@
 package org.matheclipse.core.builtin;
 
 import org.hipparchus.complex.Complex;
+import org.hipparchus.special.elliptic.carlson.CarlsonEllipticIntegral;
 import org.matheclipse.core.builtin.functions.EllipticFunctionsJS;
 import org.matheclipse.core.builtin.functions.EllipticIntegralsJS;
 import org.matheclipse.core.convert.Object2Expr;
@@ -26,38 +27,40 @@ public class EllipticIntegrals {
   private static class Initializer {
 
     private static void init() {
-      F.CarlsonRC.setEvaluator(new CarlsonRC());
-      F.CarlsonRD.setEvaluator(new CarlsonRD());
-      F.CarlsonRF.setEvaluator(new CarlsonRF());
-      F.CarlsonRG.setEvaluator(new CarlsonRG());
-      F.CarlsonRJ.setEvaluator(new CarlsonRJ());
+      S.CarlsonRC.setEvaluator(new CarlsonRC());
+      S.CarlsonRD.setEvaluator(new CarlsonRD());
+      S.CarlsonRF.setEvaluator(new CarlsonRF());
+      S.CarlsonRG.setEvaluator(new CarlsonRG());
+      S.CarlsonRJ.setEvaluator(new CarlsonRJ());
 
-      F.EllipticE.setEvaluator(new EllipticE());
-      F.EllipticF.setEvaluator(new EllipticF());
-      F.EllipticK.setEvaluator(new EllipticK());
-      F.EllipticPi.setEvaluator(new EllipticPi());
-      F.EllipticTheta.setEvaluator(new EllipticTheta());
+      S.EllipticE.setEvaluator(new EllipticE());
+      S.EllipticF.setEvaluator(new EllipticF());
+      S.EllipticK.setEvaluator(new EllipticK());
+      S.EllipticPi.setEvaluator(new EllipticPi());
+      S.EllipticTheta.setEvaluator(new EllipticTheta());
 
       // S.InverseWeierstrassP.setEvaluator(new InverseWeierstrassP());
-      F.JacobiAmplitude.setEvaluator(new JacobiAmplitude());
-      F.JacobiCD.setEvaluator(new JacobiCD());
-      F.JacobiCN.setEvaluator(new JacobiCN());
-      F.JacobiDN.setEvaluator(new JacobiDN());
-      F.JacobiSC.setEvaluator(new JacobiSC());
-      F.JacobiSD.setEvaluator(new JacobiSD());
-      F.JacobiSN.setEvaluator(new JacobiSN());
-      F.JacobiZeta.setEvaluator(new JacobiZeta());
+      S.JacobiAmplitude.setEvaluator(new JacobiAmplitude());
+      S.JacobiCD.setEvaluator(new JacobiCD());
+      S.JacobiCN.setEvaluator(new JacobiCN());
+      S.JacobiDN.setEvaluator(new JacobiDN());
+      S.JacobiSC.setEvaluator(new JacobiSC());
+      S.JacobiSD.setEvaluator(new JacobiSD());
+      S.JacobiSN.setEvaluator(new JacobiSN());
+      S.JacobiZeta.setEvaluator(new JacobiZeta());
 
-      F.KleinInvariantJ.setEvaluator(new KleinInvariantJ());
+      S.KleinInvariantJ.setEvaluator(new KleinInvariantJ());
 
-      F.WeierstrassHalfPeriods.setEvaluator(new WeierstrassHalfPeriods());
-      F.WeierstrassInvariants.setEvaluator(new WeierstrassInvariants());
-      F.WeierstrassP.setEvaluator(new WeierstrassP());
-      F.WeierstrassPPrime.setEvaluator(new WeierstrassPPrime());
+      S.WeierstrassHalfPeriods.setEvaluator(new WeierstrassHalfPeriods());
+      S.WeierstrassInvariants.setEvaluator(new WeierstrassInvariants());
+      S.WeierstrassP.setEvaluator(new WeierstrassP());
+      S.WeierstrassPPrime.setEvaluator(new WeierstrassPPrime());
     }
   }
 
   /**
+   *
+   *
    * <pre><code>CarlsonRC(x, y)
    * </code></pre>
    *
@@ -77,8 +80,8 @@ public class EllipticIntegrals {
       IExpr x = ast.arg1();
       IExpr y = ast.arg2();
       if (x.equals(y)) {
-        IExpr reCondition = F.LessEqual.of(engine, F.Re(x), F.C0);
-        IExpr imCondition = F.Equal.of(engine, F.Im(x), F.C0);
+        IExpr reCondition = S.LessEqual.of(engine, F.Re(x), F.C0);
+        IExpr imCondition = S.Equal.of(engine, F.Im(x), F.C0);
         if (reCondition.isTrue() && imCondition.isTrue()) {
           return F.CComplexInfinity;
         }
@@ -97,7 +100,15 @@ public class EllipticIntegrals {
         return F.CComplexInfinity;
       }
 
-      if (engine.isDoubleMode()) {
+      if (engine.isNumericMode()) {
+        if (engine.isArbitraryMode()) {
+          x = engine.evalN(x);
+          y = engine.evalN(y);
+          if (x.isNumber() && y.isNumber()) {
+            return F.complexNum(CarlsonEllipticIntegral.rC(x.evalComplex(), y.evalComplex()));
+          }
+          return F.NIL;
+        }
         double xd = Double.NaN;
         double yd = Double.NaN;
         try {
@@ -386,6 +397,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre>
    * EllipticE(z)
    * </pre>
@@ -481,18 +494,18 @@ public class EllipticIntegrals {
         // (Pi^2 + 2 Gamma(3/4)^4)/(4*Sqrt(Pi)*Gamma(3/4)^2)
         return F.Times(
             F.C1D4,
-            F.Power(F.Pi, F.CN1D2),
+            F.Power(S.Pi, F.CN1D2),
             F.Power(F.Gamma(F.QQ(3L, 4L)), -2),
-            F.Plus(F.Sqr(F.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
+            F.Plus(F.Sqr(S.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
       }
       if (z.isMinusOne()) {
         // (Pi^2+2*Gamma(3/4)^4)/(2*Sqrt(2)*Sqrt(Pi)*Gamma(3/4)^2)
         return F.Times(
             F.C1D2,
             F.C1DSqrt2,
-            F.Power(F.Pi, F.CN1D2),
+            F.Power(S.Pi, F.CN1D2),
             F.Power(F.Gamma(F.QQ(3L, 4L)), -2),
-            F.Plus(F.Sqr(F.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
+            F.Plus(F.Sqr(S.Pi), F.Times(F.C2, F.Power(F.Gamma(F.QQ(3L, 4L)), 4))));
       }
       if (engine.isDoubleMode()) {
         try {
@@ -535,6 +548,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre>
    * EllipticF(z)
    * </pre>
@@ -577,7 +592,7 @@ public class EllipticIntegrals {
         // EllipticF(Pi/2, m) = EllipticK(m)
         return F.EllipticK(m);
       }
-      if (z.isTimes() && z.second().equals(F.Pi) && z.first().isRational()) {
+      if (z.isTimes() && z.second().equals(S.Pi) && z.first().isRational()) {
         IRational k = ((IRational) z.first()).multiply(F.C2).normalize();
         if (k.isInteger()) {
           // EllipticF(k*Pi/2, m) = k*EllipticK(m) /; IntegerQ(k)
@@ -587,11 +602,11 @@ public class EllipticIntegrals {
       if (m.isOne()) {
         // Abs(Re(z)) <= Pi/2
         IExpr temp = engine.evaluate(F.Abs(F.Re(z)));
-        if (F.LessEqual.ofQ(engine, temp, F.CPiHalf)) {
+        if (S.LessEqual.ofQ(engine, temp, F.CPiHalf)) {
           // Log(Sec(z) + Tan(z))
           return F.Log(F.Plus(F.Sec(z), F.Tan(z)));
         }
-        if (F.Greater.ofQ(engine, temp, F.CPiHalf)) {
+        if (S.Greater.ofQ(engine, temp, F.CPiHalf)) {
           return F.CComplexInfinity;
         }
       }
@@ -626,7 +641,7 @@ public class EllipticIntegrals {
       }
 
       // test EllipticF(zz+k*Pi,m)
-      IAST parts = AbstractFunctionEvaluator.getPeriodicParts(z, F.Pi);
+      IAST parts = AbstractFunctionEvaluator.getPeriodicParts(z, S.Pi);
       if (parts.isPresent()) {
         IExpr k = parts.arg2();
         if (k.isInteger()) {
@@ -651,6 +666,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre>
    * EllipticK(z)
    * </pre>
@@ -694,11 +711,11 @@ public class EllipticIntegrals {
       }
       if (m.isMinusOne()) {
         // Gamma(1/4)^2/(4*Sqrt(2*Pi))
-        return F.Times(F.C1D4, F.C1DSqrt2, F.Power(F.Pi, F.CN1D2), F.Sqr(F.Gamma(F.C1D4)));
+        return F.Times(F.C1D4, F.C1DSqrt2, F.Power(S.Pi, F.CN1D2), F.Sqr(F.Gamma(F.C1D4)));
       }
       if (m.isNumEqualRational(F.C1D2)) {
         // (8 Pi^(3/2))/Gamma(-(1/4))^2
-        return F.Times(F.C8, F.Power(F.Pi, F.QQ(3L, 2L)), F.Power(F.Gamma(F.CN1D4), -2));
+        return F.Times(F.C8, F.Power(S.Pi, F.QQ(3L, 2L)), F.Power(F.Gamma(F.CN1D4), -2));
       }
       if (engine.isDoubleMode()) {
         try {
@@ -725,9 +742,8 @@ public class EllipticIntegrals {
         // EllipticK(m_) := Pi/(2*ArithmeticGeometricMean(1,Sqrt(1-m)))
         return F.Times(
             F.C1D2,
-            F.Pi,
-            F.Power(F.ArithmeticGeometricMean(F.C1, F.Sqrt(F.Plus(F.C1, F.Negate(m)))),
-                -1));
+            S.Pi,
+            F.Power(F.ArithmeticGeometricMean(F.C1, F.Sqrt(F.Plus(F.C1, F.Negate(m)))), -1));
       }
       return F.NIL;
     }
@@ -839,7 +855,7 @@ public class EllipticIntegrals {
       }
       if (m.isZero()) {
         // Pi/(2*Sqrt(1-n))
-        return F.Times(F.C1D2, F.Power(F.Plus(F.C1, F.Negate(n)), F.CN1D2), F.Pi);
+        return F.Times(F.C1D2, F.Power(F.Plus(F.C1, F.Negate(n)), F.CN1D2), S.Pi);
       }
       if (m.isOne()) {
         // -(Infinity/Sign(n-1))
@@ -1034,6 +1050,8 @@ public class EllipticIntegrals {
   // }
 
   /**
+   *
+   *
    * <pre><code>JacobiAmplitude(x, m)
    * </code></pre>
    *
@@ -1057,7 +1075,7 @@ public class EllipticIntegrals {
         return z;
       }
       if (m.isOne()) {
-        return F.Plus(F.CNPiHalf, F.Times(2, F.ArcTan(F.Power(F.E, z))));
+        return F.Plus(F.CNPiHalf, F.Times(2, F.ArcTan(F.Power(S.E, z))));
       }
       if (z.isZero()) {
         return F.C0;
@@ -1099,6 +1117,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre><code>JacobiCD(x, m)
    * </code></pre>
    *
@@ -1167,6 +1187,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre><code>JacobiCN(x, m)
    * </code></pre>
    *
@@ -1238,6 +1260,8 @@ public class EllipticIntegrals {
   }
 
   /**
+   *
+   *
    * <pre><code>JacobiDN(x, m)
    * </code></pre>
    *
@@ -1584,13 +1608,13 @@ public class EllipticIntegrals {
     @Override
     public IExpr evaluate(IAST ast, EvalEngine engine) {
       IExpr t = ast.arg1();
-      IExpr im = F.Im.of(engine, t);
+      IExpr im = S.Im.of(engine, t);
 
       if (im.isZero()) {
         return F.NIL;
       }
       if (im.isOne()) {
-        IExpr re = F.Re.of(engine, t);
+        IExpr re = S.Re.of(engine, t);
         if (re.isInteger()) {
           // KleinInvariantJ(re+I) = 1 and re is Integer
           return F.C1;

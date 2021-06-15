@@ -445,17 +445,13 @@ public abstract class Scanner {
       getChar();
     }
     int contextIndex = -1;
-    while ((Character.isJavaIdentifierPart(fCurrentChar) && (fCurrentChar != '_')) || (fCurrentChar
-        == '$')
-        || (fCurrentChar == '`')) {
+    while (Characters.isSymjaIdentifierPart(fCurrentChar)) {
       if (fCurrentChar == '`') {
         contextIndex = fCurrentPosition - 1;
       }
       getChar();
     }
-    while ((Character.isJavaIdentifierPart(fCurrentChar) && (fCurrentChar != '_')) || (fCurrentChar
-        == '$')
-        || (fCurrentChar == '`')) {
+    while (Characters.isSymjaIdentifierPart(fCurrentChar)) {
       if (fCurrentChar == '`') {
         contextIndex = fCurrentPosition - 1;
       }
@@ -591,8 +587,7 @@ public abstract class Scanner {
           continue; // while loop
         }
 
-        if ((Character.isJavaIdentifierStart(fCurrentChar) && (fCurrentChar != '_')) || (
-            fCurrentChar == '$')) {
+        if (Characters.isSymjaIdentifierStart(fCurrentChar)) {
           // the Character.isUnicodeIdentifierStart method doesn't
           // work in Google Web Toolkit:
           // || (Character.isUnicodeIdentifierStart(fCurrentChar))) {
@@ -806,6 +801,10 @@ public abstract class Scanner {
               fToken = TT_IDENTIFIER;
               return;
             }
+            String str = Characters.unicodeName(fCurrentChar);
+            if (str != null) {
+              throwSyntaxError("unexpected (named unicode) character: '\\[" + str + "]'");
+            }
             throwSyntaxError("unexpected character: '" + fCurrentChar + "'");
             // }
         }
@@ -825,7 +824,8 @@ public abstract class Scanner {
 
   /**
    * Return an array of a <code>String</code> at index 0 representing the parse number string and an
-   * <code>Integer</code> representing the number format at index 1. The number format value can be
+   * <code>Integer</code> representing the number format at index 1 and a <code>String</code>
+   * representing the integer exponent at index 2. The number format value can be
    *
    * <ul>
    *   <li>-1 for floating point numbers
@@ -838,7 +838,8 @@ public abstract class Scanner {
    * @return
    */
   protected Object[] getNumberString() {
-    final Object[] result = new Object[2];
+    final Object[] result = new Object[3];
+    result[2] = "1";
     int numFormat = 10;
     int startPosition = fCurrentPosition - 1;
     final char firstCh = fCurrentChar;
@@ -963,8 +964,9 @@ public abstract class Scanner {
           }
         }
       } else {
-        if (numFormat < 0) {
+        if (numFormat < 0 || numFormat == 10) {
           if (fCurrentChar == '*') {
+            //            numFormat = -1;
             int lastPosition = fCurrentPosition;
             getChar();
             if (fCurrentChar == '^') {
@@ -1004,6 +1006,15 @@ public abstract class Scanner {
     String numberStr = new String(fInputString, startPosition, (--endPosition) - startPosition);
     if (backslash) {
       numberStr = sanitizeBackslash(numberStr);
+    }
+    if (numFormat == 10) {
+      int indx = numberStr.indexOf("*^");
+      if (indx > 0) {
+        result[0] = numberStr.substring(0, indx);
+        result[1] = Integer.valueOf(numFormat);
+        result[2] = numberStr.substring(indx + 2);
+        return result;
+      }
     }
     result[0] = numberStr;
     result[1] = Integer.valueOf(numFormat);
@@ -1380,8 +1391,10 @@ public abstract class Scanner {
     }
   }
 
-  protected void throwSyntaxError(final String error) throws SyntaxError {
-    throw new SyntaxError(fCurrentPosition - 1, fRowCounter,
+  public void throwSyntaxError(final String error) throws SyntaxError {
+    throw new SyntaxError(
+        fCurrentPosition - 1,
+        fRowCounter,
         fCurrentPosition - fCurrentColumnStartPosition,
         getErrorLine(), error, 1);
   }
@@ -1392,6 +1405,7 @@ public abstract class Scanner {
   }
 
   /** Shows the current line for debugging purposes. */
+  @Override
   public String toString() {
     if (fInputString == null || //
         fCurrentPosition < 0) {

@@ -22,7 +22,7 @@
 package org.hipparchus.util;
 
 import org.hipparchus.CalculusFieldElement;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathRuntimeException;
 
@@ -136,7 +136,6 @@ public class FastMath {
     };
 
     /** Sine, Cosine, Tangent tables are for 0, 1/8, 2/8, ... 13/8 = PI/2 approx. */
-    private static final int SINE_TABLE_LEN = 14;
 
     /** Sine table (high bits). */
     private static final double SINE_TABLE_A[] =

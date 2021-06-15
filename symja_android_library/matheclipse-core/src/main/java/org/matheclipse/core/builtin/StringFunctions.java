@@ -125,10 +125,6 @@ public final class StringFunctions {
       return ARGS_1_1;
     }
 
-    @Override
-    public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.LISTABLE);
-    }
   }
 
   private static class BaseEncode extends AbstractFunctionEvaluator {
@@ -153,10 +149,6 @@ public final class StringFunctions {
       return ARGS_1_1;
     }
 
-    @Override
-    public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.LISTABLE);
-    }
   }
 
   private static class ByteArrayToString extends AbstractFunctionEvaluator {
@@ -214,6 +206,8 @@ public final class StringFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * <code>CharacterRange(min-character, max-character)
    * </code>
@@ -256,7 +250,7 @@ public final class StringFunctions {
             return IOFunctions.printMessage(
                 ast.topHead(), "argtype", F.List(ast.arg1(), ast.arg2(), ast.topHead()), engine);
           }
-          int size = to - from;
+          int size = to - from + 1;
           if (size <= 0) {
             return F.CEmptyList;
           }
@@ -277,7 +271,7 @@ public final class StringFunctions {
         }
         char from = str1.charAt(0);
         char to = str2.charAt(0);
-        int size = ((int) to) - ((int) from);
+        int size = (to) - (from) + 1;
         if (size <= 0) {
           return F.CEmptyList;
         }
@@ -2472,7 +2466,7 @@ public final class StringFunctions {
       StringBuilder buf = new StringBuilder();
       OutputFormFactory off = OutputFormFactory.get(relaxedSyntax, false);
       off.setIgnoreNewLine(true);
-      off.setQuotes(true);
+      off.setInputForm(true);
       if (off.convert(buf, expression)) {
         return buf.toString();
       }
@@ -2485,10 +2479,7 @@ public final class StringFunctions {
   }
 
   public static String inputForm(final IExpr expression) {
-    if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
-      return StringFunctions.inputForm(expression, true);
-    }
-    return StringFunctions.inputForm(expression, false);
+    return StringFunctions.inputForm(expression, FEConfig.PARSER_USE_LOWERCASE_SYMBOLS);
   }
 
   private static IExpr regexErrorHandling(

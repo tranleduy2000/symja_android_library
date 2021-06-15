@@ -23,6 +23,7 @@ public interface Multiset<T> {
 	/**
 	 * Add an entry with multiplicity 1.
 	 * @param entry
+	 * @return the previous multiplicity of the entry
 	 */
 	int add(T entry);
 
@@ -30,6 +31,7 @@ public interface Multiset<T> {
 	 * Add one entry with given multiplicity.
 	 * @param entry
 	 * @param mult
+	 * @return the previous multiplicity of the entry
 	 */
 	int add(T entry, int mult);
 
@@ -44,6 +46,12 @@ public interface Multiset<T> {
 	 * @param values
 	 */
 	void addAll(Collection<T> values);
+
+	/**
+	 * Add all values of the given array.
+	 * @param values
+	 */
+	void addAll(T[] values);
 
 	/**
 	 * Returns the multiplicity of the given value.
@@ -88,20 +96,13 @@ public interface Multiset<T> {
 	/**
 	 * Returns the multiset of elements contained in both this and in the other multiset.
 	 * @param other
-	 * @return
+	 * @return intersection of this and other
 	 */
 	Multiset<T> intersect(Multiset<T> other);
 
 	/**
 	 * @return The number of different elements
 	 */
-	// same as size()
-	int keyCount();
-
-	/**
-	 * @return The number of different elements
-	 */
-	// same as keyCount()
 	int size();
 	
 	/**

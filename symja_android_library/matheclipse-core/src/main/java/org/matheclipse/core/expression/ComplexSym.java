@@ -36,9 +36,7 @@ import static org.matheclipse.core.expression.F.Times;
 /** A symbolic complex number implementation */
 public class ComplexSym extends IComplexImpl implements IComplex {
 
-  /**
-   *
-   */
+  /** */
   private static final long serialVersionUID = 1489050560741527824L;
 
   private static final ComplexSym ZERO = ComplexSym.valueOf(0, 1, 0, 1);
@@ -217,7 +215,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
   @Override
   public INumber ceilFraction() {
-    return valueOf((IRational) fReal.ceilFraction(), (IRational) fImaginary.ceilFraction());
+    return valueOf(fReal.ceilFraction(), fImaginary.ceilFraction());
   }
 
   /** {@inheritDoc} */
@@ -266,10 +264,10 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
   @Override
   public int complexSign() {
-    final int i = fReal.numerator().sign();
+    final int i = fReal.numerator().complexSign();
 
     if (i == 0) {
-      return fImaginary.numerator().sign();
+      return fImaginary.numerator().complexSign();
     }
 
     return i;
@@ -327,6 +325,11 @@ public class ComplexSym extends IComplexImpl implements IComplex {
   @Override
   public IExpr evaluate(EvalEngine engine) {
     if (engine.isNumericMode()) {
+      if (isImaginaryUnit()) {
+        return F.CDI;
+      } else if (isNegativeImaginaryUnit()) {
+        return F.CDNI;
+      }
       return numericNumber();
     }
     final INumber cTemp = normalize();
@@ -348,7 +351,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
   @Override
   public INumber floorFraction() {
-    return valueOf((IRational) fReal.floorFraction(), (IRational) fImaginary.floorFraction());
+    return valueOf(fReal.floorFraction(), fImaginary.floorFraction());
   }
 
   @Override
@@ -584,6 +587,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
    * @param c2
    * @return the quotient and remainder as an array <code>[quotient, remainder]</code>
    */
+  @Override
   public IComplex[] quotientRemainder(final IComplex c2) {
     final IRational re = c2.re();
     final IRational im = c2.im();
@@ -600,8 +604,8 @@ public class ComplexSym extends IComplexImpl implements IComplex {
       throw new IllegalArgumentException("Denominator can not be zero.");
     }
 
-    IInteger divisionReal = numeratorReal.divideBy(denominator).round();
-    IInteger divisionImaginary = numeratorImaginary.divideBy(denominator).round();
+    IInteger divisionReal = numeratorReal.divideBy(denominator).roundExpr();
+    IInteger divisionImaginary = numeratorImaginary.divideBy(denominator).roundExpr();
 
     IRational remainderReal = fReal.subtract(re.multiply(divisionReal))
         .subtract(im.multiply(divisionImaginary).negate());
@@ -755,6 +759,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
     return r;
   }
 
+  @Override
   public void checkBitLength() {
     if (Integer.MAX_VALUE > Config.MAX_BIT_LENGTH) {
       long bitLength = fReal.toBigNumerator().bitLength() + fReal.toBigDenominator().bitLength();
@@ -797,10 +802,11 @@ public class ComplexSym extends IComplexImpl implements IComplex {
   }
 
   @Override
-  public INumber round() {
-    return valueOf((IRational) fReal.round(), (IRational) fImaginary.round());
+  public INumber roundExpr() {
+    return valueOf(fReal.roundExpr(), fImaginary.roundExpr());
   }
 
+  @Override
   public IComplex sqrtCC() {
     // https://math.stackexchange.com/a/44414
     // this == c + d*I
@@ -816,7 +822,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
           IRational b = ((IRational) val2);
           return valueOf( //
               (IRational) a, //
-              (d.sign() >= 0) ? b : b.negate()//
+              (d.complexSign() >= 0) ? b : b.negate()//
           );
         }
       }
@@ -840,7 +846,7 @@ public class ComplexSym extends IComplexImpl implements IComplex {
 
   @Override
   public IAST toPolarCoordinates() {
-    return F.pair(abs(), complexArg());
+    return F.list(abs(), complexArg());
   }
 
   @Override

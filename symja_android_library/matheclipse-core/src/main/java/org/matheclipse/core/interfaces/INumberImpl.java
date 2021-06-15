@@ -8,69 +8,80 @@ import org.matheclipse.core.expression.F;
  */
 
 public abstract class INumberImpl extends IExprImpl implements INumber {
-    @Override
-    public abstract INumber conjugate();
 
-    /**
-     * Returns the imaginary part of a complex number
-     *
-     * @return real part
-     */
-    @Override
-    public abstract ISignedNumber im();
+  @Override
+  public abstract INumber conjugate();
 
-    @Override
-    public abstract INumber opposite();
+  /**
+   * Returns the imaginary part of a complex number
+   *
+   * @return real part
+   */
+  @Override
+  public abstract ISignedNumber im();
 
-    @Override
-    public IRational rationalFactor() {
-        if (this instanceof IRational) {
-            return (IRational) this;
-        }
-        return null;
+  @Override
+  public abstract INumber opposite();
+
+  @Override
+  public IRational rationalFactor() {
+    if (this instanceof IRational) {
+      return (IRational) this;
     }
+    return null;
+  }
 
-    /**
-     * Returns the real part of a complex number
-     *
-     * @return real part
-     */
-    @Override
-    public abstract ISignedNumber re();
+  /**
+   * Returns the real part of a complex number
+   *
+   * @return real part
+   */
+  @Override
+  public abstract ISignedNumber re();
 
-    /**
-     * Get the absolute value for a given number
-     *
-     * @return
-     * @deprecated use abs()
-     */
-    @Deprecated
-    public IExpr eabs() {
-        return abs();
-    }
+  /**
+   * Get the absolute value for a given number
+   *
+   * @return
+   * @deprecated use abs()
+   */
+  @Deprecated
+  public IExpr eabs() {
+    return abs();
+  }
 
-    @Override
-    public INumber evaluatePrecision(EvalEngine engine) {
-        return this;
-    }
+  @Override
+  public INumber evaluatePrecision(EvalEngine engine) {
+    return this;
+  }
 
-    @Override
-    public double getImaginary() {
-        return imDoubleValue();
-    }
+  @Override
+  public double getImaginary() {
+    return imDoubleValue();
+  }
 
-    @Override
-    public double getReal() {
-        return reDoubleValue();
-    }
+  @Override
+  public double getReal() {
+    return reDoubleValue();
+  }
 
-    @Override
-    public IExpr[] linear(IExpr variable) {
-        return new IExpr[]{this, F.C0};
-    }
+  @Override
+  public boolean isNumber() {
+    return true;
+  }
 
-    @Override
-    public IExpr[] linearPower(IExpr variable) {
-        return new IExpr[] { this, F.C0, F.C1 };
-    }
+  @Override
+  public boolean isNumericFunction(boolean allowList) {
+    return true;
+  }
+
+  @Override
+  public IExpr[] linear(IExpr variable) {
+    return new IExpr[]{this, F.C0};
+  }
+
+  @Override
+  public IExpr[] linearPower(IExpr variable) {
+    return new IExpr[]{this, F.C0, F.C1};
+  }
 }

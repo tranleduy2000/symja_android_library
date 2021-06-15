@@ -53,6 +53,7 @@ import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.ComplexNum;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.Num;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IComplexNum;
@@ -1066,11 +1067,17 @@ public class SpecialFunctions {
 
         }
       } catch (MathIllegalArgumentException miae) {
-        return IOFunctions.printMessage(F.InverseBetaRegularized, "argillegal",
-            F.List(F.stringx(miae.getMessage()), ast), engine);
+        return IOFunctions.printMessage(
+            S.InverseBetaRegularized,
+            "argillegal",
+            F.List(F.stringx(miae.getMessage()), ast),
+            engine);
       } catch (RuntimeException rex) {
-        return IOFunctions.printMessage(F.InverseBetaRegularized, "argillegal",
-            F.List(F.stringx(rex.getMessage()), ast), engine);
+        return IOFunctions.printMessage(
+            S.InverseBetaRegularized,
+            "argillegal",
+            F.List(F.stringx(rex.getMessage()), ast),
+            engine);
       }
       return F.NIL;
     }

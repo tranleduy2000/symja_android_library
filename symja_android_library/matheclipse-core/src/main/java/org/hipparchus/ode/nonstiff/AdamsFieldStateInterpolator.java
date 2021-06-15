@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode.nonstiff;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.linear.Array2DRowFieldMatrix;
 import org.hipparchus.ode.FieldEquationsMapper;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
@@ -42,7 +42,7 @@ import java.util.Arrays;
  * @see AdamsMoultonFieldIntegrator
  */
 
-class AdamsFieldStateInterpolator<T extends RealFieldElement<T>> extends AbstractFieldODEStateInterpolator<T> {
+class AdamsFieldStateInterpolator<T extends CalculusFieldElement<T>> extends AbstractFieldODEStateInterpolator<T> {
 
     /**
      * Reference state.
@@ -130,7 +130,7 @@ class AdamsFieldStateInterpolator<T extends RealFieldElement<T>> extends Abstrac
      * @param <S>             the type of the field elements
      * @return estimated state
      */
-    public static <S extends RealFieldElement<S>> FieldODEStateAndDerivative<S> taylor(final FieldEquationsMapper<S> equationsMapper,
+    public static <S extends CalculusFieldElement<S>> FieldODEStateAndDerivative<S> taylor(final FieldEquationsMapper<S> equationsMapper,
                                                                                        final FieldODEStateAndDerivative<S> reference,
                                                                                        final S time, final S stepSize,
                                                                                        final S[] scaled,

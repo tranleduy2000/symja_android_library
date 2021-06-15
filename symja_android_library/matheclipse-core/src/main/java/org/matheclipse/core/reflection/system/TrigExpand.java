@@ -6,7 +6,9 @@ import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.builtin.StructureFunctions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.interfaces.IFunctionEvaluator;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -43,10 +45,11 @@ import static org.matheclipse.core.expression.F.evalExpandAll;
  */
 public class TrigExpand extends AbstractEvaluator {
 
-	private final static Function<IExpr, IExpr> function = new TrigExpandFunction();
-	private final static VisitorPlusTimesPowerReplaceAll visitor = new VisitorPlusTimesPowerReplaceAll(function);
+  private static final Function<IExpr, IExpr> function = new TrigExpandFunction();
+  private static final VisitorPlusTimesPowerReplaceAll visitor =
+      new VisitorPlusTimesPowerReplaceAll(function);
 
-	private final static class TrigExpandFunction implements Function<IExpr, IExpr> {
+  private static final class TrigExpandFunction implements Function<IExpr, IExpr> {
 		@Override
 		public IExpr apply(IExpr ast) {
 			if (ast.isAST1()) {
@@ -61,10 +64,10 @@ public class TrigExpand extends AbstractEvaluator {
 		}
 
 		/**
-		 * Expand <code>f(a+b+c+...)</code> and f a trig function.
+     * Expand <code>f(a+b+c+...)</code> and create a trig function.
 		 * 
-		 * @param n
-		 * @param theta
+     * @param ast
+     * @param plusAST
 		 * @return
 		 */
 		private IExpr expandPlus(IAST ast, IAST plusAST) {
@@ -72,25 +75,25 @@ public class TrigExpand extends AbstractEvaluator {
 				return expandSinPlus(plusAST, 1);
 			} else if (ast.isCos()) {
 				return expandCosPlus(plusAST, 1);
-			} else if (ast.isAST(F.Cot, 2)) {
+      } else if (ast.isAST(S.Cot, 2)) {
 				// Cos(x) / Sin(x)
 				return F.Divide(expandCosPlus(plusAST, 1), expandSinPlus(plusAST, 1));
 			} else if (ast.isTan()) {
 				// Sin(x) / Cos(x)
 				return F.Divide(expandSinPlus(plusAST, 1), expandCosPlus(plusAST, 1));
-			} else if (ast.isAST(F.Csc, 2)) {
+      } else if (ast.isAST(S.Csc, 2)) {
 				// 1 / Sin(x)
 				return F.Divide(F.C1, expandSinPlus(plusAST, 1));
-			} else if (ast.isAST(F.Sec, 2)) {
+      } else if (ast.isAST(S.Sec, 2)) {
 				// 1 / Cos(x)
 				return F.Divide(F.C1, expandCosPlus(plusAST, 1));
-			} else if (ast.isAST(F.Sech, 2)) {
+      } else if (ast.isAST(S.Sech, 2)) {
 				return expandSechPlus(plusAST, 1);
 			} else if (ast.isSinh()) {
 				return expandSinhPlus(plusAST, 1);
 			} else if (ast.isCosh()) {
 				return expandCoshPlus(plusAST, 1);
-			} else if (ast.isAST(F.Csch, 2)) {
+      } else if (ast.isAST(S.Csch, 2)) {
 				return expandCschPlus(plusAST, 1);
 			} else if (ast.isTanh()) {
 				return expandTanhPlus(plusAST, 1);
@@ -99,10 +102,10 @@ public class TrigExpand extends AbstractEvaluator {
 		}
 
 		/**
-		 * Expand <code>f(n*theta)</code> and f a trig function.
+     * Expand <code>f(n*theta)</code> and create a trig function.
 		 * 
-		 * @param n
-		 * @param theta
+     * @param ast
+     * @param timesAST
 		 * @return
 		 */
 		private IExpr expandTimes(IAST ast, IAST timesAST) {
@@ -115,38 +118,39 @@ public class TrigExpand extends AbstractEvaluator {
 							return expandSinTimes(n, theta);
 						} else if (ast.isCos()) {
 							return expandCosTimes(n, theta);
-						} else if (ast.isAST(F.Cot, 2)) {
+            } else if (ast.isAST(S.Cot, 2)) {
 							// Cos(x) / Sin(x)
 							return F.Divide(expandCosTimes(n, theta), expandSinTimes(n, theta));
 						} else if (ast.isTan()) {
 							// Sin(x) / Cos(x)
 							return F.Divide(expandSinTimes(n, theta), expandCosTimes(n, theta));
-						} else if (ast.isAST(F.Csc, 2)) {
+            } else if (ast.isAST(S.Csc, 2)) {
 							// 1 / Sin(x)
 							return F.Divide(F.C1, expandSinTimes(n, theta));
-						} else if (ast.isAST(F.Sec, 2)) {
+            } else if (ast.isAST(S.Sec, 2)) {
 							// 1 / Cos(x)
 							return F.Divide(F.C1, expandCosTimes(n, theta));
 						} else if (ast.isSinh()) {
 							int nInt = n.toInt();
 							// return expandSinhPlus(F.constantArray(F.Plus, theta, nInt), 1);
-							return expandSinhPlus(theta.constantArray(F.Plus, 0, nInt), 1);
+              return expandSinhPlus(theta.constantArray(S.Plus, 0, nInt), 1);
 						} else if (ast.isCosh()) {
 							int nInt = n.toInt();
 							// return expandCoshPlus(F.constantArray(F.Plus, theta, nInt), 1);
-							return expandCoshPlus(theta.constantArray(F.Plus, 0, nInt), 1);
-						} else if (ast.isAST(F.Csch, 2)) {
+              return expandCoshPlus(theta.constantArray(S.Plus, 0, nInt), 1);
+            } else if (ast.isAST(S.Csch, 2)) {
 							// Csch(theta)/ChebyshevU(n - 1, Cosh(theta))
 							return F.TrigExpand(F.Times(F.Csch(theta),
 									F.Power(F.ChebyshevU(F.Subtract(n, F.C1), F.Cosh(theta)), F.CN1)));
 							// int nInt = n.toInt();
 							// I^(n - 1)*2^(1 - n)* Product(Csch(theta + (I*k*Pi)/n], {k, 0, n - 1})
-							// return F.Times(F.Power(F.C2, F.Plus(F.C1, F.Negate(n))), F.Power(F.CI, F.Plus(F.CN1, n)),
+              // return F.Times(F.Power(F.C2, F.Plus(F.C1, F.Negate(n))), F.Power(F.CI,
+              // F.Plus(F.CN1, n)),
 							// F.Product(F.Csch(F.Plus(theta, F.Times(F.CI, F.k, F.Power(n, -1), F.Pi))),
 							// F.List(F.k, F.C0, F.Plus(F.CN1, n))));
-						} else if (ast.isAST(F.Sech, 2)) {
+            } else if (ast.isAST(S.Sech, 2)) {
 							int nInt = n.toInt();
-							return expandSechPlus(theta.constantArray(F.Plus, 0, nInt), 1);
+              return expandSechPlus(theta.constantArray(S.Plus, 0, nInt), 1);
 						}
 					} catch (ArithmeticException ae) {
 
@@ -354,7 +358,8 @@ public class TrigExpand extends AbstractEvaluator {
 	/**
 	 * Expands the argument of sine and cosine functions.
 	 * 
-	 * <a href="http://en.wikipedia.org/wiki/List_of_trigonometric_identities" >List of trigonometric identities</a>
+   * <p><a href="http://en.wikipedia.org/wiki/List_of_trigonometric_identities" >List of
+   * trigonometric identities</a>
 	 */
 	@Override
 	public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -375,11 +380,7 @@ public class TrigExpand extends AbstractEvaluator {
 
 	@Override
 	public int[] expectedArgSize(IAST ast) {
-		return ARGS_1_1;
-	}
-	@Override
-	public void setUp(final ISymbol newSymbol) {
-		newSymbol.setAttributes(ISymbol.LISTABLE);
+    return IFunctionEvaluator.ARGS_1_1;
 	}
 
 }

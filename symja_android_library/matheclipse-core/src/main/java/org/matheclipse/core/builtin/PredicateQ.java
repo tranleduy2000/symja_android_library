@@ -3,10 +3,12 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.Function;
 import com.duy.lambda.Predicate;
 
+import com.duy.util.ThreadLocalRandom;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.FieldVector;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
+import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.Predicates;
 import org.matheclipse.core.eval.exception.ValidateException;
@@ -14,11 +16,14 @@ import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractCorePredicateEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.ID;
 import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExpr_COMPARE_TERNARY;
 import org.matheclipse.core.interfaces.IInteger;
+import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.IPredicate;
 import org.matheclipse.core.interfaces.ISparseArray;
 import org.matheclipse.core.interfaces.IStringX;
@@ -28,8 +33,7 @@ import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.VisitorBooleanLevelSpecification;
-
-import static org.matheclipse.core.builtin.Algebra.InternalFindCommonFactorPlus;
+import org.matheclipse.parser.client.FEConfig;
 
 public class PredicateQ {
 
@@ -83,8 +87,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * AntihermitianMatrixQ(m)
    * </pre>
@@ -153,8 +155,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * 'ArrayQ(expr)
    * </pre>
@@ -206,9 +206,9 @@ public class PredicateQ {
      * (possibly nested) lists. Return <code>-1</code> if the expression isn't a full array.
      *
      * @param expr
-     * @param depth start depth of the full array
+     * @param depth     start depth of the full array
      * @param predicate an optional <code>Predicate</code> which would be applied to all elements
-     *     which aren't lists.
+     *                  which aren't lists.
      * @return <code>-1</code> if the expression isn't a full array.
      */
     private static int determineDepth(final IExpr expr, int depth, Predicate<IExpr> predicate) {
@@ -352,8 +352,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * EvenQ(x)
    * </pre>
@@ -444,74 +442,19 @@ public class PredicateQ {
    */
   private static final class FreeQ extends AbstractCoreFunctionEvaluator implements IPredicate {
 
-    /**
-     * Checks if <code>orderless1.size()</code> is greater or equal <code>orderless2.size()</code>
-     * and returns <code>false</code>, if every argument in <code>orderless2</code> equals an
-     * argument in <code>orderless1</code>. I.e. <code>orderless1</code> doesn't contain every
-     * argument of <code>orderless2</code>.
-     *
-     * @param orderless1
-     * @param orderless2
-     * @return <code>false</code> if <code>orderless1.size()</code> is greater or equal <code>
-     *     orderless2.size()</code> and if every argument in <code>orderless2</code> equals an
-     *     argument in <code>orderless1</code>
-     */
-    private static boolean isFreeOrderless(IAST orderless1, IAST orderless2) {
-      if (orderless1.size() >= orderless2.size()) {
-        IExpr temp;
-        boolean evaled = false;
-        int[] array = new int[orderless1.size()];
-        for (int i = 1; i < orderless2.size(); i++) {
-          temp = orderless2.get(i);
-          evaled = false;
-          for (int j = 1; j < orderless1.size(); j++) {
-            if (array[j] != (-1) && temp.equals(orderless1.get(j))) {
-              array[j] = -1;
-              evaled = true;
-              break;
-            }
-          }
-          if (!evaled) {
-            break;
-          }
-        }
-        if (evaled) {
-          return false;
-        }
-      }
-      return true;
-    }
 
     @Override
     public IExpr evaluate(IAST ast, EvalEngine engine) {
-      //      if (ast.isAST1()) {
-      //        ast = F.operatorForm1Append(ast);
-      //        if (!ast.isPresent()) {
-      //          return F.NIL;
-      //        }
-      //      }
       if (ast.size() == 3) {
         final IExpr arg1 = engine.evaluate(ast.arg1());
         final IExpr arg2 = engine.evalPattern(ast.arg2());
-        if (arg2.isSymbol() || arg2.isNumber() || arg2.isString()) {
-          return F.bool(arg1.isFree(arg2, true));
-        }
-
-        // final IPatternMatcher matcher = new PatternMatcherEvalEngine(arg2, engine);
-        final IPatternMatcher matcher = engine.evalPatternMatcher(arg2);
-        if (matcher.isRuleWithoutPatterns()) {
-          // special for FreeQ(), don't implemented in MemberQ()!
-          if (arg1.isOrderlessAST() && arg2.isOrderlessAST() && arg1.head().equals(arg2.head())) {
-            if (!isFreeOrderless((IAST) arg1, (IAST) arg1)) {
-              return S.False;
-            }
-          }
-        }
-        return F.bool(arg1.isFree(matcher, true));
+        return F.bool(arg1.isFree(arg2, true));
       }
+
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2_1;
     }
@@ -557,8 +500,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * MatchQ(expr, form)
    * </pre>
@@ -616,14 +557,13 @@ public class PredicateQ {
     }
 
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2_1;
     }
   }
 
   /**
-   *
-   *
    * <pre>
    * MatrixQ(m)
    * </pre>
@@ -719,8 +659,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * MemberQ(list, pattern)
    * </pre>
@@ -809,8 +747,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * OddQ(x)
    * </pre>
@@ -963,14 +899,13 @@ public class PredicateQ {
       return S.True;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
   }
 
   /**
-   *
-   *
    * <pre>
    * PossibleZeroQ(expr)
    * </pre>
@@ -1002,33 +937,7 @@ public class PredicateQ {
         return expr.isZero();
       }
       if (expr.isAST()) {
-        IExpr temp =
-            ((IAST) expr)
-                .replace( //
-                    Predicates.isNumericFunctionTrue, //
-                    Predicates.evalNumber);
-        if (temp != null) {
-          temp = engine.evaluate(temp);
-          if (temp.isZero()) {
-            return true;
-          }
-        }
-        if (expr.isPlus()) {
-          IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors((IAST) expr, true);
-          if (commonFactors != null) {
-            temp = F.Simplify.of(engine, F.Times(commonFactors[0], commonFactors[1]));
-            if (temp.isNumber()) {
-              return temp.isZero();
-            }
-            temp = temp.evalNumber();
-            if (temp != null) {
-              if (temp.isZero()) {
-                return true;
-              }
-            }
-          }
-        }
-        return isZeroTogether(expr, engine);
+        return isPossibleZeroQ((IAST) expr, false, engine);
       }
       return false;
     }
@@ -1131,7 +1040,7 @@ public class PredicateQ {
      */
     @Override
     public boolean evalArg1Boole(final IExpr arg1, EvalEngine engine, OptionArgs options) {
-      IExpr option = options.getOption(F.GaussianIntegers);
+      IExpr option = options.getOption(S.GaussianIntegers);
       if (!option.isTrue()) {
         return evalArg1Boole(arg1, engine);
       }
@@ -1152,7 +1061,7 @@ public class PredicateQ {
         return false;
       }
       // re^2 + im^2 is probable prime?
-      return reImParts[0].pow(2L).add(reImParts[1].pow(2L)).isProbablePrime();
+      return reImParts[0].powerRational(2L).add(reImParts[1].powerRational(2L)).isProbablePrime();
     }
 
     @Override
@@ -1225,14 +1134,13 @@ public class PredicateQ {
       return S.False;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
   }
 
   /**
-   *
-   *
    * <pre>
    * SquareMatrixQ(m)
    * </pre>
@@ -1270,14 +1178,13 @@ public class PredicateQ {
     }
 
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
   }
 
   /**
-   *
-   *
    * <pre>
    * SymmetricMatrixQ(m)
    * </pre>
@@ -1348,6 +1255,7 @@ public class PredicateQ {
       return S.False;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
@@ -1385,8 +1293,6 @@ public class PredicateQ {
 
 
   /**
-   *
-   *
    * <pre>
    * ValueQ(expr)
    * </pre>
@@ -1425,6 +1331,7 @@ public class PredicateQ {
       return F.bool(ast.arg1().isValue());
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -1437,8 +1344,6 @@ public class PredicateQ {
   }
 
   /**
-   *
-   *
    * <pre>
    * VectorQ(v)
    * </pre>
@@ -1520,33 +1425,369 @@ public class PredicateQ {
       return S.False;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
   }
 
-  public static boolean isZeroTogether(IExpr expr, EvalEngine engine) {
-    expr = F.expandAll(expr, true, true);
-    expr = engine.evaluate(expr);
-    if (expr.isZero()) {
-      return true;
-    }
-    if (expr.leafCount() > Config.MAX_POSSIBLE_ZERO_LEAFCOUNT) {
+  private static boolean isZeroTogether(IExpr expr, EvalEngine engine) {
+    //    expr = F.expandAll(expr, true, true);
+    //    expr = engine.evaluate(expr);
+    //    if (expr.isZero()) {
+    //      return true;
+    //    }
+    long leafCount = expr.leafCount();
+    if (leafCount > Config.MAX_POSSIBLE_ZERO_LEAFCOUNT) {
       return false;
     }
     if (expr.isPlusTimesPower()) {
-      expr = engine.evaluate(expr);
+      if (leafCount > (Config.MAX_POSSIBLE_ZERO_LEAFCOUNT / 3)) {
+        return false;
+      }
+      expr = engine.evaluate(F.Together(expr));
       if (expr.isNumber()) {
         return expr.isZero();
       }
-      if (expr.isPlusTimesPower()) {
-        expr = F.Together.of(engine, expr);
-        if (expr.isNumber()) {
-          return expr.isZero();
+      if (expr.isTimes()) {
+        IExpr denominator = engine.evaluate(F.Denominator(expr));
+        if (!denominator.isOne()) {
+          IExpr numerator = engine.evaluate(F.Numerator(expr));
+          if (numerator.isAST()) {
+            return isPossibleZeroQ((IAST) numerator, false, engine);
+          }
         }
       }
     }
     return false;
+  }
+
+  public static boolean isPossibleZeroQ(IAST function, boolean fastTest, EvalEngine engine) {
+    try {
+      VariablesSet varSet = new VariablesSet(function);
+      IAST variables = varSet.getVarList();
+
+      if (function.leafCount() < Config.MAX_POSSIBLE_ZERO_LEAFCOUNT / 5) {
+        IExpr expr = F.TrigExpand.of(engine, function);
+        expr = F.expandAll(expr, true, true);
+        expr = engine.evaluate(expr);
+        if (!expr.isAST()) {
+          return expr.isZero();
+        }
+        function = (IAST) expr;
+      }
+      if (variables.isEmpty()) {
+        INumber num = function.isNumericFunction(true) ? function.evalNumber() : null;
+        if (num == null
+            || !(F.isZero(num.reDoubleValue(), Config.SPECIAL_FUNCTIONS_TOLERANCE)
+            && F.isZero(num.imDoubleValue(), Config.SPECIAL_FUNCTIONS_TOLERANCE))) {
+          return false;
+        }
+        return true;
+      } else {
+        if (function.isNumericFunction(varSet)) {
+
+          if (function.isFreeAST(new Predicate<IExpr>() {
+            @Override
+            public boolean test(IExpr h) {
+              return specialNumericFunction(h);
+            }
+          })) {
+            int trueCounter = 0;
+
+            // 1. step test some special complex numeric values
+            IExpr_COMPARE_TERNARY possibeZero =
+                isPossibeZeroFixedValues(F.C0, function, variables, engine);
+            if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+              return false;
+            }
+            if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+              trueCounter++;
+            }
+            possibeZero = isPossibeZeroFixedValues(F.C1, function, variables, engine);
+            if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+              return false;
+            }
+            if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+              trueCounter++;
+            }
+            possibeZero = isPossibeZeroFixedValues(F.CN1, function, variables, engine);
+            if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+              return false;
+            }
+            if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+              trueCounter++;
+            }
+            possibeZero = isPossibeZeroFixedValues(F.CI, function, variables, engine);
+            if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+              return false;
+            }
+            if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+              trueCounter++;
+            }
+            possibeZero = isPossibeZeroFixedValues(F.CNI, function, variables, engine);
+            if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+              return false;
+            }
+            if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+              trueCounter++;
+            }
+
+            if (trueCounter == 5) {
+              // 2. step test some random complex numeric values
+              for (int i = 0; i < 36; i++) {
+                possibeZero = isPossibeZero(function, variables, engine);
+                if (possibeZero == IExpr_COMPARE_TERNARY.FALSE) {
+                  return false;
+                }
+                if (possibeZero == IExpr_COMPARE_TERNARY.TRUE) {
+                  trueCounter++;
+                }
+              }
+              if (trueCounter > 28) {
+                return true;
+              }
+            }
+            if (fastTest) {
+              return false;
+            }
+          }
+        }
+      }
+
+      IExpr temp =
+          function.replace( //
+              /*x -> x.isNumericFunction(true)*/Predicates.isNumericFunctionTrue, //
+              new Function<IExpr, IExpr>() {
+                @Override
+                public IExpr apply(IExpr x) {
+                  IExpr t = x.evalNumber();
+                  return t != null ? t : F.NIL;
+                }
+              });
+      if (temp.isPresent()) {
+        temp = engine.evaluate(temp);
+        if (temp.isZero()) {
+          return true;
+        }
+      }
+
+      //      if (function.isPlus()) {
+      //        IExpr[] commonFactors = InternalFindCommonFactorPlus.findCommonFactors(function,
+      // true);
+      //        if (commonFactors != null) {
+      //          temp = S.Simplify.of(engine, F.Times(commonFactors[0], commonFactors[1]));
+      //          if (temp.isNumber()) {
+      //            return temp.isZero();
+      //          }
+      //          temp = temp.evalNumber();
+      //          if (temp != null) {
+      //            if (temp.isZero()) {
+      //              return true;
+      //            }
+      //          }
+      //        }
+      //      }
+
+      return isZeroTogether(function, engine);
+    } catch (ValidateException ve) {
+      if (FEConfig.SHOW_STACKTRACE) {
+        ve.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  private static boolean specialNumericFunction(IExpr head) {
+    if (head.isPower()) {
+      if (!head.exponent().isNumber()) {
+        return false;
+      }
+      return true;
+    }
+    int h = head.headID();
+
+    return h == ID.AppellF1
+        || h == ID.Clip
+        //        || h == ID.Cosh
+        || h == ID.Csch
+        || h == ID.Cot
+        || h == ID.Csc
+        || h == ID.Gamma
+        || h == ID.HankelH1
+        || h == ID.HankelH2
+        || h == ID.Hypergeometric0F1
+        || h == ID.Hypergeometric1F1
+        || h == ID.Hypergeometric2F1
+        || h == ID.Hypergeometric1F1Regularized
+        || h == ID.HypergeometricPFQ
+        || h == ID.HypergeometricPFQRegularized
+        || h == ID.HypergeometricU
+        || h == ID.JacobiAmplitude
+        || h == ID.JacobiCD
+        || h == ID.JacobiCN
+        || h == ID.JacobiDC
+        || h == ID.JacobiDN
+        || h == ID.JacobiNC
+        || h == ID.JacobiND
+        || h == ID.JacobiSC
+        || h == ID.JacobiSD
+        || h == ID.JacobiSN
+        || h == ID.JacobiZeta
+        || h == ID.KleinInvariantJ
+        || h == ID.Log
+        || h == ID.Piecewise
+        // || h == ID.Power
+        || h == ID.ProductLog
+        //        || h == ID.Sinh
+        || h == ID.StruveH
+        || h == ID.StruveL
+        || h == ID.Tan
+        || h == ID.WeierstrassHalfPeriods
+        || h == ID.WeierstrassInvariants
+        || h == ID.WeierstrassP
+        || h == ID.WeierstrassPPrime
+        || h == ID.InverseWeierstrassP;
+  }
+
+  /**
+   * Test if <code>Complex(re, im)</code> inserted into the function approximates <code>0</code>.
+   *
+   * <ul>
+   *   <li><code>IExpr_COMPARE_TERNARY.TRUE</code> if the result approximates <code>0</code>
+   *   <li><code>IExpr_COMPARE_TERNARY.FALSE</code> if the result is a number and doesn't
+   *       approximate <code>0</code>
+   *   <li><code>IExpr_COMPARE_TERNARY.UNDECIDABLE</code> if the result isn't a number
+   * </ul>
+   *
+   * @param function the function which should be evaluate for the <code>variable</code>
+   * @param variable the symbol which will be replaced by <code>Complex(re, im)</code> to evaluate
+   *     <code>function</code>
+   * @param realPart the real value of the complex variable
+   * @param imaginaryPart the imaginary value of the complex variable
+   * @param engine
+   * @return
+   */
+  //  private static IExpr_COMPARE_TERNARY isPossibeZero(
+  //      IAST function, IExpr variable, double realPart, double imaginaryPart, EvalEngine engine) {
+  //    IComplexNum c = F.complexNum(realPart, imaginaryPart);
+  //    IExpr temp = function.replaceAll(F.Rule(variable, c));
+  //    try {
+  //      if (temp.isPresent()) {
+  //        IExpr result = engine.evalN(temp);
+  //        if (result.isZero()) {
+  //          return IExpr_COMPARE_TERNARY.TRUE;
+  //        }
+  //        if (result.isNumber() && !result.isZero()) {
+  //          INumber num = (INumber) result;
+  //          if (!(F.isZero(num.reDoubleValue(), Config.DEFAULT_ROOTS_CHOP_DELTA)
+  //              && F.isZero(num.imDoubleValue(), Config.DEFAULT_ROOTS_CHOP_DELTA))) {
+  //            return IExpr_COMPARE_TERNARY.FALSE;
+  //          }
+  //          return IExpr_COMPARE_TERNARY.TRUE;
+  //        }
+  //        if (result.isDirectedInfinity()) {
+  //          return IExpr_COMPARE_TERNARY.FALSE;
+  //        }
+  //      }
+  //    } catch (RuntimeException rex) {
+  //      //
+  //    }
+  //    return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+  //  }
+
+  /**
+   * Test if <code>Complex(re, im)</code> inserted into the arguments of the function and evaluated
+   * approximates <code>0</code>.
+   *
+   * <ul>
+   *   <li><code>IExpr_COMPARE_TERNARY.TRUE</code> if the result approximates <code>0</code>
+   *   <li><code>IExpr_COMPARE_TERNARY.FALSE</code> if the result is a number and doesn't
+   *       approximate <code>0</code>
+   *   <li><code>IExpr_COMPARE_TERNARY.UNDECIDABLE</code> if the result isn't a number
+   * </ul>
+   *
+   * @param function  the function which should be evaluate for the <code>variables</code>
+   * @param variables variables the symbols which will be replaced by <code>Complex(re, im)</code>
+   *                  to evaluate <code>function</code>
+   * @param engine
+   * @return
+   */
+  private static IExpr_COMPARE_TERNARY isPossibeZero(
+      IAST function, IAST variables, EvalEngine engine) {
+    IASTAppendable listOfRules = F.ListAlloc(variables.size());
+    ThreadLocalRandom tlr = ThreadLocalRandom.current();
+    for (int i = 1; i < variables.size(); i++) {
+      double re = tlr.nextDouble(-100, 100);
+      double im = tlr.nextDouble(-100, 100);
+      listOfRules.append(F.Rule(variables.get(i), F.complexNum(re, im)));
+    }
+    IExpr temp = function.replaceAll(listOfRules);
+    return isPossibleZeroApproximate(temp, engine);
+  }
+
+  private static IExpr_COMPARE_TERNARY isPossibeZeroFixedValues(
+      INumber number, IAST function, IAST variables, EvalEngine engine) {
+    IASTAppendable listOfRules = F.ListAlloc(variables.size());
+    for (int i = 1; i < variables.size(); i++) {
+      listOfRules.append(F.Rule(variables.get(i), number));
+    }
+    IExpr temp = function.replaceAll(listOfRules);
+    return isPossibleZeroExact(temp, engine);
+  }
+
+  private static IExpr_COMPARE_TERNARY isPossibleZeroExact(IExpr temp, EvalEngine engine) {
+    try {
+      if (temp.isPresent()) {
+        IExpr result = engine.evalQuiet(temp);
+        if (result.isNumber()) {
+          return result.isZero() ? IExpr_COMPARE_TERNARY.TRUE : IExpr_COMPARE_TERNARY.FALSE;
+        }
+        if (result.isDirectedInfinity()) {
+          return IExpr_COMPARE_TERNARY.FALSE;
+        }
+
+        //        if (isZeroTogether(result, engine)) {
+        //          return IExpr_COMPARE_TERNARY.TRUE;
+        //        }
+      }
+    } catch (RuntimeException rex) {
+      //
+    }
+    return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+  }
+
+  private static IExpr_COMPARE_TERNARY isPossibleZeroApproximate(IExpr temp, EvalEngine engine) {
+    try {
+      if (temp.isPresent()) {
+        IExpr result = engine.evalQuiet(F.N(temp));
+        if (result.isZero()) {
+          return IExpr_COMPARE_TERNARY.TRUE;
+        }
+        if (result.isNumber() && !result.isZero()) {
+          double realPart = ((INumber) result).reDoubleValue();
+          double imaginaryPart = ((INumber) result).imDoubleValue();
+          if (!(F.isZero(realPart, Config.SPECIAL_FUNCTIONS_TOLERANCE)
+              && F.isZero(imaginaryPart, Config.SPECIAL_FUNCTIONS_TOLERANCE))) {
+            if (Double.isNaN(realPart)
+                || Double.isNaN(imaginaryPart)
+                || Double.isInfinite(realPart)
+                || Double.isInfinite(imaginaryPart)) {
+              return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+            }
+            //            System.out.println("\n"+temp.toString() +((INumber) result).toString());
+            return IExpr_COMPARE_TERNARY.FALSE;
+          }
+          return IExpr_COMPARE_TERNARY.TRUE;
+        }
+        if (result.isDirectedInfinity()) {
+          return IExpr_COMPARE_TERNARY.FALSE;
+        }
+      }
+    } catch (RuntimeException rex) {
+      //
+    }
+    return IExpr_COMPARE_TERNARY.UNDECIDABLE;
   }
 
   public static void initialize() {

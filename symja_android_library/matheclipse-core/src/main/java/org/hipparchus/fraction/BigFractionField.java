@@ -37,88 +37,91 @@ import java.io.Serializable;
  */
 public class BigFractionField implements Field<BigFraction>, Serializable {
 
-    /**
-     * Serializable version identifier
-     */
-    private static final long serialVersionUID = -1699294557189741703L;
+  /**
+   * Serializable version identifier
+   */
+  private static final long serialVersionUID = -1699294557189741703L;
+
+  /**
+   * Private constructor for the singleton.
+   */
+  private BigFractionField() {
+  }
+
+  /**
+   * Get the unique instance.
+   *
+   * @return the unique instance
+   */
+  public static BigFractionField getInstance() {
+    return LazyHolder.INSTANCE;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public BigFraction getOne() {
+    return BigFraction.ONE;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public BigFraction getZero() {
+    return BigFraction.ZERO;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<BigFraction> getRuntimeClass() {
+    return BigFraction.class;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object other) {
+    return this == other;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode() {
+    return 0x7666e832;
+  }
+
+  // CHECKSTYLE: stop HideUtilityClassConstructor
+
+  /**
+   * Holder for the instance.
+   * <p>We use here the Initialization On Demand Holder Idiom.</p>
+   */
+  private static class LazyHolder {
 
     /**
-     * Private constructor for the singleton.
+     * Cached field instance.
      */
-    private BigFractionField() {
-    }
+    private static final BigFractionField INSTANCE = new BigFractionField();
+  }
+  // CHECKSTYLE: resume HideUtilityClassConstructor
 
-    /**
-     * Get the unique instance.
-     *
-     * @return the unique instance
-     */
-    public static BigFractionField getInstance() {
-        return LazyHolder.INSTANCE;
-    }
+  /**
+   * Handle deserialization of the singleton.
+   *
+   * @return the singleton instance
+   */
+  private Object readResolve() {
+    // return the singleton instance
+    return LazyHolder.INSTANCE;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BigFraction getZero() {
-        return BigFraction.ZERO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BigFraction getOne() {
-        return BigFraction.ONE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<? extends FieldElement<BigFraction>> getRuntimeClass() {
-        return BigFraction.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object other) {
-        return this == other;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return 0x7666e832;
-    }
-
-    // CHECKSTYLE: stop HideUtilityClassConstructor
-
-    /**
-     * Handle deserialization of the singleton.
-     *
-     * @return the singleton instance
-     */
-    private Object readResolve() {
-        // return the singleton instance
-        return LazyHolder.INSTANCE;
-    }
-    // CHECKSTYLE: resume HideUtilityClassConstructor
-
-    /**
-     * Holder for the instance.
-     * <p>We use here the Initialization On Demand Holder Idiom.</p>
-     */
-    private static class LazyHolder {
-        /**
-         * Cached field instance.
-         */
-        private static final BigFractionField INSTANCE = new BigFractionField();
-    }
 
 }

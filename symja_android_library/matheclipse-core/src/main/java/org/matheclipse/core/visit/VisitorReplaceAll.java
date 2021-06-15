@@ -80,17 +80,17 @@ public class VisitorReplaceAll extends VisitorExpr {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) { return true; }
-    if (obj == null) { return false; }
-    if (getClass() != obj.getClass()) { return false; }
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     VisitorReplaceAll other = (VisitorReplaceAll) obj;
     if (fFunction == null) {
-      if (other.fFunction != null) { return false; }
-    } else if (!fFunction.equals(other.fFunction)) { return false; }
-    if (fOffset != other.fOffset) { return false; }
+      if (other.fFunction != null) return false;
+    } else if (!fFunction.equals(other.fFunction)) return false;
+    if (fOffset != other.fOffset) return false;
     if (fPostProcessing == null) {
-      if (other.fPostProcessing != null) { return false; }
-    } else if (!fPostProcessing.equals(other.fPostProcessing)) { return false; }
+      if (other.fPostProcessing != null) return false;
+    } else if (!fPostProcessing.equals(other.fPostProcessing)) return false;
     return true;
   }
 
@@ -214,9 +214,7 @@ public class VisitorReplaceAll extends VisitorExpr {
     return fFunction.apply(element);
   }
 
-  /**
-   * @return <code>F.NIL</code>, if no evaluation is possible
-   */
+  /** @return <code>F.NIL</code>, if no evaluation is possible */
   @ObjcMemoryIssue
   @Override
   public IExpr visit(final IAssociation assoc) {

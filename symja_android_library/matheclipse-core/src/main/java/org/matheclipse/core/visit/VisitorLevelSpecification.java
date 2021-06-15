@@ -9,6 +9,7 @@ import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.SymjaMathException;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IAssociation;
@@ -127,7 +128,8 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 							fFromLevel = 0;
 							fToLevel = Validate.throwIntType(i1, Integer.MIN_VALUE, engine);
 						} else if (i1.isNegative()) {
-							// all subexpressions at any level greater equal i0 that have a depth of -i1 or greater.
+              // all subexpressions at any level greater equal i0 that have a depth of -i1 or
+              // greater.
 							fFromDepth = Integer.MIN_VALUE;
 							fToDepth = Validate.throwIntType(i1, Integer.MIN_VALUE, engine);
 							fFromLevel = Validate.throwIntType(i0, Integer.MIN_VALUE, engine);
@@ -164,7 +166,7 @@ public class VisitorLevelSpecification extends AbstractVisitor {
 				}
 			}
 		}
-		if (levelExpr.isInfinity() || levelExpr.equals(F.All)) {
+    if (levelExpr.isInfinity() || levelExpr.equals(S.All)) {
 			// level specification Infinity and -1 are equivalent
 			fToLevel = Integer.MAX_VALUE;
 			fFromLevel = 1;

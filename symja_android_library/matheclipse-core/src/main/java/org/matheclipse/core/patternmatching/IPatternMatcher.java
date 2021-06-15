@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.interfaces.IExpr;
 
@@ -85,6 +86,7 @@ public abstract class IPatternMatcher
     fLhsPatternExpr = lhsPatternExpr;
   }
 
+  @Override
   public Object clone() throws CloneNotSupportedException {
     IPatternMatcher v = (IPatternMatcher) super.clone();
     v.fLhsPatternExpr = fLhsPatternExpr;
@@ -233,5 +235,13 @@ public abstract class IPatternMatcher
    */
   public boolean testBlank(IExpr expr, EvalEngine engine) {
     return test(expr, engine);
+  }
+  /**
+   * If <code>true</code> throw a {@link ThrowException} with the matching result as it's value.
+   *
+   * @param throwIfMatched
+   */
+  public void throwExceptionArgIfMatched(boolean throwIfMatched) {
+    //
   }
 }

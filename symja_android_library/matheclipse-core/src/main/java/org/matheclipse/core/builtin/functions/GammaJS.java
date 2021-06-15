@@ -2,6 +2,7 @@ package org.matheclipse.core.builtin.functions;
 
 import com.duy.lambda.DoubleFunction;
 
+import com.gx.common.math.DoubleMath;
 import org.hipparchus.analysis.differentiation.DSFactory;
 import org.hipparchus.analysis.differentiation.FiniteDifferencesDifferentiator;
 import org.hipparchus.analysis.differentiation.UnivariateDifferentiableFunction;
@@ -16,6 +17,7 @@ import org.matheclipse.core.builtin.ConstantDefinitions;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.NumberUtil;
 import org.matheclipse.core.generic.UnaryNumerical;
 import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -167,11 +169,12 @@ public class GammaJS {
     if (n < 0.0) {
       throw new ArgumentTypeException("Factorial: n<0.0");
     }
-    double result = 1.0;
-    for (int i = 2; i <= n; i++) {
-      result *= i;
-    }
-    return result;
+    return DoubleMath.factorial(NumberUtil.toInt(n));
+    //    double result = 1.0;
+    //    for (int i = 2; i <= n; i++) {
+    //      result *= i;
+    //    }
+    //    return result;
 
   }
 
@@ -314,7 +317,7 @@ public class GammaJS {
     }
 
     double delta = 1e-5;
-    if (x.abs() < delta) {
+    if (x.norm() < delta) {
       // TODO implement case for abs value near 0
 
       // return taylorSeries( t => gamma(t,y), mul( x, delta/x.abs( ) ), 2.0)(x);
@@ -395,15 +398,15 @@ public class GammaJS {
 
   public static Complex expIntegralEi(Complex x) {
     double useAsymptotic = 26.0;
-    if (x.abs() > useAsymptotic) {
+    if (x.norm() > useAsymptotic) {
 
       Complex s = Complex.ONE;
       Complex p = Complex.ONE;
       int i = 1;
 
       Complex xInverse = x.reciprocal();
-      while (Math.abs(p.getReal()) > Config.SPECIAL_FUNCTIONS_TOLERANCE || //
-          Math.abs(p.getImaginary()) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
+      while (Math.abs(p.getReal()) > Config.SPECIAL_FUNCTIONS_TOLERANCE
+          || Math.abs(p.getImaginary()) > Config.SPECIAL_FUNCTIONS_TOLERANCE) {
         p = p.multiply(i).multiply(xInverse);
         s = s.add(p);
         i++;

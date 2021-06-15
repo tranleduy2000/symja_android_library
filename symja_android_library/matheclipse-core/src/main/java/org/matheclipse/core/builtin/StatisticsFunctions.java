@@ -3,6 +3,7 @@ package org.matheclipse.core.builtin;
 import com.duy.lambda.Consumer;
 import com.duy.lambda.Function;
 import com.duy.lambda.IntFunction;
+import com.duy.lambda.Predicate;
 import com.duy.lambda.Supplier;
 import com.duy.lang.DMath;
 import com.duy.util.ThreadLocalRandom;
@@ -39,6 +40,7 @@ import org.matheclipse.core.expression.ASTRealVector;
 import org.matheclipse.core.expression.ApcomplexNum;
 import org.matheclipse.core.expression.ApfloatNum;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -133,14 +135,12 @@ public class StatisticsFunctions {
     return (IDiscreteDistribution) ((IBuiltInSymbol) arg1.head()).getEvaluator();
   }
 
-  /**
-   * Capability to produce random variate.
-   */
-  interface IRandomVariate {
+  /** Capability to produce random variate. */
+  /*package*/ interface IRandomVariate {
 
     /**
      * @param distribution the distribution
-     * @param size the size of the sample
+     * @param size         the size of the sample
      * @return sample generated using the given random generator
      */
     public IExpr randomVariate(Random random, IAST distribution, int size);
@@ -262,21 +262,19 @@ public class StatisticsFunctions {
     }
   }
 
-  /**
-   * probability density function
-   */
+  /** probability density function */
   @SuppressWarnings("JavadocReference")
   public interface IPDF {
 
     /**
-     * <p>
-     * For {@link IExpectationDiscreteDistribution}, the function returns the P(X == x), i.e. probability of random
-     * variable X == x
+     * For {@link IExpectationDiscreteDistribution}, the function returns the P(X == x), i.e.
+     * probability of random variable X == x
      *
-     * <p>
-     * For continuous distributions, the function
+     * <p>For continuous distributions, the function
+     *
      * <ul>
-     * <li>returns the value of the probability density function, which is <em>not</em> identical to P(X == x)]
+     *   <li>returns the value of the probability density function, which is <em>not</em> identical
+     *       to P(X == x)]
      * </ul>
      *
      * @param x
@@ -289,11 +287,26 @@ public class StatisticsFunctions {
      * Call the pure (CDF, InverseCDF, PDF,...) function.
      *
      * @param function the pure function
-     * @param x if <code>F.NIL</code> return the pure function unevaluated. If <code>List(...)</code> map the pure
-     * function over all elements.
+     * @param x        if <code>F.NIL</code> return the pure function unevaluated. If <code>List(...)</code> map the pure
+     *                 function over all elements.
      * @return
      */
-    IExpr callFunction(IExpr pureFunction, IExpr x);
+    IExpr callFunction(IExpr pureFunction, IExpr x); /*{
+      IExpr pureFunction = function;
+      if (pureFunction.isFunction()) {
+        EvalEngine engine = EvalEngine.get();
+        if (!engine.isNumericMode()) {
+          ((IASTMutable) pureFunction).set(1, engine.evaluateNonNumeric(pureFunction.first()));
+        }
+      }
+      if (x.isPresent()) {
+        if (x.isList()) {
+          return ((IAST) x).map(v -> F.unaryAST1(pureFunction, v), 1);
+        }
+        return F.unaryAST1(pureFunction, x);
+      }
+      return pureFunction;
+    }*/
   }
 
   /**
@@ -302,16 +315,16 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns the arithmetic geometric mean of <code>a</code> and <code>b</code>.
-   * </p>
+   *
+   * <p>returns the arithmetic geometric mean of <code>a</code> and <code>b</code>.
+   *
    * </blockquote>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean">Wikipedia - Arithmetic-geometric
-   * mean)</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean">Wikipedia -
+   *       Arithmetic-geometric mean)</a>
    * </ul>
    */
   private static class ArithmeticGeometricMean extends AbstractArg2 {
@@ -358,6 +371,7 @@ public class StatisticsFunctions {
       // return F.num(a1);
     }
 
+    @Override
     public IExpr e2ObjArg(IAST ast, final IExpr a, final IExpr b) {
       if (a.isZero() || a.equals(b)) {
         return a;
@@ -407,23 +421,26 @@ public class StatisticsFunctions {
    * <code>CDF</code> can be applied to the following distributions:
    * </p>
    * <blockquote>
-   * <p>
-   * <a href="BernoulliDistribution.md">BernoulliDistribution</a>,
-   * <a href="BinomialDistribution.md">BinomialDistribution</a>,
-   * <a href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>,
-   * <a href="ErlangDistribution.md">ErlangDistribution</a>,
-   * <a href="ExponentialDistribution.md">ExponentialDistribution</a>,
-   * <a href="FrechetDistribution.md">FrechetDistribution</a>, <a href="GammaDistribution.md">GammaDistribution</a>,
-   * <a href="GeometricDistribution.md">GeometricDistribution</a>,
-   * <a href="GumbelDistribution.md">GumbelDistribution</a>,
-   * <a href="HypergeometricDistribution.md">HypergeometricDistribution</a>,
-   * <a href="LogNormalDistribution.md">LogNormalDistribution</a>,
-   * <a href="NakagamiDistribution.md">NakagamiDistribution</a>,
-   * <a href="NormalDistribution.md">NormalDistribution</a>, <a href="PoissonDistribution.md">PoissonDistribution</a>,
-   * <a href="StudentTDistribution.md">StudentTDistribution</a>,
-   * <a href="WeibullDistribution.md">WeibullDistribution</a>
-   * </p>
+   *
+   * <p><a href="BernoulliDistribution.md">BernoulliDistribution</a>, <a
+   * href="BinomialDistribution.md">BinomialDistribution</a>, <a
+   * href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>, <a
+   * href="ErlangDistribution.md">ErlangDistribution</a>, <a
+   * href="ExponentialDistribution.md">ExponentialDistribution</a>, <a
+   * href="FrechetDistribution.md">FrechetDistribution</a>, <a
+   * href="GammaDistribution.md">GammaDistribution</a>, <a
+   * href="GeometricDistribution.md">GeometricDistribution</a>, <a
+   * href="GumbelDistribution.md">GumbelDistribution</a>, <a
+   * href="HypergeometricDistribution.md">HypergeometricDistribution</a>, <a
+   * href="LogNormalDistribution.md">LogNormalDistribution</a>, <a
+   * href="NakagamiDistribution.md">NakagamiDistribution</a>, <a
+   * href="NormalDistribution.md">NormalDistribution</a>, <a
+   * href="PoissonDistribution.md">PoissonDistribution</a>, <a
+   * href="StudentTDistribution.md">StudentTDistribution</a>, <a
+   * href="WeibullDistribution.md">WeibullDistribution</a>
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -486,32 +503,31 @@ public class StatisticsFunctions {
    * returns the Bernoulli distribution.
    * </p>
    * </blockquote>
-   * <p>
-   * See:<br />
-   * </p>
+   *
+   * <p>See:<br>
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Bernoulli_distribution">Wikipedia - Bernoulli distribution</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Bernoulli_distribution">Wikipedia - Bernoulli
+   *       distribution</a>
    * </ul>
+   *
    * <h3>Examples</h3>
-   * <p>
-   * The probability density function of the Bernoulli distribution is
-   * </p>
+   *
+   * <p>The probability density function of the Bernoulli distribution is
    *
    * <pre>
    * &gt;&gt; PDF(BernoulliDistribution(p), x)
    * Piecewise({{1-p,x==0},{p,x==1}},0)
    * </pre>
-   * <p>
-   * The cumulative distribution function of the Bernoulli distribution is
-   * </p>
+   *
+   * <p>The cumulative distribution function of the Bernoulli distribution is
    *
    * <pre>
    * &gt;&gt; CDF(BernoulliDistribution(p), x)
    * Piecewise({{0,x&lt;0},{1-p,0&lt;=x&amp;&amp;x&lt;1}},1)
    * </pre>
-   * <p>
-   * The mean of the Bernoulli distribution is
-   * </p>
+   *
+   * <p>The mean of the Bernoulli distribution is
    *
    * <pre>
    * &gt;&gt; Mean(BernoulliDistribution(p))
@@ -543,11 +559,10 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <h3>Related terms</h3>
-   * <p>
-   * <a href="CDF.md">CDF</a>, <a href="Mean.md">Mean</a>, <a href="Mean.md">Median</a>, <a href="PDF.md">PDF</a>,
-   * <a href="Quantile.md">Quantile</a>, <a href="StandardDeviation.md">StandardDeviation</a>,
-   * <a href="Variance.md">Variance</a>
-   * </p>
+   *
+   * <p><a href="CDF.md">CDF</a>, <a href="Mean.md">Mean</a>, <a href="Mean.md">Median</a>, <a
+   * href="PDF.md">PDF</a>, <a href="Quantile.md">Quantile</a>, <a
+   * href="StandardDeviation.md">StandardDeviation</a>, <a href="Variance.md">Variance</a>
    */
   private final static class BernoulliDistribution extends IDistributionFunctionImpl
       implements ICDF, IDistribution, IPDF, IStatistics, IRandomVariate {
@@ -650,7 +665,6 @@ public class StatisticsFunctions {
         // see exception handling in RandonmVariate() function
         double p = dist.arg1().evalDouble();
         if (0 <= p && p <= 1) {
-          // return F.ZZ(new BinomialGenerator(1, p, random).nextValue());
           RandomDataGenerator rdg = new RandomDataGenerator();
           int[] vector = rdg.nextDeviates(
               new org.hipparchus.distribution.discrete.BinomialDistribution(1, p), size);
@@ -720,7 +734,8 @@ public class StatisticsFunctions {
           }
         }
         IExpr function =
-            // [$ ( ConditionalExpression(Piecewise({{InverseBetaRegularized(#, a, b), 0 < # < 1}, {0, # <=
+            // [$ ( ConditionalExpression(Piecewise({{InverseBetaRegularized(#, a, b), 0 < # < 1},
+            // {0, # <=
             // 0}}, 1), 0 <= # <= 1)& ) $]
             F.Function(
                 F.ConditionalExpression(
@@ -878,6 +893,8 @@ public class StatisticsFunctions {
           }
 
         }
+      } catch (ValidateException ve) {
+        return engine.printMessage(ast.topHead(), ve);
       } catch (ArithmeticException rex) {
         if (FEConfig.SHOW_STACKTRACE) {
           rex.printStackTrace();
@@ -954,7 +971,7 @@ public class StatisticsFunctions {
           int binIndex = index - xMin;
           if (binIndex < 0 || binIndex >= res.length) {
             continue;
-        }
+          }
           res[binIndex]++;
         }
         IASTAppendable result = F.ListAlloc(capacity + 1);
@@ -1261,11 +1278,13 @@ public class StatisticsFunctions {
         }
         IExpr function =
             // [$ Piecewise({{GammaRegularized(v/2, 0, #/2), # > 0}}, 0) & $]
-            F.Function(F.Piecewise(
-                F.List(
-                    F.List(F.GammaRegularized(F.Times(F.C1D2, v), F.C0, F.Times(F.C1D2, F.Slot1)),
-                        F.Greater(F.Slot1, F.C0))),
-                F.C0)); // $$;
+            F.Function(
+                F.Piecewise(
+                    F.List(
+                        F.List(
+                            F.GammaRegularized(F.Times(F.C1D2, v), F.C0, F.Times(F.C1D2, F.Slot1)),
+                            F.Greater(F.Slot1, F.C0))),
+                    F.C0)); // $$;
         return callFunction(function, k);
       }
       return F.NIL;
@@ -1286,7 +1305,8 @@ public class StatisticsFunctions {
           }
         }
         IExpr function =
-            // [$ ( ConditionalExpression(Piecewise({{2*InverseGammaRegularized(v/2, 0, #), 0 < # < 1}, {0,
+            // [$ ( ConditionalExpression(Piecewise({{2*InverseGammaRegularized(v/2, 0, #), 0 < # <
+            // 1}, {0,
             // # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
             F.Function(
                 F.ConditionalExpression(F.Piecewise(
@@ -1443,24 +1463,27 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * the Tuckey five-number summary is a set of descriptive statistics that provide information about a
-   * <code>dataset</code>. It consists of the five most important sample percentiles:
-   * </p>
+   *
+   * <p>the Tuckey five-number summary is a set of descriptive statistics that provide information
+   * about a <code>dataset</code>. It consists of the five most important sample percentiles:
+   *
    * <ol>
-   * <li>the sample minimum (smallest observation)</li>
-   * <li>the lower quartile or first quartile</li>
-   * <li>the median (the middle value)</li>
-   * <li>the upper quartile or third quartile</li>
-   * <li>the sample maximum (largest observation)</li>
+   *   <li>the sample minimum (smallest observation)
+   *   <li>the lower quartile or first quartile
+   *   <li>the median (the middle value)
+   *   <li>the upper quartile or third quartile
+   *   <li>the sample maximum (largest observation)
    * </ol>
+   *
    * </blockquote>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Five-number_summary">Wikipedia - Five-number summary</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Five-number_summary">Wikipedia - Five-number
+   *       summary</a>
    * </ul>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -1482,11 +1505,11 @@ public class StatisticsFunctions {
         // RealVector doubleArray = list.toRealVector();
         // if (doubleArray != null) {
         // IASTAppendable result = F.ListAlloc(5);
-        // result.append(F.num(doubleArray.getMinValue()));
+        // result.append(doubleArray.getMinValue());
         // result.append(F.Quantile(list, F.C1D4, param));
         // result.append(F.Median(list));
         // result.append(F.Quantile(list, F.C3D4, param));
-        // result.append(F.num(doubleArray.getMaxValue()));
+        // result.append(doubleArray.getMaxValue());
         //
         // return result;
         // }
@@ -1663,7 +1686,8 @@ public class StatisticsFunctions {
         IExpr n = dist.arg1();
         IExpr m = dist.arg2();
         return
-            // [$ Piecewise({{(2*Sqrt(2)*Sqrt(-4 + m)*(-2 + m + 2*n))/((-6 + m)*Sqrt(n)*Sqrt(-2 + m + n)), m > 6}},
+            // [$ Piecewise({{(2*Sqrt(2)*Sqrt(-4 + m)*(-2 + m + 2*n))/((-6 + m)*Sqrt(n)*Sqrt(-2 + m +
+            // n)), m > 6}},
             // Indeterminate) $]
             F.Piecewise(F.List(F.List(
                 F.Times(F.C2, F.CSqrt2, F.Sqrt(F.Plus(F.CN4, m)),
@@ -2176,7 +2200,7 @@ public class StatisticsFunctions {
             // [$ (Piecewise({{1 - (1 - n)^(1 + Floor(#)), # >= 0}}, 0)) & $]
             F.Function(
                 F.Piecewise(
-                F.List(
+                    F.List(
                         F.List(
                             F.Subtract(
                                 F.C1, F.Power(F.Subtract(F.C1, n), F.Plus(F.C1, F.Floor(F.Slot1)))),
@@ -2479,8 +2503,9 @@ public class StatisticsFunctions {
             } else if (F.isEqual(p, 1.0)) {
               return F.CInfinity;
             }
-            return F.num(n.evalDouble() + m.evalDouble() * FastMath.log(-FastMath.log(1.0 - p)));
-            // return F.num(new org.hipparchus.distribution.continuous.GumbelDistribution(n.evalDouble(),
+            return F.num(n.evalDouble() + m.evalDouble() * Math.log(-Math.log(1.0 - p)));
+            // return F.num(new
+            // org.hipparchus.distribution.continuous.GumbelDistribution(n.evalDouble(),
             // m.evalDouble()) //
             // .inverseCumulativeProbability(k.evalDouble()));
           } catch (RuntimeException rex) {
@@ -2488,7 +2513,8 @@ public class StatisticsFunctions {
           }
         }
         IExpr function =
-            // [$ ( ConditionalExpression(Piecewise({{n + m*Log(-Log(1 - #)), 0 < # < 1}, {-Infinity, # <=
+            // [$ ( ConditionalExpression(Piecewise({{n + m*Log(-Log(1 - #)), 0 < # < 1},
+            // {-Infinity, # <=
             // 0}}, Infinity), 0 <= # <= 1)& ) $]
             F.Function(
                 F.ConditionalExpression(
@@ -2851,9 +2877,9 @@ public class StatisticsFunctions {
         }
       } catch (final MathRuntimeException mre) {
         // org.hipparchus.exception.MathIllegalArgumentException: inconsistent dimensions: 0 != 3
-        return engine.printMessage(F.Covariance, mre);
+        return engine.printMessage(S.Covariance, mre);
       } catch (final ValidateException ve) {
-        return engine.printMessage(ve.getMessage(ast.topHead()));
+        return engine.printMessage(ast.topHead(), ve);
       } catch (final IndexOutOfBoundsException e) {
         if (FEConfig.SHOW_STACKTRACE) {
           e.printStackTrace();
@@ -2892,22 +2918,25 @@ public class StatisticsFunctions {
         return F.Times(F.C1D2, F.Subtract(arg1.arg1(), arg1.arg2()),
             F.Subtract(F.Conjugate(arg2.arg1()), F.Conjugate(arg2.arg2())));
       }
-      final IAST num1 = arg1.apply(F.Plus);
+      final IAST num1 = arg1.apply(S.Plus);
       final IExpr factor = F.ZZ(-1 * (arg1.size() - 2));
       IASTAppendable v1 = F.PlusAlloc(arg1.size());
-      v1.appendArgs(arg1.size(),
+      v1.appendArgs(
+          arg1.size(),
           new IntFunction<IExpr>() {
             @Override
             public IExpr apply(int i) {
-              return F.Times(F.CN1, num1.setAtCopy(i, F.Times(factor, arg1.get(i))),
+              return F.Times(
+                  F.CN1,
+                  num1.setAtCopy(i, F.Times(factor, arg1.get(i))),
                   F.Conjugate(arg2.get(i)));
             }
           });
-      return F.Divide(v1, F.ZZ(((long) arg1.argSize()) * (((long) arg1.size()) - 2L)));
+      return F.Divide(v1, F.ZZ((arg1.argSize()) * ((arg1.size()) - 2L)));
     }
 
     @Override
-    public IExpr matrixEval(FieldMatrix<IExpr> matrix) {
+    public IExpr matrixEval(FieldMatrix<IExpr> matrix, Predicate<IExpr> zeroChecker) {
       return F.NIL;
     }
 
@@ -3182,7 +3211,8 @@ public class StatisticsFunctions {
         IExpr n = dist.arg1();
         IExpr m = dist.arg2();
         IExpr function =
-            // [$ ( ConditionalExpression(Piecewise({{InverseGammaRegularized(n, 0, #)/m, 0 < # < 1}, {0, #
+            // [$ ( ConditionalExpression(Piecewise({{InverseGammaRegularized(n, 0, #)/m, 0 < # <
+            // 1}, {0, #
             // <= 0}}, Infinity), 0 <= # <= 1)& ) $]
             F.Function(
                 F.ConditionalExpression(
@@ -3876,36 +3906,38 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns the statistical mean of <code>list</code>.
-   * </p>
+   *
+   * <p>returns the statistical mean of <code>list</code>.
+   *
    * </blockquote>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Mean">Wikipedia - Mean</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Mean">Wikipedia - Mean</a>
    * </ul>
-   * <p>
-   * <code>Mean</code> can be applied to the following distributions:
-   * </p>
+   *
+   * <p><code>Mean</code> can be applied to the following distributions:
+   *
    * <blockquote>
-   * <p>
-   * <a href="BernoulliDistribution.md">BernoulliDistribution</a>,
-   * <a href="BinomialDistribution.md">BinomialDistribution</a>,
-   * <a href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>,
-   * <a href="ErlangDistribution.md">ErlangDistribution</a>,
-   * <a href="ExponentialDistribution.md">ExponentialDistribution</a>,
-   * <a href="FrechetDistribution.md">FrechetDistribution</a>, <a href="GammaDistribution.md">GammaDistribution</a>,
-   * <a href="GeometricDistribution.md">GeometricDistribution</a>,
-   * <a href="GumbelDistribution.md">GumbelDistribution</a>,
-   * <a href="HypergeometricDistribution.md">HypergeometricDistribution</a>,
-   * <a href="LogNormalDistribution.md">LogNormalDistribution</a>,
-   * <a href="NakagamiDistribution.md">NakagamiDistribution</a>,
-   * <a href="NormalDistribution.md">NormalDistribution</a>, <a href="PoissonDistribution.md">PoissonDistribution</a>,
-   * <a href="StudentTDistribution.md">StudentTDistribution</a>,
-   * <a href="WeibullDistribution.md">WeibullDistribution</a>
-   * </p>
+   *
+   * <p><a href="BernoulliDistribution.md">BernoulliDistribution</a>, <a
+   * href="BinomialDistribution.md">BinomialDistribution</a>, <a
+   * href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>, <a
+   * href="ErlangDistribution.md">ErlangDistribution</a>, <a
+   * href="ExponentialDistribution.md">ExponentialDistribution</a>, <a
+   * href="FrechetDistribution.md">FrechetDistribution</a>, <a
+   * href="GammaDistribution.md">GammaDistribution</a>, <a
+   * href="GeometricDistribution.md">GeometricDistribution</a>, <a
+   * href="GumbelDistribution.md">GumbelDistribution</a>, <a
+   * href="HypergeometricDistribution.md">HypergeometricDistribution</a>, <a
+   * href="LogNormalDistribution.md">LogNormalDistribution</a>, <a
+   * href="NakagamiDistribution.md">NakagamiDistribution</a>, <a
+   * href="NormalDistribution.md">NormalDistribution</a>, <a
+   * href="PoissonDistribution.md">PoissonDistribution</a>, <a
+   * href="StudentTDistribution.md">StudentTDistribution</a>, <a
+   * href="WeibullDistribution.md">WeibullDistribution</a>
+   *
    * </blockquote>
    * <h3>Examples</h3>
    *
@@ -4030,32 +4062,33 @@ public class StatisticsFunctions {
    * returns the median of <code>list</code>.
    * </p>
    * </blockquote>
-   * <p>
-   * See:
-   * </p>
+   *
+   * <p>See:
+   *
    * <ul>
-   * <li><a href="https://en.wikipedia.org/wiki/Median">Wikipedia - Median</a></li>
+   *   <li><a href="https://en.wikipedia.org/wiki/Median">Wikipedia - Median</a>
    * </ul>
-   * <p>
-   * <code>Median</code> can be applied to the following distributions:
-   * </p>
+   *
+   * <p><code>Median</code> can be applied to the following distributions:
+   *
    * <blockquote>
-   * <p>
-   * <a href="BernoulliDistribution.md">BernoulliDistribution</a>,
-   * <a href="BinomialDistribution.md">BinomialDistribution</a>,
-   * <a href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>,
-   * <a href="ErlangDistribution.md">ErlangDistribution</a>,
-   * <a href="ExponentialDistribution.md">ExponentialDistribution</a>,
-   * <a href="FrechetDistribution.md">FrechetDistribution</a>, <a href="GammaDistribution.md">GammaDistribution</a>,
-   * <a href="GeometricDistribution.md">GeometricDistribution</a>,
-   * <a href="GumbelDistribution.md">GumbelDistribution</a>,
-   * <a href="HypergeometricDistribution.md">HypergeometricDistribution</a>,
-   * <a href="LogNormalDistribution.md">LogNormalDistribution</a>,
-   * <a href="NakagamiDistribution.md">NakagamiDistribution</a>,
-   * <a href="NormalDistribution.md">NormalDistribution</a>,
-   * <a href="StudentTDistribution.md">StudentTDistribution</a>,
-   * <a href="WeibullDistribution.md">WeibullDistribution</a>
-   * </p>
+   *
+   * <p><a href="BernoulliDistribution.md">BernoulliDistribution</a>, <a
+   * href="BinomialDistribution.md">BinomialDistribution</a>, <a
+   * href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>, <a
+   * href="ErlangDistribution.md">ErlangDistribution</a>, <a
+   * href="ExponentialDistribution.md">ExponentialDistribution</a>, <a
+   * href="FrechetDistribution.md">FrechetDistribution</a>, <a
+   * href="GammaDistribution.md">GammaDistribution</a>, <a
+   * href="GeometricDistribution.md">GeometricDistribution</a>, <a
+   * href="GumbelDistribution.md">GumbelDistribution</a>, <a
+   * href="HypergeometricDistribution.md">HypergeometricDistribution</a>, <a
+   * href="LogNormalDistribution.md">LogNormalDistribution</a>, <a
+   * href="NakagamiDistribution.md">NakagamiDistribution</a>, <a
+   * href="NormalDistribution.md">NormalDistribution</a>, <a
+   * href="StudentTDistribution.md">StudentTDistribution</a>, <a
+   * href="WeibullDistribution.md">WeibullDistribution</a>
+   *
    * </blockquote>
    * <h3>Examples</h3>
    *
@@ -4215,7 +4248,7 @@ public class StatisticsFunctions {
      *
      * @param data
      * @param weights
-     * @param engine the evaluation engine
+     * @param engine  the evaluation engine
      * @return the sorted data at offset <code>0</code> and the new associated weights in the same order at offset
      * <code>1</code>
      */
@@ -4481,6 +4514,7 @@ public class StatisticsFunctions {
       return F.NIL;
     }
 
+    @Override
     public RealDistribution dist() {
       return new org.hipparchus.distribution.continuous.NormalDistribution(0, 1);
     }
@@ -5007,7 +5041,7 @@ public class StatisticsFunctions {
    * 1
    * </pre>
    */
-  private final static class Quantile extends AbstractFunctionEvaluator implements QuantileRules {
+  private static final class Quantile extends AbstractFunctionEvaluator implements QuantileRules {
 
     @Override
     public IAST getRuleAST() {
@@ -5030,110 +5064,117 @@ public class StatisticsFunctions {
           }
         });
       }
+      try {
 
-      int dimension = arg1.isVector();
-      if (dimension >= 0 || arg1.isList()) {
-        IExpr normal = arg1.normal(false);
-        if (normal.isList()) {
-          IAST list = (IAST) normal;
-          IExpr a = F.C0;
-          IExpr b = F.C0;
-          IExpr c = F.C1;
-          IExpr d = F.C0;
-          if (ast.size() == 4) {
-            IExpr arg3 = ast.arg3();
-            int[] dimParameters = arg3.isMatrix();
-            if (dimParameters == null || dimParameters[0] != 2 || dimParameters[1] != 2) {
-              return F.NIL;
+        int dimension = arg1.isVector();
+        if (dimension >= 0 || arg1.isList()) {
+          IExpr normal = arg1.normal(false);
+          if (normal.isList()) {
+            IAST list = (IAST) normal;
+            IExpr a = F.C0;
+            IExpr b = F.C0;
+            IExpr c = F.C1;
+            IExpr d = F.C0;
+            if (ast.size() == 4) {
+              IExpr arg3 = ast.arg3();
+              int[] dimParameters = arg3.isMatrix();
+              if (dimParameters == null || dimParameters[0] != 2 || dimParameters[1] != 2) {
+                return F.NIL;
+              }
+              a = arg3.first().first();
+              b = arg3.first().second();
+              c = arg3.second().first();
+              d = arg3.second().second();
             }
-            a = arg3.first().first();
-            b = arg3.first().second();
-            c = arg3.second().first();
-            d = arg3.second().second();
-          }
 
-          int dim1 = list.argSize();
-          try {
-            if (dim1 == 0) {
-              // Argument `1` should be a non-empty list.
-              return IOFunctions.printMessage(ast.topHead(), "empt", F.List(list), engine);
-            }
-            if (dim1 > 0 && ast.size() >= 3) {
+            int dim1 = list.argSize();
+            try {
+              if (dim1 == 0) {
+                // Argument `1` should be a non-empty list.
+                return IOFunctions.printMessage(ast.topHead(), "empt", F.List(list), engine);
+              }
+              if (dim1 > 0 && ast.size() >= 3) {
 
-              final IAST s = EvalAttributes.copySortLess(list);
-              final IInteger length = F.ZZ(s.argSize());
+                final IAST s = EvalAttributes.copySortLess(list);
+                final IInteger length = F.ZZ(s.argSize());
 
-              IExpr q = ast.arg2();
-              int dim2 = q.isVector();
-              if (dim2 >= 0 && q.isList()) {
-                final IAST vector = ((IAST) q);
-                return vector.mapThread(ast, 2);
-                // if (vector.forAll(x -> x.isReal())) {
-                // return vector.map(scalar -> of(s, length, (ISignedNumber) scalar), 1);
-                // }
-              } else {
-                if (q.isReal()) {
-                  ISignedNumber qi = (ISignedNumber) q;
-                  if (!qi.isRange(F.C0, F.C1)) {
-                    return IOFunctions.printMessage(ast.topHead(), "nquan", F.List(qi, F.C0, F.C1),
-                        engine);
-                  }
-                  // x = a + (length + b) * q
-                  IExpr x = q.isZero() ? a : F.Plus.of(engine, a, F.Times(F.Plus(length, b), q));
-                  if (x.isNumIntValue()) {
-                    int index = x.toIntDefault(Integer.MIN_VALUE);
-                    if (index != Integer.MIN_VALUE) {
-                      if (index < 1) {
-                        index = 1;
-                      } else if (index > s.argSize()) {
-                        index = s.argSize();
-                      }
-                      return s.get(index);
+                IExpr q = ast.arg2();
+                int dim2 = q.isVector();
+                if (dim2 >= 0 && q.isList()) {
+                  final IAST vector = ((IAST) q);
+                  return vector.mapThread(ast, 2);
+                  // if (vector.forAll(x -> x.isReal())) {
+                  // return vector.map(scalar -> of(s, length, (ISignedNumber) scalar), 1);
+                  // }
+                } else {
+                  if (q.isReal()) {
+                    ISignedNumber qi = (ISignedNumber) q;
+                    if (!qi.isRange(F.C0, F.C1)) {
+                      return IOFunctions
+                          .printMessage(ast.topHead(), "nquan", F.List(qi, F.C0, F.C1),
+                              engine);
                     }
-                  }
-                  if (x.isReal()) {
-                    ISignedNumber xi = (ISignedNumber) x;
-                    int xFloor = xi.floorFraction().toIntDefault();
-                    int xCeiling = xi.ceilFraction().toIntDefault();
-                    if (xFloor != Integer.MIN_VALUE && xCeiling != Integer.MIN_VALUE) {
-                      if (xFloor < 1) {
-                        xFloor = 1;
+                    // x = a + (length + b) * q
+                    IExpr x = q.isZero() ? a : S.Plus.of(engine, a, F.Times(F.Plus(length, b), q));
+                    if (x.isNumIntValue()) {
+                      int index = x.toIntDefault(Integer.MIN_VALUE);
+                      if (index != Integer.MIN_VALUE) {
+                        if (index < 1) {
+                          index = 1;
+                        } else if (index > s.argSize()) {
+                          index = s.argSize();
+                        }
+                        return s.get(index);
                       }
-                      if (xCeiling > s.argSize()) {
-                        xCeiling = s.argSize();
-                      }
-                      // factor = c + d * FractionalPart(x);
-                      IExpr factor = d.isZero() || xi.isZero() ? c
-                          : F.Plus.of(engine, c, F.Times(d, xi.fractionalPart()));
-                      // s[[Floor(x)]]+(s[[Ceiling(x)]]-s[[Floor(x)]]) * (c + d *
-                      // FractionalPart(x))
-                      return F.Plus(s.get(xFloor), //
-                          F.Times(F.Subtract(s.get(xCeiling), s.get(xFloor)), factor));
                     }
+                    if (x.isReal()) {
+                      ISignedNumber xi = (ISignedNumber) x;
+                      int xFloor = xi.floorFraction().toIntDefault();
+                      int xCeiling = xi.ceilFraction().toIntDefault();
+                      if (xFloor != Integer.MIN_VALUE && xCeiling != Integer.MIN_VALUE) {
+                        if (xFloor < 1) {
+                          xFloor = 1;
+                        }
+                        if (xCeiling > s.argSize()) {
+                          xCeiling = s.argSize();
+                        }
+                        // factor = c + d * FractionalPart(x);
+                        IExpr factor =
+                            d.isZero() || xi.isZero()
+                                ? c
+                                : S.Plus.of(engine, c, F.Times(d, xi.fractionalPart()));
+                        // s[[Floor(x)]]+(s[[Ceiling(x)]]-s[[Floor(x)]]) * (c + d *
+                        // FractionalPart(x))
+                        return F.Plus(s.get(xFloor), //
+                            F.Times(F.Subtract(s.get(xCeiling), s.get(xFloor)), factor));
+                      }
+                    }
+                    // return of(s, length, q);
                   }
-                  // return of(s, length, q);
                 }
               }
-            }
-          } catch (ArithmeticException ae) {
-            if (FEConfig.SHOW_STACKTRACE) {
-              ae.printStackTrace();
-            }
-          }
-        }
-      } else if (arg1.isDistribution() && ast.size() >= 3) {
-        final IExpr function = engine.evaluate(F.Quantile(arg1));
-        if (function.isFunction()) {
-          if (ast.arg2().isList()) {
-            return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
-              @Override
-              public IExpr apply(IExpr x) {
-                return F.unaryAST1(function, x);
+            } catch (ArithmeticException ae) {
+              if (FEConfig.SHOW_STACKTRACE) {
+                ae.printStackTrace();
               }
-            }, 1);
+            }
           }
-          return F.unaryAST1(function, ast.arg2());
+        } else if (arg1.isDistribution() && ast.size() >= 3) {
+          final IExpr function = engine.evaluate(F.Quantile(arg1));
+          if (function.isFunction()) {
+            if (ast.arg2().isList()) {
+              return ((IAST) ast.arg2()).map(new Function<IExpr, IExpr>() {
+                @Override
+                public IExpr apply(IExpr x) {
+                  return F.unaryAST1(function, x);
+                }
+              }, 1);
+            }
+            return F.unaryAST1(function, ast.arg2());
+          }
         }
+      } catch (ValidateException ve) {
+        return engine.printMessage(ast.topHead(), ve);
       }
       return F.NIL;
     }
@@ -5165,9 +5206,9 @@ public class StatisticsFunctions {
 
   private static class Quartiles extends AbstractFunctionEvaluator {
 
-    private final static IAST Q = F.List(F.C1D4, F.C1D2, F.C3D4);
+    private static final IAST Q = F.List(F.C1D4, F.C1D2, F.C3D4);
 
-    private final static IAST PARAMETER = F.List(F.List(F.C1D2, F.C0), F.List(F.C0, F.C1));
+    private static final IAST PARAMETER = F.List(F.List(F.C1D2, F.C0), F.List(F.C0, F.C1));
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -5194,7 +5235,7 @@ public class StatisticsFunctions {
 
   }
 
-  private final static class RandomVariate extends AbstractEvaluator {
+  private static final class RandomVariate extends AbstractEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -5325,17 +5366,17 @@ public class StatisticsFunctions {
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       IExpr x = ast.arg1();
       if (ast.size() == 2 && x.isList()) {
-        IExpr min = F.Min.of(engine, x);
-        IExpr max = F.Max.of(engine, x);
+        IExpr min = S.Min.of(engine, x);
+        IExpr max = S.Max.of(engine, x);
         return rescale(x, min, max, engine);
       }
       if (ast.size() >= 3) {
-        if (ast.arg2().isAST(F.List, 3)) {
+        if (ast.arg2().isAST(S.List, 3)) {
           IAST list1 = (IAST) ast.arg2();
           IExpr min = list1.first();
           IExpr max = list1.second();
           if (ast.size() == 4) {
-            if (ast.arg3().isAST(F.List, 3)) {
+            if (ast.arg3().isAST(S.List, 3)) {
               IAST list2 = (IAST) ast.arg3();
               IExpr ymin = list2.first();
               IExpr ymax = list2.second();
@@ -5378,11 +5419,12 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * gives Pearson's moment coefficient of skewness for $list$ (a measure for estimating the symmetry of a
-   * distribution).
-   * </p>
+   *
+   * <p>gives Pearson's moment coefficient of skewness for $list$ (a measure for estimating the
+   * symmetry of a distribution).
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -5390,7 +5432,7 @@ public class StatisticsFunctions {
    * 0.40704
    * </pre>
    */
-  private final static class Skewness extends AbstractEvaluator {
+  private static final class Skewness extends AbstractEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -5432,36 +5474,38 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * computes the standard deviation of <code>list</code>. <code>list</code> may consist of numerical values or
-   * symbols. Numerical values may be real or complex.
-   * </p>
+   *
+   * <p>computes the standard deviation of <code>list</code>. <code>list</code> may consist of
+   * numerical values or symbols. Numerical values may be real or complex.
+   *
    * </blockquote>
-   * <p>
-   * <code>StandardDeviation({{a1, a2, ...}, {b1, b2, ...}, ...})</code> will yield
-   * <code>{StandardDeviation({a1, b1, ...}, StandardDeviation({a2, b2, ...}), ...}</code>.
-   * </p>
-   * <p>
-   * <code>StandardDeviation</code> can be applied to the following distributions:
-   * </p>
+   *
+   * <p><code>StandardDeviation({{a1, a2, ...}, {b1, b2, ...}, ...})</code> will yield <code>
+   * {StandardDeviation({a1, b1, ...}, StandardDeviation({a2, b2, ...}), ...}</code>.
+   *
+   * <p><code>StandardDeviation</code> can be applied to the following distributions:
+   *
    * <blockquote>
-   * <p>
-   * <a href="BernoulliDistribution.md">BernoulliDistribution</a>,
-   * <a href="BinomialDistribution.md">BinomialDistribution</a>,
-   * <a href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>,
-   * <a href="ErlangDistribution.md">ErlangDistribution</a>,
-   * <a href="ExponentialDistribution.md">ExponentialDistribution</a>,
-   * <a href="FrechetDistribution.md">FrechetDistribution</a>, <a href="GammaDistribution.md">GammaDistribution</a>,
-   * <a href="GeometricDistribution.md">GeometricDistribution</a>,
-   * <a href="GumbelDistribution.md">GumbelDistribution</a>,
-   * <a href="HypergeometricDistribution.md">HypergeometricDistribution</a>,
-   * <a href="LogNormalDistribution.md">LogNormalDistribution</a>,
-   * <a href="NakagamiDistribution.md">NakagamiDistribution</a>,
-   * <a href="NormalDistribution.md">NormalDistribution</a>, <a href="PoissonDistribution.md">PoissonDistribution</a>,
-   * <a href="StudentTDistribution.md">StudentTDistribution</a>,
-   * <a href="WeibullDistribution.md">WeibullDistribution</a>
-   * </p>
+   *
+   * <p><a href="BernoulliDistribution.md">BernoulliDistribution</a>, <a
+   * href="BinomialDistribution.md">BinomialDistribution</a>, <a
+   * href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>, <a
+   * href="ErlangDistribution.md">ErlangDistribution</a>, <a
+   * href="ExponentialDistribution.md">ExponentialDistribution</a>, <a
+   * href="FrechetDistribution.md">FrechetDistribution</a>, <a
+   * href="GammaDistribution.md">GammaDistribution</a>, <a
+   * href="GeometricDistribution.md">GeometricDistribution</a>, <a
+   * href="GumbelDistribution.md">GumbelDistribution</a>, <a
+   * href="HypergeometricDistribution.md">HypergeometricDistribution</a>, <a
+   * href="LogNormalDistribution.md">LogNormalDistribution</a>, <a
+   * href="NakagamiDistribution.md">NakagamiDistribution</a>, <a
+   * href="NormalDistribution.md">NormalDistribution</a>, <a
+   * href="PoissonDistribution.md">PoissonDistribution</a>, <a
+   * href="StudentTDistribution.md">StudentTDistribution</a>, <a
+   * href="WeibullDistribution.md">WeibullDistribution</a>
+   *
    * </blockquote>
+   *
    * <h3>Examples</h3>
    *
    * <pre>
@@ -5643,8 +5687,10 @@ public class StatisticsFunctions {
           }
         }
         IExpr function =
-            // [$ ( ConditionalExpression(Piecewise({{(-Sqrt(n))*Sqrt(-1 + 1/InverseBetaRegularized(2*#,
-            // n/2, 1/2)), 0 < # < 1/2}, {0, # == 1/2}, {Sqrt(n)*Sqrt(-1 + 1/InverseBetaRegularized(2*(1 -
+            // [$ ( ConditionalExpression(Piecewise({{(-Sqrt(n))*Sqrt(-1 +
+            // 1/InverseBetaRegularized(2*#,
+            // n/2, 1/2)), 0 < # < 1/2}, {0, # == 1/2}, {Sqrt(n)*Sqrt(-1 +
+            // 1/InverseBetaRegularized(2*(1 -
             // #), n/2, 1/2)), 1/2 < # < 1}, {-Infinity, # <= 0}}, Infinity), 0 <= # <= 1)& ) $]
             F.Function(
                 F.ConditionalExpression(
@@ -5980,35 +6026,36 @@ public class StatisticsFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * computes the variance of <code>list</code>. <code>list</code> may consist of numerical values or symbols.
-   * Numerical values may be real or complex.
-   * </p>
+   *
+   * <p>computes the variance of <code>list</code>. <code>list</code> may consist of numerical
+   * values or symbols. Numerical values may be real or complex.
+   *
    * </blockquote>
-   * <p>
-   * <code>Variance({{a1, a2, ...}, {b1, b2, ...}, ...})</code> will yield
-   * <code>{Variance({a1, b1, ...}, Variance({a2, b2, ...}), ...}</code>.
-   * </p>
-   * <p>
-   * <code>Variance</code> can be applied to the following distributions:
-   * </p>
+   *
+   * <p><code>Variance({{a1, a2, ...}, {b1, b2, ...}, ...})</code> will yield <code>
+   * {Variance({a1, b1, ...}, Variance({a2, b2, ...}), ...}</code>.
+   *
+   * <p><code>Variance</code> can be applied to the following distributions:
+   *
    * <blockquote>
-   * <p>
-   * <a href="BernoulliDistribution.md">BernoulliDistribution</a>,
-   * <a href="BinomialDistribution.md">BinomialDistribution</a>,
-   * <a href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>,
-   * <a href="ErlangDistribution.md">ErlangDistribution</a>,
-   * <a href="ExponentialDistribution.md">ExponentialDistribution</a>,
-   * <a href="FrechetDistribution.md">FrechetDistribution</a>, <a href="GammaDistribution.md">GammaDistribution</a>,
-   * <a href="GeometricDistribution.md">GeometricDistribution</a>,
-   * <a href="GumbelDistribution.md">GumbelDistribution</a>,
-   * <a href="HypergeometricDistribution.md">HypergeometricDistribution</a>,
-   * <a href="LogNormalDistribution.md">LogNormalDistribution</a>,
-   * <a href="NakagamiDistribution.md">NakagamiDistribution</a>,
-   * <a href="NormalDistribution.md">NormalDistribution</a>, <a href="PoissonDistribution.md">PoissonDistribution</a>,
-   * <a href="StudentTDistribution.md">StudentTDistribution</a>,
-   * <a href="WeibullDistribution.md">WeibullDistribution</a>
-   * </p>
+   *
+   * <p><a href="BernoulliDistribution.md">BernoulliDistribution</a>, <a
+   * href="BinomialDistribution.md">BinomialDistribution</a>, <a
+   * href="DiscreteUniformDistribution.md">DiscreteUniformDistribution</a>, <a
+   * href="ErlangDistribution.md">ErlangDistribution</a>, <a
+   * href="ExponentialDistribution.md">ExponentialDistribution</a>, <a
+   * href="FrechetDistribution.md">FrechetDistribution</a>, <a
+   * href="GammaDistribution.md">GammaDistribution</a>, <a
+   * href="GeometricDistribution.md">GeometricDistribution</a>, <a
+   * href="GumbelDistribution.md">GumbelDistribution</a>, <a
+   * href="HypergeometricDistribution.md">HypergeometricDistribution</a>, <a
+   * href="LogNormalDistribution.md">LogNormalDistribution</a>, <a
+   * href="NakagamiDistribution.md">NakagamiDistribution</a>, <a
+   * href="NormalDistribution.md">NormalDistribution</a>, <a
+   * href="PoissonDistribution.md">PoissonDistribution</a>, <a
+   * href="StudentTDistribution.md">StudentTDistribution</a>, <a
+   * href="WeibullDistribution.md">WeibullDistribution</a>
+   *
    * </blockquote>
    * <h3>Examples</h3>
    *
@@ -6301,11 +6348,8 @@ public class StatisticsFunctions {
     }
 
     @Override
-    public void setUp(final ISymbol newSymbol) {
-    }
-
+    public void setUp(final ISymbol newSymbol) {}
   }
-
 
   public static void initialize() {
     Initializer.init();

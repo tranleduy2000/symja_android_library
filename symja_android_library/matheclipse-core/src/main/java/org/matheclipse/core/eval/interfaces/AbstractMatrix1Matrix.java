@@ -1,5 +1,6 @@
 package org.matheclipse.core.eval.interfaces;
 
+import com.duy.lambda.Predicate;
 import org.hipparchus.exception.MathRuntimeException;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.RealMatrix;
@@ -30,7 +31,8 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
       if (dims != null) {
         matrix = Convert.list2Matrix(ast.arg1());
         if (matrix != null) {
-          matrix = matrixEval(matrix);
+          Predicate<IExpr> zeroChecker = AbstractMatrix1Expr.optionZeroTest(ast, 2, engine);
+          matrix = matrixEval(matrix, zeroChecker);
           return Convert.matrix2List(matrix);
         }
 
@@ -47,6 +49,10 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
       if (FEConfig.SHOW_STACKTRACE) {
         e.printStackTrace();
       }
+    } catch (final RuntimeException rex) {
+      if (FEConfig.SHOW_STACKTRACE) {
+        rex.printStackTrace();
+      }
     } finally {
       engine.setTogetherMode(togetherMode);
     }
@@ -56,7 +62,7 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
 
   @Override
   public int[] expectedArgSize(IAST ast) {
-    return IFunctionEvaluator.ARGS_1_1;
+    return IFunctionEvaluator.ARGS_1_2;
   }
 
   @Override
@@ -74,7 +80,8 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
           if (fieldMatrix == null) {
             return F.NIL;
           }
-          fieldMatrix = matrixEval(fieldMatrix);
+          Predicate<IExpr> zeroChecker = AbstractMatrix1Expr.optionZeroTest(ast, 2, engine);
+          fieldMatrix = matrixEval(fieldMatrix, zeroChecker);
           return Convert.matrix2List(fieldMatrix);
         }
         matrix = ast.arg1().toRealMatrix();
@@ -115,7 +122,8 @@ public abstract class AbstractMatrix1Matrix extends AbstractFunctionEvaluator {
    * @param matrix the matrix which contains symbolic values
    * @return
    */
-  public abstract FieldMatrix<IExpr> matrixEval(FieldMatrix<IExpr> matrix);
+  public abstract FieldMatrix<IExpr> matrixEval(
+      FieldMatrix<IExpr> matrix, Predicate<IExpr> zeroChecker);
 
   /**
    * Evaluate the numeric matrix for this algorithm.

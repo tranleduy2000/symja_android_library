@@ -22,7 +22,7 @@
 package org.hipparchus.analysis.polynomials;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.FieldUnivariateFunction;
 import org.hipparchus.analysis.ParametricUnivariateFunction;
 import org.hipparchus.analysis.RealFieldUnivariateFunction;
@@ -207,7 +207,7 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Fie
     }
 
     @Override
-    public <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
+    public <T extends CalculusFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
         return new RealFieldUnivariateFunction<T>() {
             @Override
             public T value(T x) {
@@ -224,7 +224,7 @@ public class PolynomialFunction implements UnivariateDifferentiableFunction, Fie
      * @since 1.3
      */
     @Override
-    public <T extends RealFieldElement<T>> T value(final T t)
+    public <T extends CalculusFieldElement<T>> T value(final T t)
             throws MathIllegalArgumentException, NullArgumentException {
         MathUtils.checkNotNull(coefficients);
         int n = coefficients.length;

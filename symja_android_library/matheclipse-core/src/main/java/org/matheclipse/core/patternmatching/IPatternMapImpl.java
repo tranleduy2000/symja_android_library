@@ -16,11 +16,6 @@ import org.matheclipse.core.visit.VisitorReplaceAllWithPatternFlags;
 @SuppressWarnings("JavaDoc")
 public abstract class IPatternMapImpl implements IPatternMap {
 
-  /**
-   * The default priority when associating a new rule to a symbol. Lower values have higher priorities.
-   */
-  public final static int DEFAULT_RULE_PRIORITY = Integer.MAX_VALUE;
-
   @Override
   public void initPatternBlank() {
     initPattern();

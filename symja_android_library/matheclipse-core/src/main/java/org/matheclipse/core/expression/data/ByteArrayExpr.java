@@ -7,31 +7,42 @@ import java.io.ObjectOutput;
 import java.util.Arrays;
 import org.matheclipse.core.expression.DataExpr;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.WL;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IExpr;
 
 public class ByteArrayExpr extends DataExpr<byte[]> implements Externalizable {
 
-  /**
-   *
-   */
+  /** */
   private static final long serialVersionUID = 5799157739970931450L;
 
   /**
-   * @param value
+   * Create a new <a
+   * href="https://github.com/axkr/symja_android_library/tree/master/symja_android_library/doc/functions/ByteArray.md">ByteArray</a>
+   * object.
+   *
+   * @param array the byte array which should be wrapped
    * @return
    */
-  public static ByteArrayExpr newInstance(final byte[] value) {
-    return new ByteArrayExpr(value);
+  public static ByteArrayExpr newInstance(final byte[] array) {
+    return new ByteArrayExpr(array);
   }
 
   public ByteArrayExpr() {
-    super(F.ByteArray, null);
+    super(S.ByteArray, null);
   }
 
+  /**
+   * Create a new <a
+   * href="https://github.com/axkr/symja_android_library/tree/master/symja_android_library/doc/functions/ByteArray.md">ByteArray</a>
+   * object.
+   *
+   * @param array the byte array which should be wrapped
+   * @return
+   */
   protected ByteArrayExpr(final byte[] array) {
-    super(F.ByteArray, array);
+    super(S.ByteArray, array);
   }
 
   @Override
@@ -60,11 +71,16 @@ public class ByteArrayExpr extends DataExpr<byte[]> implements Externalizable {
     return new ByteArrayExpr(fData);
   }
 
+  @Override
   public IAST normal(boolean nilIfUnevaluated) {
     byte[] bArray = toData();
     return WL.toList(bArray);
   }
 
+  @Override
+  public String toString() {
+    return fHead.toString() + "[" + fData.length + " Bytes]";
+  }
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     final int len = in.readInt();

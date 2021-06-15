@@ -1,5 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2002-2021 Mikko Tommila
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.apfloat;
 
+import java.io.PushbackReader;
 import org.apfloat.spi.ApfloatImpl;
 
 import java.io.IOException;
@@ -27,11 +51,14 @@ import static java.util.FormattableFlags.UPPERCASE;
  * you construct an apfloat like <code>new Apfloat(0.3f, 1000)</code>, the
  * resulting number won't be accurate to 1000 digits, but only to roughly 7
  * digits (in radix 10). In fact, the resulting number will be something like
- * <code>0.30000001192092896</code>...
+ * <code>0.30000001192092896</code>...<p>
+ *
+ * If you want an <i>exact</i> representation of a floating-point primitive
+ * (which is a rational number), you can use {@link Aprational#Aprational(double)}.
  *
  * @see ApfloatMath
  *
- * @version 1.8.0
+ * @version 1.10.0
  * @author Mikko Tommila
  */
 
@@ -95,7 +122,7 @@ public class Apfloat
      */
 
     public Apfloat(String value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, false));
     }
@@ -104,7 +131,7 @@ public class Apfloat
      * Constructs an apfloat from the specified string, precision and radix.<p>
      *
      * Note that it's impossible to construct apfloats with a specified exponent
-     * and with radix >= 14, since the characters 'e' and 'E' will be treated as
+     * and with radix &gt;= 14, since the characters 'e' and 'E' will be treated as
      * digits of the mantissa.<p>
      *
      * For example, in radix 10, "1e5" means the decimal number 100000. But in
@@ -119,7 +146,7 @@ public class Apfloat
      */
 
     public Apfloat(String value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix, false));
     }
@@ -152,7 +179,7 @@ public class Apfloat
      */
 
     public Apfloat(long value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
@@ -170,7 +197,7 @@ public class Apfloat
      */
 
     public Apfloat(long value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
     }
@@ -194,7 +221,13 @@ public class Apfloat
 
     /**
      * Constructs an apfloat from the specified <code>float</code>
-     * and precision. The default radix will be used.
+     * and precision. The default radix will be used.<p>
+     *
+     * Note that the resulting apfloat won't accurately represent the given
+     * <code>float</code> value to more than the default precision of a
+     * <code>float</code>, for example in radix 10 the result is accurate to
+     * only 7 digits. The rest of the digits are unspecified even if a greater
+     * precision is specified.
      *
      * @param value The value of the number.
      * @param precision The precision of the number.
@@ -204,14 +237,20 @@ public class Apfloat
      */
 
     public Apfloat(float value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
 
     /**
      * Constructs an apfloat from the specified <code>float</code>,
-     * precision and radix.
+     * precision and radix.<p>
+     *
+     * Note that the resulting apfloat won't accurately represent the given
+     * <code>float</code> value to more than the default precision of a
+     * <code>float</code>, for example in radix 10 the result is accurate to
+     * only 7 digits. The rest of the digits are unspecified even if a greater
+     * precision is specified.
      *
      * @param value The value of the number.
      * @param precision The precision of the number.
@@ -222,7 +261,7 @@ public class Apfloat
      */
 
     public Apfloat(float value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
     }
@@ -246,7 +285,18 @@ public class Apfloat
 
     /**
      * Constructs an apfloat from the specified <code>double</code>
-     * and precision. The default radix will be used.
+     * and precision. The default radix will be used.<p>
+     *
+     * Note that the resulting apfloat won't accurately represent the given
+     * <code>double</code> value to more than the default precision of a
+     * <code>double</code>, for example in radix 10 the result is accurate to
+     * only 16 digits. The rest of the digits are unspecified even if a greater
+     * precision is specified.<p>
+     *
+     * In particular, this constructor does <i>not</i> work the same way as the
+     * {@link BigDecimal#BigDecimal(double)} constructor. If you want that kind
+     * of behavior then please use the {@link #Apfloat(BigDecimal, long)}
+     * constructor.
      *
      * @param value The value of the number.
      * @param precision The precision of the number.
@@ -256,14 +306,25 @@ public class Apfloat
      */
 
     public Apfloat(double value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
 
     /**
      * Constructs an apfloat from the specified <code>double</code>,
-     * precision and radix.
+     * precision and radix.<p>
+     *
+     * Note that the resulting apfloat won't accurately represent the given
+     * <code>double</code> value to more than the default precision of a
+     * <code>double</code>, for example in radix 10 the result is accurate to
+     * only 16 digits. The rest of the digits are unspecified even if a greater
+     * precision is specified.<p>
+     *
+     * In particular, this constructor does <i>not</i> work the same way as the
+     * {@link BigDecimal#BigDecimal(double)} constructor. If you want that kind
+     * of behavior then please use the {@link #Apfloat(BigDecimal, long)}
+     * constructor.
      *
      * @param value The value of the number.
      * @param precision The precision of the number.
@@ -274,11 +335,77 @@ public class Apfloat
      */
 
     public Apfloat(double value, long precision, int radix)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision, radix));
     }
 
+    /**
+     * Reads an apfloat from a stream using default precision and radix.
+     * The stream needs to be a <code>PushbackReader</code>,
+     * as the first invalid character is pushed back to the stream.<p>
+     *
+     * Note that since only a pushback buffer of one character is used,
+     * the number read may still not be valid. For example, if the stream
+     * contains <code>"-#"</code> or <code>"1.5e#"</code> (here <code>'#'</code>
+     * is the first invalid character), the number is actually not valid, and
+     * only the character <code>'#'</code> would be put back to the stream.<p>
+     *
+     * The precision is determined similarly as in the {@link #Apfloat(String)}
+     * constructor that is as the number of digits read from the stream.
+     *
+     * @param in The stream to read from
+     *
+     * @exception java.io.IOException If an I/O error occurs accessing the stream.
+     * @exception java.lang.NumberFormatException If the number is not valid.
+     */
+
+    public Apfloat(PushbackReader in)
+        throws IOException, NumberFormatException, ApfloatRuntimeException
+    {
+        this(ApfloatHelper.createApfloat(in, false));
+    }
+
+    /**
+     * Reads an apfloat from a stream using the specified precision.
+     * The default radix is used.
+     *
+     * @param in The stream to read from
+     * @param precision The precision of the number.
+     *
+     * @exception java.io.IOException If an I/O error occurs accessing the stream.
+     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
+     *
+     * @see #Apfloat(PushbackReader)
+     */
+
+    public Apfloat(PushbackReader in, long precision)
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        this(ApfloatHelper.createApfloat(in, precision, false));
+    }
+
+    /**
+     * Reads an apfloat from a stream using the specified precision
+     * and radix.
+     *
+     * @param in The stream to read from
+     * @param precision The precision of the number.
+     * @param radix The radix of the number.
+     *
+     * @exception java.io.IOException If an I/O error occurs accessing the stream.
+     * @exception java.lang.NumberFormatException If the number is not valid.
+     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
+     *
+     * @see #Apfloat(PushbackReader)
+     */
+
+    public Apfloat(PushbackReader in, long precision, int radix)
+        throws IOException, NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        this(ApfloatHelper.createApfloat(in, precision, radix, false));
+    }
     /**
      * Constructs an apfloat from a <code>BigInteger</code>.
      * Precision will be {@link #INFINITE} and the default radix
@@ -307,11 +434,28 @@ public class Apfloat
      */
 
     public Apfloat(BigInteger value, long precision)
-        throws IllegalArgumentException, ApfloatRuntimeException
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
     {
         this(ApfloatHelper.createApfloat(value, precision));
     }
 
+    /**
+     * Constructs an apfloat from a <code>BigInteger</code> with
+     * the specified precision and radix.
+     *
+     * @param value The value of the number.
+     * @param precision The precision of the number.
+     * @param radix The radix of the number.
+     *
+     * @exception java.lang.NumberFormatException If the radix is not valid.
+     * @exception java.lang.IllegalArgumentException In case the precision is invalid.
+     */
+
+    public Apfloat(BigInteger value, long precision, int radix)
+        throws NumberFormatException, IllegalArgumentException, ApfloatRuntimeException
+    {
+        this(ApfloatHelper.createApfloat(value, precision, radix));
+    }
     /**
      * Creates an apfloat from a <code>BigDecimal</code>. An apfloat created this
      * way will always have radix 10 regardless of the current default radix.
@@ -347,6 +491,7 @@ public class Apfloat
      * @return Radix of this apfloat.
      */
 
+    @Override
     public int radix()
     {
         return this.impl.radix();
@@ -358,6 +503,7 @@ public class Apfloat
      * @return <code>this</code>
      */
 
+    @Override
     public Apfloat real()
     {
         return this;
@@ -369,6 +515,7 @@ public class Apfloat
      * @return {@link #ZERO}
      */
 
+    @Override
     public Apfloat imag()
     {
         return Apfloat.ZERO;
@@ -380,6 +527,7 @@ public class Apfloat
      * @return The precision of this apfloat in number of digits of the radix in which it's presented.
      */
 
+    @Override
     public long precision()
         throws ApfloatRuntimeException
     {
@@ -409,9 +557,10 @@ public class Apfloat
      *
      * @return An apfloat with the specified precision and same value as this apfloat.
      *
-     * @exception java.lang.IllegalArgumentException If <code>precision</code> is <= 0.
+     * @exception java.lang.IllegalArgumentException If <code>precision</code> is &lt;= 0.
      */
 
+    @Override
     public Apfloat precision(long precision)
         throws IllegalArgumentException, ApfloatRuntimeException
     {
@@ -425,7 +574,7 @@ public class Apfloat
      *
      * <code>apfloat = signum * mantissa * radix<sup>scale</sup></code><p>
      *
-     * where 1/radix <= mantissa < 1. In other words,
+     * where 1/radix &lt;= mantissa &lt; 1. In other words,
      * <code>scale&nbsp;=&nbsp;floor(log<sub>radix</sub>(apfloat))&nbsp;+&nbsp;1</code>.<p>
      *
      * For example, 1 has a scale of 1, and 100 has a scale of 3 (in radix 10).
@@ -438,6 +587,7 @@ public class Apfloat
      * @return The exponent of this apfloat in number of digits of the radix in which it's presented.
      */
 
+    @Override
     public long scale()
         throws ApfloatRuntimeException
     {
@@ -457,7 +607,7 @@ public class Apfloat
      * <code>apfloat = signum * mantissa * radix<sup>scale</sup></code> and<p>
      * <code>mantissa = n / radix<sup>size</sup></code><p>
      *
-     * where 1/radix <= mantissa < 1 and n is the smallest possible integer.
+     * where 1/radix &lt;= mantissa &lt; 1 and n is the smallest possible integer.
      * In other words, the size is the number of significant digits in the
      * mantissa (excluding leading and trailing zeros but including all zeros
      * between the first and last nonzero digit).
@@ -472,6 +622,7 @@ public class Apfloat
      * @since 1.6
      */
 
+    @Override
     public long size()
         throws ApfloatRuntimeException
     {
@@ -541,6 +692,7 @@ public class Apfloat
      * @since 1.1
      */
 
+    @Override
     public Apfloat negate()
         throws ApfloatRuntimeException
     {
@@ -788,7 +940,7 @@ public class Apfloat
     }
 
     /**
-     * Returns the fractional part. The fractional part is always <code>0 <= abs(frac()) < 1</code>.
+     * Returns the fractional part. The fractional part is always <code>0 &lt;= abs(frac()) &lt; 1</code>.
      * The fractional part has the same sign as the number. For the fractional and integer parts, this always holds:<p>
      *
      * <code>x = x.truncate() + x.frac()</code>
@@ -813,6 +965,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>double</code>.
      */
 
+    @Override
     public double doubleValue()
     {
         int targetPrecision = ApfloatHelper.getDoublePrecision(radix());
@@ -830,6 +983,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>float</code>.
      */
 
+    @Override
     public float floatValue()
     {
         return (float) doubleValue();
@@ -844,6 +998,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>byte</code>.
      */
 
+    @Override
     public byte byteValue()
     {
         long longValue = longValue();
@@ -859,6 +1014,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>short</code>.
      */
 
+    @Override
     public short shortValue()
     {
         long longValue = longValue();
@@ -874,6 +1030,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>int</code>.
      */
 
+    @Override
     public int intValue()
     {
         long longValue = longValue();
@@ -889,6 +1046,7 @@ public class Apfloat
      * @return The numeric value represented by this object after conversion to type <code>long</code>.
      */
 
+    @Override
     public long longValue()
     {
         int targetPrecision = ApfloatHelper.getLongPrecision(radix());
@@ -952,6 +1110,7 @@ public class Apfloat
      * @since 1.2
      */
 
+    @Override
     public Apfloat toRadix(int radix)
         throws NumberFormatException, ApfloatRuntimeException
     {
@@ -962,14 +1121,14 @@ public class Apfloat
      * Compare this apfloat to the specified apfloat.<p>
      *
      * Note: if two apfloats are compared where one number doesn't have enough
-     * precise digits, the mantissa is assumed to contain zeros. For example:<p>
+     * precise digits, the mantissa is assumed to contain zeros. For example:
      *
      * <pre>
      * Apfloat x = new Apfloat("0.12", 2);
      * Apfloat y = new Apfloat("0.12345", 5);
      * </pre>
      *
-     * Now <code>x.compareTo(y) < 0</code> because <code>x</code> is assumed to
+     * Now <code>x.compareTo(y) &lt; 0</code> because <code>x</code> is assumed to
      * be <code>0.12000</code>.<p>
      *
      * However, <code>new Apfloat("0.12", 2)</code> and <code>new Apfloat("0.12", 5)</code>
@@ -980,6 +1139,7 @@ public class Apfloat
      * @return -1, 0 or 1 as this apfloat is numerically less than, equal to, or greater than <code>x</code>.
      */
 
+    @Override
     public int compareTo(Apfloat x)
     {
         if (x.preferCompare(this))
@@ -1023,6 +1183,7 @@ public class Apfloat
      * @return <code>true</code> if the objects are equal; <code>false</code> otherwise.
      */
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -1046,11 +1207,41 @@ public class Apfloat
     }
 
     /**
+     * Tests two apfloat numbers for equality.
+     * Returns <code>false</code> if the numbers are definitely known to be not equal.
+     * If <code>true</code> is returned, equality is unknown and should be verified by
+     * calling {@link #equals(Object)}.
+     * This method is usually significantly faster than calling <code>equals(Object)</code>.
+     *
+     * @param x The number to test against.
+     *
+     * @return <code>false</code> if the numbers are definitely not equal, <code>true</code> if unknown.
+     *
+     * @since 1.10.0
+     */
+
+    public boolean test(Apfloat x)
+        throws ApfloatRuntimeException
+    {
+        if (x.preferCompare(this))
+        {
+            // Special handling of aprationals
+            return x.test(this);
+        }
+        else
+        {
+            return signum() == x.signum() &&
+                   scale() == x.scale() &&
+                   size() == x.size();
+        }
+    }
+    /**
      * Returns a hash code for this apfloat.
      *
      * @return The hash code value for this object.
      */
 
+    @Override
     public int hashCode()
     {
         return this.impl.hashCode();
@@ -1064,6 +1255,7 @@ public class Apfloat
      * @return A string representing this object.
      */
 
+    @Override
     public String toString(boolean pretty)
         throws ApfloatRuntimeException
     {
@@ -1079,6 +1271,7 @@ public class Apfloat
      * @exception java.io.IOException In case of I/O error writing to the stream.
      */
 
+    @Override
     public void writeTo(Writer out, boolean pretty)
         throws IOException, ApfloatRuntimeException
     {
@@ -1088,7 +1281,7 @@ public class Apfloat
     /**
      * Formats the object using the provided formatter.<p>
      *
-     * The format specifiers affect the output as follows:<p>
+     * The format specifiers affect the output as follows:
      * <ul>
      *   <li>By default, the exponential notation is used.</li>
      *   <li>If the alternate format is specified (<code>'#'</code>), then the fixed-point notation is used.</li>
@@ -1096,6 +1289,7 @@ public class Apfloat
      *   <li>If the <code>'-'</code> flag is specified, then the padding will be on the right.</li>
      *   <li>The precision is the number of significant digts output. If the precision of the number exceeds the number of characters output, the rounding mode for output is undefined.</li>
      * </ul>
+     * <p>
      *
      * The decimal separator will be localized if the formatter specifies a locale.
      * The digits will be localized also, but only if the radix is less than or equal to 10.
@@ -1108,6 +1302,7 @@ public class Apfloat
      * @since 1.3
      */
 
+    @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision)
     {
         Apfloat x = (precision == -1 ? this : ApfloatHelper.limitPrecision(this, precision));

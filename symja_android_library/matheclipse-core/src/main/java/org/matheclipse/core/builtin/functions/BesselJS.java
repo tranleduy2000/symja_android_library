@@ -13,12 +13,13 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.UnaryNumerical;
 import org.matheclipse.core.interfaces.ISymbol;
 
 /**
- * Ported from JavaScript file
- * <a href="https://github.com/paulmasson/math/blob/master/src/functions/bessel.js">bessel.js</a>
+ * Ported from JavaScript file <a
+ * href="https://github.com/paulmasson/math/blob/master/src/functions/bessel.js">bessel.js</a>
  */
 public class BesselJS {
 
@@ -35,7 +36,8 @@ public class BesselJS {
     }
     return new Complex(besselJDouble(n, x));
     // return new Complex(
-    // Math.pow(x / 2.0, n) * HypergeometricJS.hypergeometric0F1(n + 1, -0.25 * x * x) / Gamma.gamma(n + 1));
+    // Math.pow(x / 2.0, n) * HypergeometricJS.hypergeometric0F1(n + 1, -0.25 * x * x) /
+    // Gamma.gamma(n + 1));
   }
 
   public static double besselJDouble(double n, double x) {
@@ -98,7 +100,8 @@ public class BesselJS {
     // if (F.isNumIntValue(n)) {
     // return (besselY(n + delta, x).add(besselY(n - delta, x))).divide(2.0);
     // }
-    // return besselJ(n, x).multiply(Math.cos(n * Math.PI)).subtract(besselJ(-n, x)).divide(Math.sin(n * Math.PI));
+    // return besselJ(n, x).multiply(Math.cos(n * Math.PI)).subtract(besselJ(-n,
+    // x)).divide(Math.sin(n * Math.PI));
   }
 
   public static double besselYDouble(double n, double x) {
@@ -178,7 +181,8 @@ public class BesselJS {
     // // return findRoot( x => diff( x => besselY(n,x), x ), [ e-delta, e+delta ] );
     // BisectionSolver solver = new BisectionSolver();
     // ISymbol x = F.Dummy("x");
-    // IExpr function= F.Times(F.C1D2,F.Subtract(F.BesselY(F.num(-1.0 + n), x),F.BesselY(F.num(1.0 + n), x)));
+    // IExpr function= F.Times(F.C1D2,F.Subtract(F.BesselY(F.num(-1.0 + n), x),F.BesselY(F.num(1.0 +
+    // n), x)));
     // UnivariateDifferentiableFunction f = new UnaryNumerical(function, x, EvalEngine.get(), true);
     // return solver.solve(200, f, e - delta, e + delta);
     // } else {
@@ -200,14 +204,13 @@ public class BesselJS {
       return besselI(new Complex(n), new Complex(x));
     }
     return new Complex(besselIDouble(n, x));
-    // return new Complex(Math.pow(x / 2.0, n) * HypergeometricJS.hypergeometric0F1(n + 1.0, 0.25 * x * x)
+    // return new Complex(Math.pow(x / 2.0, n) * HypergeometricJS.hypergeometric0F1(n + 1.0, 0.25 *
+    // x * x)
     // / Gamma.gamma(n + 1.0));
   }
 
   public static double besselIDouble(double n, double x) {
-    if (F.isNumIntValue(n) && n < 0) {
-      return besselIDouble(-n, x);
-    }
+    if (F.isNumIntValue(n) && n < 0) return besselIDouble(-n, x);
 
     if (!F.isNumIntValue(n) && x < 0) {
       throw new ArgumentTypeException(x + " < 0.0");
@@ -278,10 +281,11 @@ public class BesselJS {
     double delta = 1e-5;
 
     // asymptotic form as per Johansson
-    if (x.abs() > useAsymptotic) {
+    if (x.norm() > useAsymptotic) {
 
       Complex t1 = new Complex(Math.PI / 2.0).divide(x).sqrt().multiply(x.negate().exp());
-      // Complex t2 = HypergeometricJS.hypergeometricSeries(new Complex[] { n.add(0.5), n.negate().add(0.5) },
+      // Complex t2 = HypergeometricJS.hypergeometricSeries(new Complex[] { n.add(0.5),
+      // n.negate().add(0.5) },
       // new Complex[0], new Complex(-0.5).divide(x));
       Complex t2 = HypergeometricJS.hypergeometric2F0(n.add(0.5), new Complex(0.5).subtract(n),
           new Complex(-0.5).divide(x));
@@ -295,7 +299,7 @@ public class BesselJS {
       if (recursionLimit > 0) {
         int counter = engine.incRecursionCounter();
         if (counter > recursionLimit) {
-          RecursionLimitExceeded.throwIt(counter, F.BesselK);
+          RecursionLimitExceeded.throwIt(counter, S.BesselK);
         }
 
       }

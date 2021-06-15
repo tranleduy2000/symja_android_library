@@ -2,7 +2,10 @@ package org.matheclipse.core.eval.util;
 
 import com.duy.lambda.Consumer;
 
+import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IBuiltInSymbol;
 import org.matheclipse.core.interfaces.IDistribution;
@@ -18,79 +21,83 @@ public class Assumptions extends AbstractAssumptions {
 
 	private static class SignedNumberRelations {
 
-		final static int GREATER_ID = 0;
-		final static int GREATEREQUAL_ID = 1;
-		final static int LESS_ID = 2;
-		final static int LESSEQUAL_ID = 3;
-		final static int EQUALS_ID = 4;
+    static final int GREATER_ID = 0;
+    static final int GREATEREQUAL_ID = 1;
+    static final int LESS_ID = 2;
+    static final int LESSEQUAL_ID = 3;
+    static final int EQUALS_ID = 4;
 
-		final private ISignedNumber[] values;
+    private final ISignedNumber[] values;
 
 		public SignedNumberRelations() {
 			this.values = new ISignedNumber[5];
 		}
 
-		final public void addEquals(ISignedNumber expr) {
+    public final void addEquals(ISignedNumber expr) {
 			values[EQUALS_ID] = expr;
 		}
 
-		final public void addGreater(ISignedNumber expr) {
+    public final void addGreater(ISignedNumber expr) {
 			values[GREATER_ID] = expr;
 		}
 
-		final public void addGreaterEqual(ISignedNumber expr) {
+    public final void addGreaterEqual(ISignedNumber expr) {
 			values[GREATEREQUAL_ID] = expr;
 		}
 
-		final public void addLess(ISignedNumber expr) {
+    public final void addLess(ISignedNumber expr) {
 			values[LESS_ID] = expr;
 		}
 
-		final public void addLessEqual(ISignedNumber expr) {
+    public final void addLessEqual(ISignedNumber expr) {
 			values[LESSEQUAL_ID] = expr;
 		}
 
-		final public ISignedNumber getEquals() {
+    public final ISignedNumber getEquals() {
 			return values[EQUALS_ID];
 		}
 
 		/**
-		 * The key has to be greater than the returned value from the values map, if <code>value!=null</code>
+     * The key has to be greater than the returned value from the values map, if <code>value!=null
+     * </code>
 		 *
 		 * @return
 		 */
-		final public ISignedNumber getGreater() {
+    public final ISignedNumber getGreater() {
 			return values[GREATER_ID];
 		}
 
 		/**
-		 * The key has to be greater equal the returned value from the values map, if <code>value!=null</code>
+     * The key has to be greater equal the returned value from the values map, if <code>value!=null
+     * </code>
 		 *
 		 * @return
 		 */
-		final public ISignedNumber getGreaterEqual() {
+    public final ISignedNumber getGreaterEqual() {
 			return values[GREATEREQUAL_ID];
 		}
 
 		/**
-		 * The key has to be less than the returned value from the values map, if <code>value!=null</code>
+     * The key has to be less than the returned value from the values map, if <code>value!=null
+     * </code>
 		 *
 		 * @return
 		 */
-		final public ISignedNumber getLess() {
+    public final ISignedNumber getLess() {
 			return values[LESS_ID];
 		}
 
 		/**
-		 * The key has to be less equal the returned value from the values map, if <code>value!=null</code>
+     * The key has to be less equal the returned value from the values map, if <code>value!=null
+     * </code>
 		 *
 		 * @return
 		 */
-		final public ISignedNumber getLessEqual() {
+    public final ISignedNumber getLessEqual() {
 			return values[LESSEQUAL_ID];
 		}
 
-		final public boolean isLessOrGreaterRelation() {
+    public final boolean isLessOrGreaterRelation() {
 			for (int i = 0; i <= LESSEQUAL_ID; i++) {
 				if (values != null) {
 					return true;
@@ -100,122 +107,136 @@ public class Assumptions extends AbstractAssumptions {
 		}
 	}
 
-	@Override
-	public int[] reduceRange(IExpr x, final int[] xRange) {
-		IExpr temp = elementsMap.get(x);
-		if (temp != null) {
-			return null;
-		}
-		temp = distributionsMap.get(x);
-		if (temp != null) {
-			return null;
-		}
-		SignedNumberRelations rr = valueMap.get(x);
-		if (rr != null) {
-			int[] newXRange = new int[] { xRange[0], xRange[1] };
-			boolean evaled = false;
-			ISignedNumber num = rr.getLess();
-			if (num != null) {
-				int i = num.toIntDefault(Integer.MIN_VALUE);
-				if (i == Integer.MIN_VALUE) {
-					i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
+  /**
+   * Add a distribution.
+   *
+   * @param element a <code>Distributed(x, &lt;distribution&gt;)</code> expression
+   * @param assumptions
+   * @return
+   */
+  private static boolean addDistribution(IAST element, final Assumptions assumptions) {
+    if (element.arg2().isAST()) {
+      final IAST dist = (IAST) element.arg2();
+
+      ISymbol head = (ISymbol) dist.head();
+      if (head instanceof IBuiltInSymbol) {
+        IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
+        if (evaluator instanceof IDistribution) {
+          IExpr arg1 = element.arg1();
+          if (arg1.isAST(S.Alternatives)) {
+            ((IAST) arg1).forEach(new Consumer<IExpr>() {
+							@Override
+							public void accept(IExpr x) {
+								assumptions.distributionsMap.put(x, dist);
+							}
+						});
+          } else {
+            assumptions.distributionsMap.put(arg1, dist);
 				}
-				if (i != Integer.MIN_VALUE) {
-					if (newXRange[1] >= i) {
-						evaled = true;
-						newXRange[1] = i - 1;
-					}
-				}
+          return true;
 			}
-			num = rr.getLessEqual();
-			if (num != null) {
-				int i = num.toIntDefault(Integer.MIN_VALUE);
-				if (i == Integer.MIN_VALUE) {
-					i = num.floorFraction().toIntDefault(Integer.MIN_VALUE);
-				}
-				if (i != Integer.MIN_VALUE) {
-					if (newXRange[1] > i) {
-						evaled = true;
-						newXRange[1] = i;
-					}
-				}
-			}
-			num = rr.getGreater();
-			if (num != null) {
-				int i = num.toIntDefault(Integer.MIN_VALUE);
-				if (i == Integer.MIN_VALUE) {
-					i = num.floorFraction().toIntDefault(Integer.MIN_VALUE);
-				}
-				if (i != Integer.MIN_VALUE) {
-					if (newXRange[0] <= i) {
-						evaled = true;
-						newXRange[0] = i + 1;
-					}
-				}
-			}
-			num = rr.getGreaterEqual();
-			if (num != null) {
-				int i = num.toIntDefault(Integer.MIN_VALUE);
-				if (i == Integer.MIN_VALUE) {
-					i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
-				}
-				if (i != Integer.MIN_VALUE) {
-					if (newXRange[0] < i) {
-						evaled = true;
-						newXRange[0] = i;
-					}
-				}
-			}
-			num = rr.getEquals();
-			if (num != null) {
-				int i = num.toIntDefault(Integer.MIN_VALUE);
-				if (i == Integer.MIN_VALUE) {
-					i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
-				}
-				if (i != Integer.MIN_VALUE) {
-					if (newXRange[0] < i) {
-						evaled = true;
-						newXRange[0] = i;
-					}
-					if (newXRange[1] > i) {
-						evaled = true;
-						newXRange[1] = i;
-					}
-				}
-			}
-			if (evaled) {
-				return newXRange;
 			}
 		}
-		return null;
+    return false;
 	}
 	/**
-	 * Add a domain. Domain can be <code>Algebraics, Booleans, Complexes, Integers, Primes, Rationals, Reals</code>
+   * Add a domain. Domain can be <code>
+   * Algebraics, Booleans, Complexes, Integers, Primes, Rationals, Reals</code>
 	 *
-	 * @param element
-	 *            a <code>Element(x, &lt;domain&gt;)</code> expression
+   * @param element a <code>Element(x, &lt;domain&gt;)</code> expression
 	 * @param assumptions
 	 * @return
 	 */
-	private static boolean addElement(IAST element, final Assumptions assumptions) {
+  private static boolean addElement(IAST element, final Assumptions assumptions) {
+    if (element.size() >= 3) {
+      IExpr arg1 = element.arg1();
+      if (arg1.isAlternatives()) {
+        IAST list = ((IAST) arg1).apply(S.List);
+        list = list.mapThread(element, 1);
+        for (int i = 1; i < list.size(); i++) {
+          final IExpr arg = list.get(i);
+          if (!arg.isAST()) {
+            return false;
+          }
+          if (!addElement((IAST) arg, assumptions)) {
+            return false;
+          }
+        }
+        return true;
+      }
 		if (element.arg2().isSymbol()) {
-			final ISymbol domain = (ISymbol) element.arg2();
-			if (domain.equals(F.Algebraics) || domain.equals(F.Booleans) || domain.equals(F.Complexes)
-					|| domain.equals(F.Integers) || domain.equals(F.Primes) || domain.equals(F.Rationals)
-					|| domain.equals(F.Reals)) {
-				IExpr arg1 = element.arg1();
-				if (arg1.isAST(F.Alternatives)) {
-					((IAST) arg1).forEach(new Consumer<IExpr>() {
-						@Override
-						public void accept(IExpr x) {
-							assumptions.elementsMap.put(x, domain);
-						}
-					});
+        final ISymbol domain = (ISymbol) element.arg2();
+        if (S.isDomain(domain)) {
+          if (arg1.isAST(S.Alternatives)) {
+            ((IAST) arg1).forEach(new Consumer<IExpr>() {
+							@Override
+							public void accept(IExpr x) {
+								assumptions.elementsMap.put(x, domain);
+							}
+						});
 				} else {
 					assumptions.elementsMap.put(arg1, domain);
 				}
 				return true;
 			}
+      } else if (element.arg2().isAST(S.Arrays, 2, 3)) {
+        IAST arrays = (IAST) element.arg2();
+        ISymbol domain = S.Complexes;
+        if (arrays.size() > 2 && arrays.arg2().isSymbol()) {
+          domain = (ISymbol) arrays.arg2();
+          if (S.isDomain(domain)) {
+            // pass
+          } else {
+            return false;
+          }
+        }
+        if (arrays.arg1().isList() && arrays.arg1().argSize() >= 2) {
+          assumptions.tensorsMap.put(arg1, F.Arrays(arrays.arg1(), domain));
+          return true;
+        } else {
+          // The list `1` of dimensions must have length `2`.
+          IOFunctions.printMessage(
+              S.Arrays, "rankl", F.List(arrays.arg1(), F.C2), EvalEngine.get());
+        }
+      } else if (element.arg2().isAST(S.Matrices, 2, 4)) {
+        IAST matrices = (IAST) element.arg2();
+        ISymbol domain = S.Complexes;
+        if (matrices.size() > 2 && matrices.arg2().isSymbol()) {
+          domain = (ISymbol) matrices.arg2();
+          if (S.isDomain(domain)) {
+            // pass
+          } else {
+            return false;
+          }
+        }
+        if (matrices.arg1().isList() && matrices.arg1().argSize() == 2) {
+          assumptions.tensorsMap.put(arg1, F.Matrices(matrices.arg1(), domain));
+          return true;
+        } else {
+          // The list `1` of dimensions must have length `2`.
+          IOFunctions.printMessage(
+              S.Matrices, "rankl", F.List(matrices.arg1(), F.C2), EvalEngine.get());
+        }
+      } else if (element.arg2().isAST(S.Vectors, 2, 3)) {
+        IAST vectors = (IAST) element.arg2();
+        ISymbol domain = S.Complexes;
+        if (vectors.size() > 2 && vectors.arg2().isSymbol()) {
+          domain = (ISymbol) vectors.arg2();
+          if (S.isDomain(domain)) {
+            // pass
+          } else {
+            return false;
+          }
+        }
+        if (!vectors.arg1().isList()) {
+          assumptions.tensorsMap.put(arg1, F.Vectors(vectors.arg1(), domain));
+          return true;
+        } else {
+          // The list `1` of dimensions must have length `2`.
+          IOFunctions.printMessage(
+              S.Vectors, "rankl", F.List(vectors.arg1(), F.C2), EvalEngine.get());
+        }
+      }
 		}
 		return false;
 	}
@@ -247,39 +268,6 @@ public class Assumptions extends AbstractAssumptions {
 		return false;
 	}
 
-	/**
-	 * Add a distribution.
-	 *
-	 * @param element
-	 *            a <code>Distributed(x, &lt;distribution&gt;)</code> expression
-	 * @param assumptions
-	 * @return
-	 */
-	private static boolean addDistribution(IAST element, final Assumptions assumptions) {
-		if (element.arg2().isAST()) {
-			final IAST dist = (IAST) element.arg2();
-
-			ISymbol head = (ISymbol) dist.head();
-			if (head instanceof IBuiltInSymbol) {
-				IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
-				if (evaluator instanceof IDistribution) {
-					IExpr arg1 = element.arg1();
-					if (arg1.isAST(F.Alternatives)) {
-						((IAST) arg1).forEach(new Consumer<IExpr>() {
-							@Override
-							public void accept(IExpr x) {
-								assumptions.distributionsMap.put(x, dist);
-							}
-						});
-					} else {
-						assumptions.distributionsMap.put(arg1, dist);
-					}
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	private static boolean addGreater(IAST greaterAST, Assumptions assumptions) {
 		if (greaterAST.isAST3()) {
 			// arg1 > arg2 > arg3
@@ -316,10 +304,8 @@ public class Assumptions extends AbstractAssumptions {
 			SignedNumberRelations gla = assumptions.valueMap.get(key);
 			if (gla == null) {
 				gla = new SignedNumberRelations();
+      }
 				gla.addGreater(num);
-			} else {
-				gla.addGreater(num);
-			}
 			assumptions.valueMap.put(key, gla);
 			return true;
 		}
@@ -335,10 +321,8 @@ public class Assumptions extends AbstractAssumptions {
 			SignedNumberRelations gla = assumptions.valueMap.get(key);
 			if (gla == null) {
 				gla = new SignedNumberRelations();
+      }
 				gla.addLess(num);
-			} else {
-				gla.addLess(num);
-			}
 			assumptions.valueMap.put(key, gla);
 			return true;
 		}
@@ -531,27 +515,27 @@ public class Assumptions extends AbstractAssumptions {
 		for (int i = 1; i < ast.size(); i++) {
 			if (ast.get(i).isAST()) {
 				IAST temp = (IAST) ast.get(i);
-				if (temp.isAST(F.Element, 3)) {
+        if (temp.isAST(S.Element, 3)) {
 					if (!addElement(temp, assumptions)) {
 						return null;
 					}
-				} else if (temp.isAST(F.Greater, 3, 4)) {
+        } else if (temp.isAST(S.Greater, 3, 4)) {
 					if (!addGreater(temp, assumptions)) {
 						return null;
 					}
-				} else if (temp.isAST(F.GreaterEqual, 3, 4)) {
+        } else if (temp.isAST(S.GreaterEqual, 3, 4)) {
 					if (!addGreaterEqual(temp, assumptions)) {
 						return null;
 					}
-				} else if (temp.isAST(F.Less, 3, 4)) {
+        } else if (temp.isAST(S.Less, 3, 4)) {
 					if (!addLess(temp, assumptions)) {
 						return null;
 					}
-				} else if (temp.isAST(F.LessEqual, 3, 4)) {
+        } else if (temp.isAST(S.LessEqual, 3, 4)) {
 					if (!addLessEqual(temp, assumptions)) {
 						return null;
 					}
-				} else if (temp.isAST(F.Equal, 3)) {
+        } else if (temp.isAST(S.Equal, 3)) {
 					if (!addLess(temp, assumptions)) {
 						return null;
 					}
@@ -562,99 +546,125 @@ public class Assumptions extends AbstractAssumptions {
 	}
 
 	/**
-	 * Create a new <code>IAssumptions</code> from the given expression. If the creation is not possible return
-	 * <code>null</code>
+   * Create a new <code>IAssumptions</code> from the given expression. If the creation is not
+   * possible return <code>null</code>
 	 * 
 	 * @param expr
-	 * @return <code>null</code> if <code>Assumptions</code> could not be created from the given expression.
+   * @return <code>null</code> if <code>Assumptions</code> could not be created from the given
+   *     expression.
 	 */
 	public static IAssumptions getInstance(IExpr expr) {
 		if (expr.isAST()) {
-			IAST ast = (IAST) expr;
 			Assumptions assumptions = new Assumptions();
-			return assumptions.addAssumption(ast);
+      assumptions.$assumptions = expr;
+      if (expr.isList()) {
+        Assumptions.addList((IAST) expr, assumptions);
+      } else if (expr.isAST()) {
+        assumptions.addAssumption((IAST) expr);
+      }
+      return assumptions;
 		}
 
 		return null;
 	}
 
-	/**
-	 * Add more assumptions from the given <code>ast</code>. If the creation is not possible return <code>null</code>
-	 * 
-	 * @param ast
-	 *            the assumptions which should be added to the <code>assumptions</code> instance.
-	 * @return <code>null</code> if assumptions could not be added from the given expression.
-	 */
+  /** Map for storing the domain of an expression */
+  private HashMap<IExpr, ISymbol> elementsMap = new HashMap<IExpr, ISymbol>();
+
+  private HashMap<IExpr, IAST> distributionsMap = new HashMap<IExpr, IAST>();
+
+  private Map<IExpr, IAST> tensorsMap = new HashMap<IExpr, IAST>();
+
+  private HashMap<IExpr, SignedNumberRelations> valueMap =
+      new HashMap<IExpr, SignedNumberRelations>();
+
+  private IExpr $assumptions = F.NIL;
+
+  private Assumptions() {}
 	@Override
-	public IAssumptions addAssumption(IAST ast) {
-		if (ast.isAST(F.Element, 3)) {
+  public IAssumptions addAssumption(IExpr expr) {
+    if (expr.isAST()) {
+      IAST ast = (IAST) expr;
+      if (ast.isAST(S.Element, 3)) {
 			if (addElement(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAST(F.Greater, 3, 4)) {
+      } else if (ast.isAST(S.Greater, 3, 4)) {
 			if (addGreater(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAST(F.GreaterEqual, 3, 4)) {
+      } else if (ast.isAST(S.GreaterEqual, 3, 4)) {
 			if (addGreaterEqual(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAST(F.Less, 3, 4)) {
+      } else if (ast.isAST(S.Less, 3, 4)) {
 			if (addLess(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAST(F.LessEqual, 3, 4)) {
+      } else if (ast.isAST(S.LessEqual, 3, 4)) {
 			if (addLessEqual(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAST(F.Equal, 3)) {
+      } else if (ast.isAST(S.Equal, 3)) {
 			if (addEqual(ast, this)) {
 				return this;
 			}
-		} else if (ast.isAnd() || ast.isSameHeadSizeGE(F.List, 2)) {
+      } else if (ast.isAnd() || ast.isSameHeadSizeGE(S.List, 2)) {
 			return addList(ast, this);
-		} else if (ast.isAST(F.Distributed, 3)) {
+      } else if (ast.isAST(S.Distributed, 3)) {
 			if (addDistribution(ast, this)) {
 				return this;
 			}
 		}
-		return null;
+    }
+    return this;
+  }
+
+  public IAssumptions copy() {
+    Assumptions assumptions = new Assumptions();
+    assumptions.distributionsMap = (HashMap) distributionsMap.clone();
+    assumptions.elementsMap = (HashMap) elementsMap.clone();
+    assumptions.valueMap = (HashMap) valueMap.clone();
+    assumptions.$assumptions = $assumptions.copy();
+    return assumptions;
 	}
 
 	@Override
-	final public IAST distribution(IExpr expr) {
+  public final IAST distribution(IExpr expr) {
 		IAST dist = distributionsMap.get(expr);
-		// Swift changed: type is incompatible
-		return (dist == null) ? F.nilPtr() : dist;
+    return (dist == null) ? F.NIL : dist;
 	}
-	/**
-	 * Map for storing the domain of an expression
-	 */
-	private Map<IExpr, ISymbol> elementsMap = new HashMap<IExpr, ISymbol>();
 
-	private Map<IExpr, IAST> distributionsMap = new HashMap<IExpr, IAST>();
-	private Map<IExpr, SignedNumberRelations> valueMap = new HashMap<IExpr, SignedNumberRelations>();
+  @Override
+  public final IAST tensors(IExpr expr) {
+    IAST tensor = tensorsMap.get(expr);
+    return (tensor == null) ? F.NIL : tensor;
+  }
 
-	private Assumptions() {
+  public IExpr get$Assumptions() {
+    return $assumptions;
+  }
 
+  public Map<IExpr, IAST> getTensorsMap() {
+    return tensorsMap;
 	}
 
 	@Override
 	public boolean isAlgebraic(IExpr expr) {
-		return isDomain(expr, F.Algebraics);
+    return isDomain(expr, S.Algebraics);
 	}
 
 	@Override
 	public boolean isBoolean(IExpr expr) {
-		return isDomain(expr, F.Booleans);
+    return isDomain(expr, S.Booleans);
 	}
 
 	@Override
 	public boolean isComplex(IExpr expr) {
-		return isDomain(expr, F.Complexes);
+    return isDomain(expr, S.Complexes);
 	}
 
-	final private boolean isDomain(IExpr expr, ISymbol domain) {
+  private final boolean isDomain(IExpr expr, ISymbol domain) {
 		ISymbol mappedDomain = elementsMap.get(expr);
 		return mappedDomain != null && mappedDomain.equals(domain);
 	}
@@ -795,12 +805,12 @@ public class Assumptions extends AbstractAssumptions {
 
 	@Override
 	public boolean isPrime(IExpr expr) {
-		return isDomain(expr, F.Primes);
+    return isDomain(expr, S.Primes);
 	}
 
 	@Override
 	public boolean isRational(IExpr expr) {
-		return isDomain(expr, F.Rationals);
+    return isDomain(expr, S.Rationals);
 	}
 
 	@Override
@@ -809,7 +819,100 @@ public class Assumptions extends AbstractAssumptions {
 		if (gla != null && gla.isLessOrGreaterRelation()) {
 			return true;
 		}
-		return isDomain(expr, F.Reals);
+    return isDomain(expr, S.Reals);
+  }
+
+  @Override
+  public int[] reduceRange(IExpr x, final int[] xRange) {
+    IExpr temp = elementsMap.get(x);
+    if (temp != null) {
+      return null;
+    }
+    temp = distributionsMap.get(x);
+    if (temp != null) {
+      return null;
+    }
+    SignedNumberRelations rr = valueMap.get(x);
+    if (rr != null) {
+      int[] newXRange = new int[] {xRange[0], xRange[1]};
+      boolean evaled = false;
+      ISignedNumber num = rr.getLess();
+      if (num != null) {
+        int i = num.toIntDefault(Integer.MIN_VALUE);
+        if (i == Integer.MIN_VALUE) {
+          i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
+        }
+        if (i != Integer.MIN_VALUE) {
+          if (newXRange[1] >= i) {
+            evaled = true;
+            newXRange[1] = i - 1;
+          }
+        }
+      }
+      num = rr.getLessEqual();
+      if (num != null) {
+        int i = num.toIntDefault(Integer.MIN_VALUE);
+        if (i == Integer.MIN_VALUE) {
+          i = num.floorFraction().toIntDefault(Integer.MIN_VALUE);
+        }
+        if (i != Integer.MIN_VALUE) {
+          if (newXRange[1] > i) {
+            evaled = true;
+            newXRange[1] = i;
+          }
+        }
+      }
+      num = rr.getGreater();
+      if (num != null) {
+        int i = num.toIntDefault(Integer.MIN_VALUE);
+        if (i == Integer.MIN_VALUE) {
+          i = num.floorFraction().toIntDefault(Integer.MIN_VALUE);
+        }
+        if (i != Integer.MIN_VALUE) {
+          if (newXRange[0] <= i) {
+            evaled = true;
+            newXRange[0] = i + 1;
+          }
+        }
+      }
+      num = rr.getGreaterEqual();
+      if (num != null) {
+        int i = num.toIntDefault(Integer.MIN_VALUE);
+        if (i == Integer.MIN_VALUE) {
+          i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
+        }
+        if (i != Integer.MIN_VALUE) {
+          if (newXRange[0] < i) {
+            evaled = true;
+            newXRange[0] = i;
+          }
+        }
+      }
+      num = rr.getEquals();
+      if (num != null) {
+        int i = num.toIntDefault(Integer.MIN_VALUE);
+        if (i == Integer.MIN_VALUE) {
+          i = num.ceilFraction().toIntDefault(Integer.MIN_VALUE);
+        }
+        if (i != Integer.MIN_VALUE) {
+          if (newXRange[0] < i) {
+            evaled = true;
+            newXRange[0] = i;
+          }
+          if (newXRange[1] > i) {
+            evaled = true;
+            newXRange[1] = i;
+          }
+        }
+      }
+      if (evaled) {
+        return newXRange;
+      }
+    }
+    return null;
 	}
 
+  public void set$Assumptions(IExpr $assumptions) {
+    this.$assumptions = $assumptions;
+  }
 }

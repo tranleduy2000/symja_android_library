@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 
 /**
  * This interface represents a first order differential equations set.
@@ -30,7 +30,7 @@ import org.hipparchus.RealFieldElement;
  * <p>This interface should be implemented by all real first order
  * differential equation problems before they can be handled by the
  * integrators {@link FieldODEIntegrator#integrate(FieldExpandableODE,
- * FieldODEState, RealFieldElement)} method.</p>
+ * FieldODEState, CalculusFieldElement)} method.</p>
  *
  * <p>A first order differential equations problem, as seen by an
  * integrator is the time derivative <code>dY/dt</code> of a state
@@ -49,7 +49,7 @@ import org.hipparchus.RealFieldElement;
  * @see FieldODEIntegrator
  */
 
-public interface FieldOrdinaryDifferentialEquation<T extends RealFieldElement<T>> {
+public interface FieldOrdinaryDifferentialEquation<T extends CalculusFieldElement<T>> {
 
     /**
      * Get the dimension of the problem.

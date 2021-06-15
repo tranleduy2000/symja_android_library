@@ -12,6 +12,11 @@ import java.util.List;
 /** Interface for mapping ISymbol objects to int values. */
 public interface IPatternMap {
 
+  /**
+   * The default priority when associating a new rule to a symbol. Lower values have higher priorities.
+   */
+  public final static int DEFAULT_RULE_PRIORITY = Integer.MAX_VALUE;
+
   public IPatternMap copy();
 
   /**

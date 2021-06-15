@@ -22,7 +22,7 @@
 package org.hipparchus.analysis.polynomials;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.FieldUnivariateFunction;
 import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.analysis.differentiation.DerivativeStructure;
@@ -173,7 +173,7 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
     }
 
     @Override
-    public <T extends RealFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
+    public <T extends CalculusFieldElement<T>> RealFieldUnivariateFunction<T> toRealFieldUnivariateFunction(Field<T> field) {
         return new RealFieldUnivariateFunction<T>() {
             @Override
             public T value(T x) {
@@ -186,7 +186,7 @@ public class PolynomialFunctionNewtonForm implements UnivariateDifferentiableFun
      * {@inheritDoc}
      */
     @Override
-    public <T extends RealFieldElement<T>> T value(final T t) {
+    public <T extends CalculusFieldElement<T>> T value(final T t) {
         verifyInputArray(a, c);
 
         final int n = c.length;

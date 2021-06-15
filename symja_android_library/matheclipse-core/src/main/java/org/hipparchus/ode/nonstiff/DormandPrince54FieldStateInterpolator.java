@@ -23,7 +23,7 @@
 package org.hipparchus.ode.nonstiff;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.ode.FieldEquationsMapper;
 import org.hipparchus.ode.FieldODEStateAndDerivative;
 
@@ -35,7 +35,7 @@ import org.hipparchus.ode.FieldODEStateAndDerivative;
  * @see DormandPrince54Integrator
  */
 
-class DormandPrince54FieldStateInterpolator<T extends RealFieldElement<T>>
+class DormandPrince54FieldStateInterpolator<T extends CalculusFieldElement<T>>
         extends RungeKuttaFieldStateInterpolator<T> {
 
     /**

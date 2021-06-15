@@ -21,8 +21,9 @@ public class PatternMatcherList extends PatternMatcherAndEvaluator {
     fReplaceList = F.ListAlloc();
   }
 
-  protected IExpr replaceSubExpressionOrderlessFlat(final IAST lhsPatternAST, final IAST lhsEvalAST,
-      final IExpr rhsExpr, EvalEngine engine) {
+  @Override
+  protected IExpr replaceSubExpressionOrderlessFlat(
+      final IAST lhsPatternAST, final IAST lhsEvalAST, final IExpr rhsExpr, EvalEngine engine) {
 
     return F.NIL;
   }

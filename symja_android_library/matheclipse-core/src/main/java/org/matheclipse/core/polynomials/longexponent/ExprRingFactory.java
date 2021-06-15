@@ -1,6 +1,7 @@
 package org.matheclipse.core.polynomials.longexponent;
 
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IExpr;
 
 import java.io.Reader;
@@ -10,17 +11,12 @@ import java.util.Random;
 
 import edu.jas.structure.RingFactory;
 
-/**
- * Singleton ring factory class.
- * 
- */
+/** Singleton ring factory class. */
 public class ExprRingFactory implements RingFactory<IExpr> {
-	/**
-	 * 
-	 */
+  /** */
 	private static final long serialVersionUID = -6146597389011632638L;
 
-	public final static ExprRingFactory CONST = new ExprRingFactory();
+  public static final ExprRingFactory CONST = new ExprRingFactory();
 
 	private ExprRingFactory() {
 		super();
@@ -49,24 +45,22 @@ public class ExprRingFactory implements RingFactory<IExpr> {
 	/**
 	 * Get a BigRational element from a long.
 	 * 
-	 * @param a
-	 *            long.
+   * @param a long.
 	 * @return BigRational from a.
 	 */
 	@Override
 	public IExpr fromInteger(long a) {
-		return F.integer(a);
+    return F.ZZ(a);
 	}
 
 	/**
 	 * Get a BigRational element from a long.
 	 * 
-	 * @param a
-	 *            long.
+   * @param a long.
 	 * @return BigRational from a.
 	 */
 	public static IExpr valueOf(long a) {
-		return F.integer(a);
+    return F.ZZ(a);
 	}
 
 	@Override
@@ -81,7 +75,7 @@ public class ExprRingFactory implements RingFactory<IExpr> {
 
 	@Override
 	public IExpr fromInteger(BigInteger a) {
-		return F.integer(a);
+    return F.ZZ(a);
 	}
 
 	@Override
@@ -97,7 +91,7 @@ public class ExprRingFactory implements RingFactory<IExpr> {
 
 	@Override
 	public IExpr parse(String s) {
-		return F.Null;
+    return S.Null;
 	}
 
 	@Override

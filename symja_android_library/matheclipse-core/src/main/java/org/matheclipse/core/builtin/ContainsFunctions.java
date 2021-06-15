@@ -4,6 +4,7 @@ import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
+import org.matheclipse.core.eval.interfaces.AbstractFunctionOptionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.S;
@@ -33,6 +34,7 @@ public class ContainsFunctions {
 
   private static class DisjointQ extends ContainsNone implements IPredicate {
 
+    @Override
     public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
       return arg1.isAST() && arg2.isAST(arg1.head());
     }
@@ -40,6 +42,7 @@ public class ContainsFunctions {
 
   private static class IntersectingQ extends ContainsAny implements IPredicate {
 
+    @Override
     public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
       return arg1.isAST() && arg2.isAST(arg1.head());
     }
@@ -47,33 +50,21 @@ public class ContainsFunctions {
 
   private static class SubsetQ extends ContainsAll implements IPredicate {
 
+    @Override
     public boolean validateArgs(IExpr arg1, IExpr arg2, EvalEngine engine) {
       return arg1.isAST() && arg2.isAST(arg1.head());
     }
   }
 
-  private static class ContainsAny extends AbstractEvaluator {
+  private static class ContainsAny extends AbstractFunctionOptionEvaluator {
 
     static final ContainsAny CONST = new ContainsAny();
 
     @Override
-    public IExpr evaluate(IAST ast, EvalEngine engine) {
-      //      if (ast.isAST1()) {
-      //        ast = F.operatorForm1Append(ast);
-      //        if (!ast.isPresent()) {
-      //          return F.NIL;
-      //        }
-      //      }
-      IExpr sameTest = F.SameQ;
-      if (validateArgs(ast.arg1(), ast.arg2(), engine)) {
-        if (ast.isAST3()) {
-          // determine option SameTest
-          final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-          IExpr option = options.getOptionAutomatic(F.SameTest);
-          if (option.isPresent()) {
-            sameTest = option;
-          }
-        }
+    protected IExpr evaluate(
+        final IAST ast, final int argSize, final IExpr[] option, final EvalEngine engine) {
+      if (argSize >= 2 && validateArgs(ast.arg1(), ast.arg2(), engine)) {
+        IExpr sameTest = option[0].equals(S.Automatic) ? S.SameQ : option[0];
         IAST list1 = (IAST) ast.arg1();
         IAST list2 = (IAST) ast.arg2();
         return containsFunction(list1, list2, sameTest, engine);
@@ -85,7 +76,8 @@ public class ContainsFunctions {
       return arg1.isListOrAssociation() && arg2.isListOrAssociation();
     }
 
-    public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest, final EvalEngine engine) {
+    public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest,
+        final EvalEngine engine) {
       for (int i = 1; i < list1.size(); i++) {
         final IExpr list1Arg = list1.get(i);
 
@@ -95,10 +87,10 @@ public class ContainsFunctions {
             return engine.evalTrue(F.binaryAST2(sameTest, list1Arg, x));
           }
         })) {
-          return F.True;
-          }
+          return S.True;
         }
-      return F.False;
+      }
+      return S.False;
     }
 
     @Override
@@ -108,22 +100,22 @@ public class ContainsFunctions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
-      setOptions(
-          newSymbol, //
-          F.List(F.Rule(F.SameTest, F.Automatic)));
+      setOptions(newSymbol, S.SameTest, S.Automatic);
     }
   }
 
   private static final class ContainsExactly extends ContainsAny {
+
     static final ContainsExactly CONST = new ContainsExactly();
 
+    @Override
     public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
       if (ContainsAll.CONST.containsFunction(list1, list2, sameTest, engine).isTrue()) {
         if (ContainsOnly.CONST.containsFunction(list1, list2, sameTest, engine).isTrue()) {
-          return F.True;
+          return S.True;
         }
       }
-      return F.False;
+      return S.False;
     }
 
   }
@@ -132,6 +124,7 @@ public class ContainsFunctions {
 
     static final ContainsAll CONST = new ContainsAll();
 
+    @Override
     public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
       boolean evaledTrue;
       for (int i = 1; i < list2.size(); i++) {
@@ -145,17 +138,19 @@ public class ContainsFunctions {
           }
         }
         if (!evaledTrue) {
-          return F.False;
+          return S.False;
         }
       }
-      return F.True;
+      return S.True;
     }
 
   }
 
   private static final class ContainsOnly extends ContainsAny {
+
     static final ContainsOnly CONST = new ContainsOnly();
 
+    @Override
     public IExpr containsFunction(IAST list1, IAST list2, IExpr sameTest, EvalEngine engine) {
       boolean evaledTrue;
       for (int i = 1; i < list1.size(); i++) {
@@ -169,18 +164,21 @@ public class ContainsFunctions {
           }
         }
         if (!evaledTrue) {
-          return F.False;
+          return S.False;
         }
       }
-      return F.True;
+      return S.True;
     }
 
   }
 
   private static class ContainsNone extends ContainsAny {
+
     static final ContainsNone CONST = new ContainsNone();
 
-    public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest, final EvalEngine engine) {
+    @Override
+    public IExpr containsFunction(IAST list1, IAST list2, final IExpr sameTest,
+        final EvalEngine engine) {
       for (int i = 1; i < list1.size(); i++) {
         final IExpr list1Arg = list1.get(i);
         if (list2.exists(new Predicate<IExpr>() {
@@ -189,11 +187,11 @@ public class ContainsFunctions {
             return engine.evalTrue(F.binaryAST2(sameTest, list1Arg, x));
           }
         })) {
-          return F.False;
-          }
+          return S.False;
         }
-      return F.True;
       }
+      return S.True;
+    }
 
   }
 

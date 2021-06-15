@@ -16,13 +16,16 @@ import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.functions.GammaJS;
 import org.matheclipse.core.builtin.functions.HypergeometricJS;
+import org.matheclipse.core.eval.EvalAttributes;
 import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.exception.ResultException;
 import org.matheclipse.core.eval.exception.ThrowException;
 import org.matheclipse.core.eval.exception.ValidateException;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractTrigArg1;
 import org.matheclipse.core.eval.interfaces.INumeric;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -45,6 +48,7 @@ public class HypergeometricFunctions {
   private static class Initializer {
 
     private static void init() {
+      F.AppellF1.setEvaluator(new AppellF1());
       F.CosIntegral.setEvaluator(new CosIntegral());
       F.CoshIntegral.setEvaluator(new CoshIntegral());
       F.ExpIntegralE.setEvaluator(new ExpIntegralE());
@@ -63,11 +67,84 @@ public class HypergeometricFunctions {
       F.WhittakerM.setEvaluator(new WhittakerM());
       F.WhittakerW.setEvaluator(new WhittakerW());
     }
-
   }
 
-  private static class CosIntegral extends
-      AbstractFunctionEvaluator {// implements INumeric, DoubleUnaryOperator {
+  private static class AppellF1 extends AbstractFunctionEvaluator {
+
+    @Override
+    public IExpr evaluate(IAST ast, EvalEngine engine) {
+      IExpr a = ast.arg1();
+      IExpr b1 = ast.arg2();
+      IExpr b2 = ast.arg3();
+      IExpr c = ast.arg4();
+      IExpr z1 = ast.arg5();
+      IExpr z2 = ast.get(6);
+      if (b1.compareTo(b2) > 0) {
+        // permutation symmetry
+        return F.AppellF1(a, b2, b1, c, z1, z2);
+      }
+      if (z1.isZero() && z2.isZero()) {
+        return F.C1;
+      }
+      if (z1.isZero()) {
+        return F.Hypergeometric2F1(a, b2, c, z2);
+      }
+      if (z2.isZero()) {
+        return F.Hypergeometric2F1(a, b1, c, z1);
+      }
+      if (z2.isOne()) {
+        return F.Times(
+            F.Hypergeometric2F1(a, b1, F.Subtract(c, b2), z1), F.Hypergeometric2F1(a, b2, c, F.C1));
+    }
+
+      if (z1.subtract(z2).isPossibleZero(true)) {
+        // Hypergeometric2F1(a, b1 + b2, c, z1)
+        return F.Hypergeometric2F1(a, F.Plus(b1, b2), c, z1);
+      }
+      if (b1.subtract(b2).isPossibleZero(true) && z1.plus(z2).isPossibleZero(true)) {
+        // HypergeometricPFQ({1/2+a/2,a/2,b1},{1/2+c/2,c/2},z1^2)
+        return F.HypergeometricPFQ(
+            F.List(F.Plus(F.C1D2, F.Divide(a, F.C2)), F.Divide(a, F.C2), b1), //
+            F.List(F.Plus(F.C1D2, F.Divide(c, F.C2)), F.Divide(c, F.C2)),
+            F.Sqr(z1));
+      }
+      if (b1.plus(b2).subtract(c).isPossibleZero(true)) {
+        // Hypergeometric2F1(a, b1, b1 + b2, (z1 - z2)/(1 - z2)) / (1 - z2)^a
+        return F.Times( //
+            F.Hypergeometric2F1(
+                a, //
+                b1,
+                F.Plus(b1, b2),
+                F.Divide(F.Subtract(z1, z2), F.Subtract(F.C1, z2))),
+            F.Power(F.Subtract(F.C1, z2), a));
+      }
+      //            if (engine.isDoubleMode()) {
+      //              try {
+      //              } catch (ThrowException te) {
+      //                if (FEConfig.SHOW_STACKTRACE) {
+      //                  te.printStackTrace();
+      //                }
+      //                return te.getValue();
+      //              } catch (ValidateException ve) {
+      //                if (FEConfig.SHOW_STACKTRACE) {
+      //                  ve.printStackTrace();
+      //                }
+      //              } catch (RuntimeException rex) {
+      //                // rex.printStackTrace();
+      //                return engine.printMessage(ast.topHead(), rex);
+      //              }
+      //            }
+      return F.NIL;
+  }
+
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_6_6;
+    }
+  }
+
+  private static class CosIntegral
+      extends AbstractFunctionEvaluator { // implements INumeric, DoubleUnaryOperator {
     // @Override
     // public IExpr e1ComplexArg(final Complex c) {
     // return F.complexNum(GammaJS.cosIntegral(c));
@@ -153,6 +230,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -173,7 +251,8 @@ public class HypergeometricFunctions {
     // return Double.NEGATIVE_INFINITY;
     // }
     // // 1/4*(2*(ExpIntegralEi(-z)+ExpIntegralEi(z))+Log(-1/z)+Log(1/z)-Log(-z)+3*Log(z))
-    // return 0.25 * (2.0 * (ExpIntegralEi.CONST.applyAsDouble(-z) + ExpIntegralEi.CONST.applyAsDouble(z))
+    // return 0.25 * (2.0 * (ExpIntegralEi.CONST.applyAsDouble(-z) +
+    // ExpIntegralEi.CONST.applyAsDouble(z))
     // + Math.log(-1 / z) + Math.log(1 / z) - Math.log(-z) + 3 * Math.log(z));
     // }
     //
@@ -212,7 +291,7 @@ public class HypergeometricFunctions {
         return F.Times(F.CNPiHalf, F.CI);
       }
       if (z.isComplexInfinity()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (engine.isDoubleMode()) {
         try {
@@ -255,6 +334,7 @@ public class HypergeometricFunctions {
       super.setUp(newSymbol);
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -269,7 +349,7 @@ public class HypergeometricFunctions {
       IExpr z = ast.arg2();
       if (n.isZero()) {
         // 1/(E^z*z)
-        return F.Power(F.Times(z, F.Power(F.E, z)), -1);
+        return F.Power(F.Times(z, F.Power(S.E, z)), -1);
       }
       if (z.isZero()) {
         IExpr nRe = n.re();
@@ -314,6 +394,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_2_2;
     }
@@ -363,6 +444,7 @@ public class HypergeometricFunctions {
     // return F.complexNum(GammaJS.expIntegralEi(c));
     // }
 
+    @Override
     public IExpr evaluate(IAST ast, EvalEngine engine) {
       IExpr z = ast.arg1();
       if (z.isZero()) {
@@ -375,10 +457,10 @@ public class HypergeometricFunctions {
         return F.C0;
       }
       if (z.isDirectedInfinity(F.CI)) {
-        return F.Times(F.CI, F.Pi);
+        return F.Times(F.CI, S.Pi);
       }
       if (z.isDirectedInfinity(F.CNI)) {
-        return F.Times(F.CNI, F.Pi);
+        return F.Times(F.CNI, S.Pi);
       }
       if (z.isComplexInfinity()) {
         return F.Indeterminate;
@@ -418,6 +500,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -474,7 +557,7 @@ public class HypergeometricFunctions {
         return F.Divide(F.CNI, F.C2);
       }
       if (arg1.equals(F.CComplexInfinity)) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
       if (negExpr.isPresent()) {
@@ -488,6 +571,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -544,7 +628,7 @@ public class HypergeometricFunctions {
         return F.Divide(F.CI, F.C2);
       }
       if (arg1.equals(F.CComplexInfinity)) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(arg1);
       if (negExpr.isPresent()) {
@@ -558,6 +642,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -569,7 +654,7 @@ public class HypergeometricFunctions {
     }
   }
 
-  private final static class GegenbauerC extends AbstractFunctionEvaluator {
+  private static final class GegenbauerC extends AbstractFunctionEvaluator {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -884,10 +969,8 @@ public class HypergeometricFunctions {
         return F.C1;
       }
       if (a.compareTo(b) > 0) {
-        IASTMutable newAST = ast.copy();
-        newAST.set(1, b);
-        newAST.set(2, a);
-        return newAST;
+        // permutation symmetry
+        return F.Hypergeometric2F1(b, a, c, z);
       }
       if (c.isInteger() && c.isNegative()) {
         if (a.isNumber() && b.isNumber()) {
@@ -984,7 +1067,7 @@ public class HypergeometricFunctions {
         // return engine.printMessage(ast.topHead() + ": " + rex.getMessage());
         // }
         // }
-      } catch (ThrowException te) {
+      } catch (ResultException te) {
         if (FEConfig.SHOW_STACKTRACE) {
           te.printStackTrace();
         }
@@ -1000,6 +1083,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_4_4;
     }
@@ -1021,6 +1105,26 @@ public class HypergeometricFunctions {
       if (c.isList()) {
         // thread elementwise over list in arg3
         return ((IAST) c).mapThread(ast.setAtCopy(3, F.Slot1), 3);
+      }
+      if (a.isVector() > 0) {
+        IAST aVector = (IAST) a.normal(false);
+        if (!aVector.isEvalFlagOn(IAST.IS_SORTED)) {
+          IASTMutable aResult = aVector.copy();
+          if (EvalAttributes.sortWithFlags(aResult)) {
+            return F.HypergeometricPFQ(aResult, b, c);
+          }
+          aVector.addEvalFlags(IAST.IS_SORTED);
+        }
+      }
+      if (b.isVector() > 0) {
+        IAST bVector = (IAST) b.normal(false);
+        if (!bVector.isEvalFlagOn(IAST.IS_SORTED)) {
+          IASTMutable bResult = bVector.copy();
+          if (EvalAttributes.sortWithFlags(bResult)) {
+            return F.HypergeometricPFQ(a, bResult, c);
+          }
+          bVector.addEvalFlags(IAST.IS_SORTED);
+        }
       }
 
       if (engine.isDoubleMode() && a.isVector() > 0 && b.isVector() > 0) {
@@ -1057,6 +1161,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_3_3;
     }
@@ -1213,6 +1318,7 @@ public class HypergeometricFunctions {
     // return F.complexNum(GammaJS.logIntegral(c));
     // }
 
+    @Override
     public IExpr evaluate(IAST ast, EvalEngine engine) {
       IExpr arg1 = ast.arg1();
       if (arg1.isZero()) {
@@ -1268,6 +1374,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -1370,7 +1477,7 @@ public class HypergeometricFunctions {
       }
       if (z.isTimes() && z.first().isComplex() && z.first().re().isZero()) {
         // I * SinhIntegral(-I*arg1)
-        return F.Times(F.I, F.SinhIntegral(F.Times(F.CNI, z)));
+        return F.Times(S.I, F.SinhIntegral(F.Times(F.CNI, z)));
       }
       IExpr imPart = AbstractFunctionEvaluator.getPureImaginaryPart(z);
       if (imPart.isPresent()) {
@@ -1379,6 +1486,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -1408,7 +1516,7 @@ public class HypergeometricFunctions {
         return F.Times(F.CI, F.CPiHalf);
       }
       if (z.isComplexInfinity()) {
-        return F.Indeterminate;
+        return S.Indeterminate;
       }
       if (engine.isDoubleMode()) {
         try {
@@ -1444,7 +1552,7 @@ public class HypergeometricFunctions {
       }
       if (z.isTimes() && z.first().isComplex() && z.first().re().isZero()) {
         // I * SinIntegral(-I*arg1)
-        return F.Times(F.I, F.SinIntegral(F.Times(F.CNI, z)));
+        return F.Times(S.I, F.SinIntegral(F.Times(F.CNI, z)));
       }
       IExpr negExpr = AbstractFunctionEvaluator.getNormalizedNegativeExpression(z);
       if (negExpr.isPresent()) {
@@ -1457,6 +1565,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
@@ -1520,6 +1629,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_3_3;
     }
@@ -1582,6 +1692,7 @@ public class HypergeometricFunctions {
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_3_3;
     }

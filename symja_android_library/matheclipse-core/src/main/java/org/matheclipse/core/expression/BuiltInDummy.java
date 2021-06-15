@@ -6,13 +6,13 @@ import com.duy.lambda.Predicate;
 import org.hipparchus.complex.Complex;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.AttributeFunctions;
+import org.matheclipse.core.builtin.IOFunctions;
 import org.matheclipse.core.convert.AST2Expr;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
 import org.matheclipse.core.eval.exception.RuleCreationError;
 import org.matheclipse.core.form.output.OutputFormFactory;
 import org.matheclipse.core.generic.UnaryVariable2Slot;
-import org.matheclipse.core.interfaces.ExprUtil;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IASTMutable;
@@ -25,6 +25,8 @@ import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
+import org.matheclipse.core.interfaces.ISymbolStatic;
+import org.matheclipse.core.patternmatching.IPatternMap;
 import org.matheclipse.core.patternmatching.IPatternMapImpl;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.RulesData;
@@ -500,7 +502,12 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
   @Override
   public boolean hasFlatAttribute() {
-    return (fAttributes & FLAT) == FLAT;
+    return ISymbolStatic.hasFlatAttribute(fAttributes);
+  }
+
+  @Override
+  public final boolean hasHoldAllCompleteAttribute() {
+    return ISymbolStatic.hasHoldAllCompleteAttribute(fAttributes);
   }
 
   /** {@inheritDoc} */
@@ -766,6 +773,11 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
     return fSymbolName.equals(str);
   }
 
+  // @Override
+  public final boolean isStringIgnoreCase(final String str) {
+    return fSymbolName.equalsIgnoreCase(str);
+  }
+
   @Override
   public final boolean isSymbolName(String name) {
     if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
@@ -832,7 +844,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
   @Override
   public IExpr ofNIL(EvalEngine engine, IExpr... args) {
     IAST ast = F.ast(args, this);
-    return engine.evaluateNull(ast);
+    return engine.evaluateNIL(ast);
   }
 
   /** {@inheritDoc} */
@@ -859,7 +871,7 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
         equalRule,
         leftHandSide,
         rightHandSide,
-        IPatternMapImpl.DEFAULT_RULE_PRIORITY,
+        IPatternMap.DEFAULT_RULE_PRIORITY,
         packageMode);
   }
 
@@ -906,10 +918,10 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
 
   /** {@inheritDoc} */
   @Override
-  public final IPatternMatcher putUpRule(final int setSymbol, boolean equalRule, IAST leftHandSide,
-      IExpr rightHandSide) {
-    return putUpRule(setSymbol, equalRule, leftHandSide, rightHandSide,
-        IPatternMapImpl.DEFAULT_RULE_PRIORITY);
+  public final IPatternMatcher putUpRule(
+      final int setSymbol, boolean equalRule, IAST leftHandSide, IExpr rightHandSide) {
+    return putUpRule(
+        setSymbol, equalRule, leftHandSide, rightHandSide, IPatternMap.DEFAULT_RULE_PRIORITY);
   }
 
   /** {@inheritDoc} */
@@ -969,8 +981,13 @@ public class BuiltInDummy extends ISymbolImpl implements IBuiltInSymbol, Seriali
       }
 
     }
-    engine.printMessage(functionSymbol.toString() + ": " + toString()
-        + " is not a variable with a value, so its value cannot be changed.");
+    // `1` is not a variable with a value, so its value cannot be changed.
+    IOFunctions.printMessage(functionSymbol, "rvalue", F.List(this), engine);
+    //    engine.printMessage(
+    //        functionSymbol.toString()
+    //            + ": "
+    //            + toString()
+    //            + " is not a variable with a value, so its value cannot be changed.");
     return null;
   }
 

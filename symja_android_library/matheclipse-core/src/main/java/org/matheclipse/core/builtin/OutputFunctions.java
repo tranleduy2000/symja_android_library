@@ -1,30 +1,20 @@
 
 package org.matheclipse.core.builtin;
 
+import com.baeldung.algorithms.romannumerals.RomanArabicConverter;
 import com.duy.lambda.Function;
-
-import net.numericalchameleon.util.spokennumbers.DutchNumber;
-import net.numericalchameleon.util.spokennumbers.EsperantoNumber;
-import net.numericalchameleon.util.spokennumbers.FinnishNumber;
-import net.numericalchameleon.util.spokennumbers.FrenchNumber;
-import net.numericalchameleon.util.spokennumbers.GermanNumber;
-import net.numericalchameleon.util.spokennumbers.HungarianNumber;
-import net.numericalchameleon.util.spokennumbers.ItalianNumber;
-import net.numericalchameleon.util.spokennumbers.LatinNumber;
-import net.numericalchameleon.util.spokennumbers.PolishNumber;
-import net.numericalchameleon.util.spokennumbers.PortugueseNumber;
-import net.numericalchameleon.util.spokennumbers.RomanianNumber;
-import net.numericalchameleon.util.spokennumbers.RussianNumber;
-import net.numericalchameleon.util.spokennumbers.SpanishNumber;
-import net.numericalchameleon.util.spokennumbers.SpokenNumber;
-import net.numericalchameleon.util.spokennumbers.SwedishNumber;
-import net.numericalchameleon.util.spokennumbers.TonganNumber;
-import net.numericalchameleon.util.spokennumbers.TurkishNumber;
-import net.numericalchameleon.util.spokennumbers.USEnglishNumber;
-
+import java.io.IOException;
+import java.io.StringWriter;
+import java.math.BigInteger;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.hipparchus.linear.FieldMatrix;
 import org.hipparchus.linear.FieldVector;
-import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.convert.Convert;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
@@ -34,28 +24,23 @@ import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractCoreFunctionEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractFunctionEvaluator;
 import org.matheclipse.core.eval.util.OptionArgs;
+import org.matheclipse.core.expression.Blank;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.S;
 import org.matheclipse.core.expression.data.GraphExpr;
 import org.matheclipse.core.form.output.DoubleFormFactory;
+import org.matheclipse.core.form.output.JavaComplexFormFactory;
 import org.matheclipse.core.form.output.JavaDoubleFormFactory;
 import org.matheclipse.core.form.output.JavaScriptFormFactory;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTDataset;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.IStringX;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.polynomials.HornerScheme;
 import org.matheclipse.parser.client.FEConfig;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.math.BigInteger;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public final class OutputFunctions {
 
@@ -66,20 +51,20 @@ public final class OutputFunctions {
   private static class Initializer {
 
     private static void init() {
-      F.BaseForm.setEvaluator(new BaseForm());
-      F.CForm.setEvaluator(new CForm());
-      F.FullForm.setEvaluator(new FullForm());
-      F.HoldForm.setEvaluator(new HoldForm());
-      F.HornerForm.setEvaluator(new HornerForm());
-      F.InputForm.setEvaluator(new InputForm());
-      // F.IntegerName.setEvaluator(new IntegerName());
-      F.JavaForm.setEvaluator(new JavaForm());
-      F.JSForm.setEvaluator(new JSForm());
-      F.MathMLForm.setEvaluator(new MathMLForm());
-      F.RomanNumeral.setEvaluator(new RomanNumeral());
-      F.TableForm.setEvaluator(new TableForm());
-      F.TeXForm.setEvaluator(new TeXForm());
-      F.TreeForm.setEvaluator(new TreeForm());
+      S.BaseForm.setEvaluator(new BaseForm());
+      S.CForm.setEvaluator(new CForm());
+      S.FullForm.setEvaluator(new FullForm());
+      S.HoldForm.setEvaluator(new HoldForm());
+      S.HornerForm.setEvaluator(new HornerForm());
+      S.InputForm.setEvaluator(new InputForm());
+      //S.IntegerName.setEvaluator(new IntegerName());
+      S.JavaForm.setEvaluator(new JavaForm());
+      S.JSForm.setEvaluator(new JSForm());
+      S.MathMLForm.setEvaluator(new MathMLForm());
+      S.RomanNumeral.setEvaluator(new RomanNumeral());
+      S.TableForm.setEvaluator(new TableForm());
+      S.TeXForm.setEvaluator(new TeXForm());
+      S.TreeForm.setEvaluator(new TreeForm());
     }
   }
 
@@ -105,9 +90,6 @@ public final class OutputFunctions {
       return ARGS_2_2;
     }
 
-    @Override
-    public void setUp(ISymbol newSymbol) {
-    }
   }
 
   private static class CForm extends AbstractCoreFunctionEvaluator {
@@ -135,8 +117,6 @@ public final class OutputFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * FullForm(expression)
    * </pre>
@@ -175,107 +155,10 @@ public final class OutputFunctions {
     }
 
     @Override
-    public void setUp(ISymbol newSymbol) {
-    }
-  }
-
-  private static class RomanNumeral extends AbstractFunctionEvaluator {
-
-    @Override
-    public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      IExpr arg1 = ast.arg1();
-      if (arg1.isInteger()) {
-        try {
-          long value = ((IInteger) arg1).toLong();
-          if (value == 0) {
-            return F.stringx("N");
-          }
-          net.numericalchameleon.util.romannumerals.RomanNumeral romanNumeral = //
-              new net.numericalchameleon.util.romannumerals.RomanNumeral(value);
-          return F.stringx(romanNumeral.toRoman());
-        } catch (net.numericalchameleon.util.romannumerals.RomanNumeralException rne) {
-          // Integer expected in range `1` to `2`.
-          return IOFunctions.printMessage(//
-              ast.topHead(), //
-              "intrange", //
-              F.List(F.ZZ(net.numericalchameleon.util.romannumerals.RomanNumeral.MIN_VALUE), //
-                  F.ZZ(net.numericalchameleon.util.romannumerals.RomanNumeral.MAX_VALUE)), //
-              engine);
-        } catch (RuntimeException rex) {
-          if (FEConfig.SHOW_STACKTRACE) {
-            rex.printStackTrace();
-          }
-        }
-      }
-      return F.NIL;
-    }
-
-    @Override
-    public int[] expectedArgSize(IAST ast) {
-      return ARGS_1_1;
-    }
-
-    @Override
-    public void setUp(final ISymbol newSymbol) {
-      newSymbol.setAttributes(ISymbol.LISTABLE);
-    }
-
-  }
-
-  private static class TableForm extends AbstractCoreFunctionEvaluator {
-
-    @Override
-    public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      if (ast.isAST1()) {
-        IExpr arg1 = engine.evaluate(ast.arg1());
-        StringBuilder tableForm = new StringBuilder();
-        if (plaintextTable(tableForm, arg1, " ", new Function<IExpr, String>() {
-          @Override
-          public String apply(IExpr x) {
-            return x.toString();
-          }
-        }, true)) {
-          return F.stringx(tableForm.toString(), IStringX.TEXT_PLAIN);
-        }
-        if (arg1.isList()) {
-          IAST list = (IAST) arg1;
-          StringBuilder sb = new StringBuilder();
-          for (int i = 1; i < list.size(); i++) {
-            sb.append(list.get(i).toString());
-            sb.append("\n");
-          }
-          return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
-        }
-        int dim = arg1.isVector();
-        if (dim >= 0) {
-          FieldVector<IExpr> vector = Convert.list2Vector(arg1);
-          if (vector != null) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < dim; i++) {
-              sb.append(vector.getEntry(i).toString());
-              sb.append("\n");
-            }
-            return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
-          }
-        }
-        return F.stringx(arg1.toString(), IStringX.TEXT_PLAIN);
-      }
-      return F.NIL;
-    }
-
-    @Override
-    public void setUp(ISymbol newSymbol) {
-    }
-
-    @Override
-    public int[] expectedArgSize(IAST ast) {
-      return ARGS_1_1;
-    }
+    public void setUp(ISymbol newSymbol) {}
   }
 
   /**
-   *
-   *
    * <pre>
    * HoldForm(expr)
    * </pre>
@@ -308,8 +191,6 @@ public final class OutputFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * HornerForm(polynomial)
    * </pre>
@@ -360,7 +241,7 @@ public final class OutputFunctions {
         VariablesSet eVar;
         IAST variables;
         if (ast.isAST2()) {
-          variables = Validate.checkIsVariableOrVariableList(ast, 2, engine);
+          variables = Validate.checkIsVariableOrVariableList(ast, 2, ast.topHead(), engine);
         } else {
           eVar = new VariablesSet(ast.arg1());
           variables = eVar.getVarList();
@@ -519,8 +400,6 @@ public final class OutputFunctions {
 //	}
 
   /**
-   *
-   *
    * <pre>
    * JavaForm(expr)
    * </pre>
@@ -566,31 +445,107 @@ public final class OutputFunctions {
    */
   private static class JavaForm extends AbstractCoreFunctionEvaluator {
 
+    public static String javaForm(IExpr arg1, boolean strictJava, boolean usePrefix) {
+      return arg1.internalJavaString(strictJava, 0, false, usePrefix, false, F.CNullFunction);
+    }
+
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
 
       try {
         IExpr arg1 = engine.evaluate(ast.arg1());
         boolean floatJava = false;
+        boolean complexJava = false;
         boolean strictJava = false;
         boolean usePrefix = false;
         if (ast.isAST2()) {
           IExpr arg2 = engine.evaluate(ast.arg2());
-          if (arg2 == F.Float) {
+          if (arg2 == S.Float || arg2 == S.Real) {
             floatJava = true;
-          } else if (arg2 == F.Strict) {
+          } else if (arg2 == S.Complex) {
+            complexJava = true;
+          } else if (arg2 == S.Strict) {
             strictJava = true;
-          } else if (arg2 == F.Prefix) {
+          } else if (arg2 == S.Prefix) {
             usePrefix = true;
           } else {
             final OptionArgs options = new OptionArgs(ast.topHead(), arg2, engine);
-            floatJava = options.isTrue(F.Float);
-            strictJava = options.isTrue(F.Strict);
-            usePrefix = options.isTrue(F.Prefix);
+            floatJava = options.isTrue(S.Float);
+            strictJava = options.isTrue(S.Strict);
+            usePrefix = options.isTrue(S.Prefix);
           }
         }
         if (floatJava) {
+          IExpr optimized = S.OptimizeExpression.of(engine, arg1);
+          if (optimized.isList2() && optimized.second().isListOfRules()) {
+            IExpr newExpr = optimized.first();
+            IAST listOfRules = (IAST) optimized.second();
+            VariablesSet varSet = new VariablesSet(arg1);
+            List<IExpr> functionsParameters = varSet.getArrayList();
+            StringBuilder buf = new StringBuilder();
+            long functionCounter = engine.incModuleCounter();
+            buf.append("double f");
+            buf.append(functionCounter);
+            buf.append("(");
+            for (int i = 0; i < functionsParameters.size(); i++) {
+              buf.append("double ");
+              buf.append(functionsParameters.get(i));
+              if (i < functionsParameters.size() - 1) {
+                buf.append(", ");
+              }
+            }
+            buf.append(") {\n");
+            for (int i = 1; i < listOfRules.size(); i++) {
+              IAST rule = (IAST) listOfRules.get(i);
+              buf.append("double ");
+              buf.append(toJavaDouble(rule.first()));
+              buf.append(" = ");
+              buf.append(toJavaDouble(rule.second()));
+              buf.append(";\n");
+            }
+            buf.append("return ");
+            buf.append(toJavaDouble(newExpr));
+            buf.append(";\n");
+            buf.append("}\n");
+            return F.$str(buf.toString(), IStringX.APPLICATION_JAVA);
+          }
+
           return F.$str(toJavaDouble(arg1), IStringX.APPLICATION_JAVA);
+        } else if (complexJava) {
+          IExpr optimized = S.OptimizeExpression.of(engine, arg1);
+          if (optimized.isList2() && optimized.second().isListOfRules()) {
+            IExpr newExpr = optimized.first();
+            IAST listOfRules = (IAST) optimized.second();
+            VariablesSet varSet = new VariablesSet(arg1);
+            List<IExpr> functionsParameters = varSet.getArrayList();
+            StringBuilder buf = new StringBuilder();
+            long functionCounter = engine.incModuleCounter();
+            buf.append("Complex f");
+            buf.append(functionCounter);
+            buf.append("(");
+            for (int i = 0; i < functionsParameters.size(); i++) {
+              buf.append("Complex ");
+              buf.append(functionsParameters.get(i));
+              if (i < functionsParameters.size() - 1) {
+                buf.append(", ");
+              }
+            }
+            buf.append(") {\n");
+            for (int i = 1; i < listOfRules.size(); i++) {
+              IAST rule = (IAST) listOfRules.get(i);
+              buf.append("Complex ");
+              buf.append(toJavaComplex(rule.first()));
+              buf.append(" = ");
+              buf.append(toJavaComplex(rule.second()));
+              buf.append(";\n");
+            }
+            buf.append("return ");
+            buf.append(toJavaComplex(newExpr));
+            buf.append(";\n");
+            buf.append("}\n");
+            return F.$str(buf.toString(), IStringX.APPLICATION_JAVA);
+          }
+          return F.$str(toJavaComplex(arg1), IStringX.APPLICATION_JAVA);
         }
         String resultStr = javaForm(arg1, strictJava, usePrefix);
         return F.$str(resultStr, IStringX.APPLICATION_JAVA);
@@ -607,9 +562,6 @@ public final class OutputFunctions {
       return ARGS_1_2;
     }
 
-    public static String javaForm(IExpr arg1, boolean strictJava, boolean usePrefix) {
-      return arg1.internalJavaString(strictJava, 0, false, usePrefix, false, F.CNullFunction);
-    }
 
   }
 
@@ -619,11 +571,11 @@ public final class OutputFunctions {
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
       try {
         int javascriptFlavor = JavaScriptFormFactory.USE_PURE_JS;
-        if (ast.isAST2() && ast.arg2().isString("Mathcell")) {
+        if (ast.isAST2() && ast.arg2().isStringIgnoreCase("mathcell")) {
           javascriptFlavor = JavaScriptFormFactory.USE_MATHCELL;
         }
         IExpr arg1 = engine.evaluate(ast.arg1());
-        if (arg1.isAST(F.JSFormData, 3)) {
+        if (arg1.isAST(S.JSFormData, 3)) {
           String manipulateStr = ((IAST) arg1).arg1().toString();
           return F.$str(manipulateStr, IStringX.APPLICATION_JAVASCRIPT);
         }
@@ -651,8 +603,6 @@ public final class OutputFunctions {
   }
 
   /**
-   *
-   *
    * <pre>
    * MathMLForm(expr)
    * </pre>
@@ -686,9 +636,95 @@ public final class OutputFunctions {
     }
   }
 
+  private static class RomanNumeral extends AbstractFunctionEvaluator {
+
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      IExpr arg1 = ast.arg1();
+      if (arg1.isList()) {
+        return ((IAST) arg1).mapThread(ast, 1);
+      }
+      if (arg1.isInteger()) {
+        try {
+          int value = arg1.toIntDefault();
+          if (value < RomanArabicConverter.MIN_VALUE || value > RomanArabicConverter.MAX_VALUE) {
+            // Integer expected in range `1` to `2`.
+            return IOFunctions.printMessage( //
+                ast.topHead(), //
+                "intrange", //
+                F.List(
+                    F.ZZ(RomanArabicConverter.MIN_VALUE), //
+                    F.ZZ(RomanArabicConverter.MAX_VALUE)), //
+                engine);
+          }
+          String result = RomanArabicConverter.arabicToRoman(value);
+          return F.stringx(result);
+        } catch (RuntimeException rex) {
+          if (FEConfig.SHOW_STACKTRACE) {
+            rex.printStackTrace();
+          }
+        }
+      }
+      return F.NIL;
+    }
+
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_1_1;
+    }
+  }
+
+  private static class TableForm extends AbstractCoreFunctionEvaluator {
+
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      if (ast.isAST1()) {
+        IExpr arg1 = engine.evaluate(ast.arg1());
+        StringBuilder tableForm = new StringBuilder();
+        if (plaintextTable(tableForm, arg1, " ", new Function<IExpr, String>() {
+          @Override
+          public String apply(IExpr x) {
+            return x.toString();
+          }
+        }, true)) {
+          return F.stringx(tableForm.toString(), IStringX.TEXT_PLAIN);
+        }
+        if (arg1.isList()) {
+          IAST list = (IAST) arg1;
+          StringBuilder sb = new StringBuilder();
+          for (int i = 1; i < list.size(); i++) {
+            sb.append(list.get(i).toString());
+            sb.append("\n");
+          }
+          return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
+        }
+        int dim = arg1.isVector();
+        if (dim >= 0) {
+          FieldVector<IExpr> vector = Convert.list2Vector(arg1);
+          if (vector != null) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < dim; i++) {
+              sb.append(vector.getEntry(i).toString());
+              sb.append("\n");
+            }
+            return F.stringx(sb.toString(), IStringX.TEXT_PLAIN);
+          }
+        }
+        return F.stringx(arg1.toString(), IStringX.TEXT_PLAIN);
+      }
+      return F.NIL;
+    }
+
+    @Override
+    public int[] expectedArgSize(IAST ast) {
+      return ARGS_1_1;
+    }
+
+    @Override
+    public void setUp(ISymbol newSymbol) {}
+  }
+
   /**
-   *
-   *
    * <pre>
    * TeXForm(expr)
    * </pre>
@@ -731,8 +767,55 @@ public final class OutputFunctions {
 
   private static class TreeForm extends AbstractCoreFunctionEvaluator {
 
-    private static void vertexToVisjs(StringBuilder buf,
-        List<SimpleImmutableEntry<String, Integer>> vertexSet) {
+    private static void edgesToVisjs(
+        StringBuilder buf, List<SimpleImmutableEntry<Integer, Integer>> edgeSet) {
+      boolean first = true;
+
+      buf.append("var edges = new vis.DataSet([\n");
+      for (SimpleImmutableEntry<Integer, Integer> edge : edgeSet) {
+        // {from: 1, to: 3},
+        if (first) {
+          buf.append("  {from: ");
+        } else {
+          buf.append(", {from: ");
+        }
+        buf.append(edge.getKey());
+        buf.append(", to: ");
+        buf.append(edge.getValue());
+        // , arrows: { to: { enabled: true, type: 'arrow'}}
+        buf.append(" , arrows: { to: { enabled: true, type: 'arrow'}}");
+        buf.append("}\n");
+        first = false;
+      }
+      buf.append("]);\n");
+    }
+
+    private static void treeToGraph(
+        IAST tree,
+        final int level,
+        final int maxLevel,
+        int[] currentCount,
+        List<SimpleImmutableEntry<String, Integer>> vertexList,
+        List<SimpleImmutableEntry<Integer, Integer>> edgeList) {
+      vertexList.add(
+          new SimpleImmutableEntry<String, Integer>(
+              tree.head().toString(), Integer.valueOf(level)));
+      int currentNode = vertexList.size();
+      final int nextLevel = level + 1;
+      for (int i = 1; i < tree.size(); i++) {
+        currentCount[0]++;
+        edgeList.add(new SimpleImmutableEntry<Integer, Integer>(currentNode, currentCount[0]));
+        IExpr arg = tree.get(i);
+        if (nextLevel >= maxLevel || !arg.isAST()) {
+          vertexList.add(new SimpleImmutableEntry<String, Integer>(arg.toString(), nextLevel));
+        } else {
+          treeToGraph((IAST) arg, nextLevel, maxLevel, currentCount, vertexList, edgeList);
+        }
+      }
+    }
+
+    private static void vertexToVisjs(
+        StringBuilder buf, List<SimpleImmutableEntry<String, Integer>> vertexSet) {
       buf.append("var nodes = new vis.DataSet([\n");
       boolean first = true;
       int counter = 1;
@@ -754,29 +837,6 @@ public final class OutputFunctions {
       buf.append("]);\n");
     }
 
-    private static void edgesToVisjs(StringBuilder buf,
-        List<SimpleImmutableEntry<Integer, Integer>> edgeSet) {
-      boolean first = true;
-
-      buf.append("var edges = new vis.DataSet([\n");
-      for (SimpleImmutableEntry<Integer, Integer> edge : edgeSet) {
-        // {from: 1, to: 3},
-        if (first) {
-          buf.append("  {from: ");
-        } else {
-          buf.append(", {from: ");
-        }
-        buf.append(edge.getKey());
-        buf.append(", to: ");
-        buf.append(edge.getValue());
-        // , arrows: { to: { enabled: true, type: 'arrow'}}
-        buf.append(" , arrows: { to: { enabled: true, type: 'arrow'}}");
-        buf.append("}\n");
-        first = false;
-      }
-      buf.append("]);\n");
-
-    }
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
@@ -815,42 +875,141 @@ public final class OutputFunctions {
       }
     }
 
-    private static void treeToGraph(IAST tree, final int level, final int maxLevel,
-        int[] currentCount,
-        List<SimpleImmutableEntry<String, Integer>> vertexList,
-        List<SimpleImmutableEntry<Integer, Integer>> edgeList) {
-      vertexList.add(new SimpleImmutableEntry<String, Integer>(tree.head().toString(),
-          Integer.valueOf(level)));
-      int currentNode = vertexList.size();
-      final int nextLevel = level + 1;
-      for (int i = 1; i < tree.size(); i++) {
-        currentCount[0]++;
-        edgeList.add(new SimpleImmutableEntry<Integer, Integer>(currentNode, currentCount[0]));
-        IExpr arg = tree.get(i);
-        if (nextLevel >= maxLevel || !arg.isAST()) {
-          vertexList.add(new SimpleImmutableEntry<String, Integer>(arg.toString(), nextLevel));
-        } else {
-          treeToGraph((IAST) arg, nextLevel, maxLevel, currentCount, vertexList, edgeList);
-        }
-      }
-    }
 
     @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_2;
     }
-
   }
 
-  public static String toJavaDouble(final IExpr arg1) throws IOException {
-    DoubleFormFactory factory = JavaDoubleFormFactory.get(true, false);
-    StringBuilder buf = new StringBuilder();
-    factory.convert(buf, arg1);
-    return buf.toString();
+  public static class VariableManager implements Function<IExpr, String> {
+
+    ArrayDeque<Map<IExpr, String>> varStack;
+
+    public void put(IExpr key, String variable) {
+      varStack.peek().put(key, variable);
+    }
+
+    public Map<IExpr, String> peek() {
+      return varStack.peek();
+    }
+
+    public void push() {
+      Map<IExpr, String> map = new HashMap<IExpr, String>();
+      varStack.push(map);
+    }
+
+    public void push(Map<IExpr, String> map) {
+      varStack.push(map);
+    }
+
+    public Map<IExpr, String> pop() {
+      return varStack.pop();
+    }
+
+    public VariableManager(Map<IExpr, String> map) {
+      varStack = new ArrayDeque<Map<IExpr, String>>();
+      varStack.add(map);
+    }
+
+    @Override
+    public String apply(IExpr expr) {
+      for (Iterator<Map<IExpr, String>> iterator = varStack.descendingIterator();
+          iterator.hasNext(); ) {
+        Map<IExpr, String> map = iterator.next();
+        String temp = map.get(expr);
+        if (temp != null) {
+          return temp;
+        }
+      }
+      return null;
+    }
   }
 
-  public static boolean markdownTable(StringBuilder result, IExpr expr,
-      Function<IExpr, String> function, boolean fillUpWithSPACE) {
+  /**
+   * Get an array with 2 elements returning the declared variables in the first entry and the
+   * corresponding types <code>Real, Integer,...</code> for the variable names in the second entry.
+   *
+   * @param ast    the original definition <code>
+   *               CompilePrint({variable/types}, function)</code>
+   * @param engine the evaluation engine
+   * @return <code>null</code> if the variable declaration isn't correct
+   */
+  public static IAST[] checkIsVariableOrVariableList(IAST ast, EvalEngine engine) {
+    IASTMutable[] result = new IASTMutable[2];
+    IExpr arg1 = ast.arg1();
+    if (arg1.isList()) {
+      IAST list = (IAST) arg1;
+      result[0] = list.copy();
+      result[1] = F.constantArray(S.Real, list.argSize());
+      for (int i = 1; i < list.size(); i++) {
+        if (!checkVariable(list.get(i), i, result[0], result[1], engine)) {
+          // `1` is not a valid variable.
+          IOFunctions.printMessage(ast.topHead(), "ivar", F.List(list.get(i)), engine);
+          return null;
+        }
+      }
+    } else {
+      result[0] = F.unaryAST1(S.List, arg1);
+      result[1] = F.unaryAST1(S.List, S.Real);
+      if (!checkVariable(arg1, 1, result[0], result[1], engine)) {
+        // `1` is not a valid variable.
+        IOFunctions.printMessage(ast.topHead(), "ivar", F.List(arg1), engine);
+        return null;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @param arg            the input argument for the current <code>variablesIndex</code>
+   * @param variablesIndex
+   * @param variables      set the variable at the current <code>variablesIndex</code>
+   * @param types          set the corresponding type <code>Real, Integer,...</code> for variable at the
+   *                       current <code>variablesIndex</code>
+   * @param engine
+   * @return <code>true</code> if the variables and types
+   */
+  private static boolean checkVariable(
+      IExpr arg, int variablesIndex, IASTMutable variables, IASTMutable types, EvalEngine engine) {
+    IExpr sym = arg;
+    IExpr headTest = S.Real;
+    if (arg.isList1() || arg.isList2()) {
+      sym = arg.first();
+      if (arg.isList2()) {
+        headTest = null;
+        if (arg.second().isBlank()) {
+          Blank blank = (Blank) arg.second();
+          headTest = blank.getHeadTest();
+          if (headTest == null) {
+            return false;
+          }
+          if (headTest.equals(S.Integer) || headTest.equals(S.Complex) || headTest.equals(S.Real)) {
+            // allowed machine-sized types
+          } else {
+            headTest = null;
+          }
+        }
+        if (headTest == null) {
+          return false;
+        }
+      }
+    }
+
+    variables.set(variablesIndex, sym);
+    types.set(variablesIndex, headTest);
+    return true;
+  }
+
+  public static void initialize() {
+    Initializer.init();
+  }
+
+  public static boolean markdownTable(
+      StringBuilder result,
+      IExpr expr,
+      com.duy.lambda.Function<IExpr, String> function,
+      boolean fillUpWithSPACE) {
     int[] dim = expr.isMatrix();
     if (dim != null && dim[0] > 0 && dim[1] > 0) {
       IAST matrix = (IAST) expr;
@@ -1002,6 +1161,20 @@ public final class OutputFunctions {
     return false;
   }
 
+  public static String toJavaDouble(final IExpr arg1) throws IOException {
+    DoubleFormFactory factory = JavaDoubleFormFactory.get(true, false);
+    StringBuilder buf = new StringBuilder();
+    factory.convert(buf, arg1);
+    return buf.toString();
+  }
+
+  public static String toJavaComplex(final IExpr arg1) throws IOException {
+    JavaComplexFormFactory factory = JavaComplexFormFactory.get(true, false);
+    StringBuilder buf = new StringBuilder();
+    factory.convert(buf, arg1);
+    return buf.toString();
+  }
+
   public static String toJavaScript(final IExpr arg1, int javascriptFlavor) {
     DoubleFormFactory factory = new JavaScriptFormFactory(true, false, -1, -1, javascriptFlavor);
     StringBuilder buf = new StringBuilder();
@@ -1009,12 +1182,6 @@ public final class OutputFunctions {
     return buf.toString();
   }
 
-  public static void initialize() {
-    Initializer.init();
-  }
-
-  private OutputFunctions() {
-
-  }
+  private OutputFunctions() {}
 
 }

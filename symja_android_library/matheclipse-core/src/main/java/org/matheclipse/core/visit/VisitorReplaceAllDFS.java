@@ -9,9 +9,9 @@ import org.matheclipse.core.interfaces.IExpr;
 import java.util.Map;
 
 /**
- * Replace all occurrences in depth first search of expressions where the given <code>function.apply()</code> method returns a non
- * <code>F.NIL</code> value. The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
- * occurred.
+ * Replace all occurrences in depth first search of expressions where the given <code>
+ * function.apply()</code> method returns a non <code>F.NIL</code> value. The visitors <code>visit()
+ * </code> methods return <code>F.NIL</code> if no substitution occurred.
  */
 public class VisitorReplaceAllDFS extends VisitorReplaceAll {
 

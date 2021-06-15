@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-/**
- * Maintain <code>Dispatch()</code> rules.
- *
- */
+/** Maintain <code>Dispatch()</code> rules. */
 public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externalizable {
 	public static DispatchExpr newInstance(final IAST listOfRules) {
 		return new DispatchExpr(listOfRules);
@@ -28,21 +25,19 @@ public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externa
 
 	IAST listOfRules;
 
-	/**
-	 * Needed for serialization.
-	 */
+  /** Needed for serialization. */
 	public DispatchExpr() {
-		super(F.Dispatch, null);
+    super(S.Dispatch, null);
 		listOfRules = F.NIL;
 	}
 
 	protected DispatchExpr(final IAST listOfRules) {
-		super(F.Dispatch, new VisitorReplaceAll(listOfRules));
+    super(S.Dispatch, new VisitorReplaceAll(listOfRules));
 		this.listOfRules = listOfRules;
 	}
 
 	protected DispatchExpr(final IAssociation assoc) {
-		super(F.Dispatch, new VisitorReplaceAll(assoc));
+    super(S.Dispatch, new VisitorReplaceAll(assoc));
 		this.listOfRules = assoc.normal(false);
 	}
 
@@ -52,7 +47,7 @@ public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externa
 	 * @param visitor
 	 */
 	protected DispatchExpr(final VisitorReplaceAll visitor, IAST listOfRules) {
-		super(F.Dispatch, visitor);
+    super(S.Dispatch, visitor);
 		this.listOfRules = listOfRules;
 	}
 
@@ -86,6 +81,7 @@ public class DispatchExpr extends DataExpr<VisitorReplaceAll> implements Externa
 		return DISPATCHID;
 	}
 
+  @Override
 	public IAST normal(boolean nilIfUnevaluated) {
 		return listOfRules;
 	}

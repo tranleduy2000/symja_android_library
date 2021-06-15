@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * A list of <code>ASTNode</code>'s which represents a parsed function.<br/s> The head of the function (i.e. Sin, Cos, Times,...) is
- * stored in the 0-th index of the list.<br/>
+ * A list of <code>ASTNode</code>'s which represents a parsed function.<br/s>
+ * The head of the function (i.e. Sin, Cos, Times,...) is stored in the 0-th index of the list.<br>
  * The arguments of the function are stored in the 1...n-th index of the list.
  */
-final public class FunctionNode extends ASTNode implements java.util.List<ASTNode> {
+public final class FunctionNode extends ASTNode implements java.util.List<ASTNode> {
 	
 	private final ArrayList<ASTNode> fNodesList;
 
@@ -209,11 +209,13 @@ final public class FunctionNode extends ASTNode implements java.util.List<ASTNod
 	}
 
 	/**
-	 * Because GWT doesn't support the subList() method, we also throw an UnsupportedOperationException
+   * Because GWT doesn't support the subList() method, we also throw an
+   * UnsupportedOperationException
 	 */
 	@Override
-	public List<ASTNode> subList(final int fromIndex, final int toIndex) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("Arraylist#subList() not supported");
+  public List<ASTNode> subList(final int fromIndex, final int toIndex)
+      throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("FunctionNode#subList() not supported");
 	}
 
 	@Override

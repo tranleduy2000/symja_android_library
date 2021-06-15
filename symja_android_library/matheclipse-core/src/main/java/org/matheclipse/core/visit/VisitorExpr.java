@@ -8,9 +8,7 @@ import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 
-/**
- * Visit every node of an <code>IExpr</code> expression.
- */
+/** Visit every node of an <code>IExpr</code> expression. */
 public abstract class VisitorExpr extends AbstractVisitor {
 
 	public VisitorExpr() {
@@ -71,9 +69,8 @@ public abstract class VisitorExpr extends AbstractVisitor {
 	}
 
 	/**
-	 * 
-	 * @return the cloned <code>IAST</code> with changed evaluated subexpressions, or <code>F.NIL</code>, if no
-	 *         evaluation is possible
+   * @return the cloned <code>IAST</code> with changed evaluated subexpressions, or <code>F.NIL
+   *     </code>, if no evaluation is possible
 	 */
 	@ObjcMemoryIssue
 	protected IExpr visitAST(IAST ast) {

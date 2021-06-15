@@ -12,7 +12,8 @@ import org.matheclipse.core.interfaces.ISymbol;
 /**
  * Replace all occurrences of expressions with the slot at that position in the AST list.
  * 
- * The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution occurred.
+ * <p>The visitors <code>visit()</code> methods return <code>F.NIL</code> if no substitution
+ * occurred.
  */
 public class VisitorReplaceArgs extends VisitorExpr {
 	final IAST astSlots;

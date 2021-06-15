@@ -15,10 +15,7 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * The basic node for storing a parsed number expression string
- * 
- */
+/** The basic node for storing a parsed number expression string */
 public abstract class NumberNode extends ASTNode {
 
 	protected boolean sign;
@@ -55,9 +52,7 @@ public abstract class NumberNode extends ASTNode {
 		return sign;
 	}
 
-	/**
-	 * Toggle the sign of the number.
-	 */
+  /** Toggle the sign of the number. */
 	public void toggleSign() {
 		sign = !sign;
 	}

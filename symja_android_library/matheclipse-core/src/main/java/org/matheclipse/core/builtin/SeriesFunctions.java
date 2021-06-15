@@ -45,14 +45,14 @@ public class SeriesFunctions {
   private static class Initializer {
 
     private static void init() {
-      F.Limit.setEvaluator(new Limit());
+      S.Limit.setEvaluator(new Limit());
       if (ToggleFeature.SERIES) {
-        F.ComposeSeries.setEvaluator(new ComposeSeries());
-        F.InverseSeries.setEvaluator(new InverseSeries());
-        F.Normal.setEvaluator(new Normal());
-        F.Series.setEvaluator(new Series());
-        F.SeriesCoefficient.setEvaluator(new SeriesCoefficient());
-        F.SeriesData.setEvaluator(new SeriesData());
+        S.ComposeSeries.setEvaluator(new ComposeSeries());
+        S.InverseSeries.setEvaluator(new InverseSeries());
+        S.Normal.setEvaluator(new Normal());
+        S.Series.setEvaluator(new Series());
+        S.SeriesCoefficient.setEvaluator(new SeriesCoefficient());
+        S.SeriesData.setEvaluator(new SeriesData());
       }
     }
   }
@@ -201,8 +201,8 @@ public class SeriesFunctions {
         // engine.setQuietMode(true);
         // return evalLimit(expr, data, true);
         IExpr direction =
-            data.direction() == Direction.TWO_SIDED ? F.Reals : F.ZZ(data.direction().toInt());
-        return engine.evaluate(F.Limit(expr, data.rule(), F.Rule(F.Direction, direction)));
+            data.direction() == Direction.TWO_SIDED ? S.Reals : F.ZZ(data.direction().toInt());
+        return engine.evaluate(F.Limit(expr, data.rule(), F.Rule(S.Direction, direction)));
       } finally {
         engine.setQuietMode(quiet);
       }
@@ -225,7 +225,7 @@ public class SeriesFunctions {
       if (result.isNumericFunction(true)) {
         return result;
       }
-      if (!result.equals(F.Indeterminate)) {
+      if (!result.equals(S.Indeterminate)) {
         expression = result;
       }
       if (result.isFree(data.variable(), true)) {
@@ -267,7 +267,7 @@ public class SeriesFunctions {
 
       if (expression.isAST()) {
         if (!limitValue.isNumericFunction(true)
-            && limitValue.isFree(F.DirectedInfinity)
+            && limitValue.isFree(S.DirectedInfinity)
             && limitValue.isFree(data.variable())) {
           // example Limit(E^(3*x), x->a) ==> E^(3*a)
           return expr.replaceAll(data.rule()).orElse(expr);
@@ -747,7 +747,7 @@ public class SeriesFunctions {
               return F.C0;
             }
             return F.NIL;
-          } else if (temp.equals(F.Indeterminate) || temp.isAST(F.Limit)) {
+          } else if (temp.equals(S.Indeterminate) || temp.isAST(S.Limit)) {
             return F.NIL;
           }
           if (n.isPositive()) {
@@ -930,15 +930,15 @@ public class SeriesFunctions {
         Direction direction = Direction.TWO_SIDED; // no direction as default
         if (ast.isAST3()) {
           final OptionArgs options = new OptionArgs(ast.topHead(), ast, 2, engine);
-          IExpr option = options.getOption(F.Direction);
+          IExpr option = options.getOption(S.Direction);
           if (option.isPresent()) {
             if (option.isOne()) {
               direction = Direction.FROM_BELOW;
             } else if (option.isMinusOne()) {
               direction = Direction.FROM_ABOVE;
-            } else if (option.equals(F.Automatic)
+            } else if (option.equals(S.Automatic)
                 || //
-                option.equals(F.Reals)) {
+                option.equals(S.Reals)) {
               direction = Direction.TWO_SIDED;
             } else {
               return engine
@@ -949,7 +949,7 @@ public class SeriesFunctions {
                 .printMessage(ast.topHead() + ": direction option expected at position 2!");
           }
           if (direction == Direction.TWO_SIDED) {
-            IExpr temp = F.Limit.evalDownRule(engine, F.Limit(arg1, arg2));
+            IExpr temp = S.Limit.evalDownRule(engine, F.Limit(arg1, arg2));
             if (temp.isPresent()) {
               return temp;
             }
@@ -989,6 +989,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * Normal(series)
    * </pre>
@@ -1056,6 +1058,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * ComposeSeries(series1, series2)
    * </pre>
@@ -1108,6 +1112,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * InverseSeries(series)
    * </pre>
@@ -1143,6 +1149,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * Series(expr, {x, x0, n})
    * </pre>
@@ -1277,7 +1285,7 @@ public class SeriesFunctions {
      * @param varSet the variables of the function (including x)
      * @param engine the evaluation engine
      * @return the <code>SeriesCoefficient()</code> series or <code>null</code> if the function is
-     * not numeric w.r.t the varSet
+     *     not numeric w.r.t the varSet
      */
     private static ASTSeriesData seriesCoefficient(
         final IExpr function,
@@ -1338,7 +1346,7 @@ public class SeriesFunctions {
      * @param varSet the variables of the function (including x)
      * @param engine the evaluation engine
      * @return the Taylor series or <code>null</code> if the function is not numeric w.r.t the
-     * varSet
+     *     varSet
      */
     private static ASTSeriesData taylorSeries(
         final IExpr function,
@@ -1578,6 +1586,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * SeriesCoefficient(expr, {x, x0, n})
    * </pre>
@@ -1731,7 +1741,7 @@ public class SeriesFunctions {
       if (degree == 0) {
         return F.ReplaceAll(function, F.Rule(x, x0));
       }
-      IExpr derivedFunction = F.D.of(engine, function, F.List(x, n));
+      IExpr derivedFunction = S.D.of(engine, function, F.List(x, n));
       return F.Times(F.Power(F.Factorial(n), F.CN1), F.ReplaceAll(derivedFunction, F.Rule(x, x0)));
 
     }
@@ -1756,7 +1766,7 @@ public class SeriesFunctions {
         IASTAppendable coefficientPlus = F.PlusAlloc(2);
         if (coefficientMap.size() > 0) {
           IExpr defaultValue = F.C0;
-          IASTAppendable piecewiseAST = F.ast(F.Piecewise);
+          IASTAppendable piecewiseAST = F.ast(S.Piecewise);
           IASTAppendable rules = F.ListAlloc(2);
           IASTAppendable plus = F.PlusAlloc(coefficientMap.size());
           IAST comparator = F.GreaterEqual(n, F.C0);
@@ -1814,7 +1824,7 @@ public class SeriesFunctions {
             rules.append(
                 F.List(engine.evaluate(F.Times(F.Power(x0, n.negate()), plus)), comparator));
           }
-          if (comparator.isAST(F.Greater)) {
+          if (comparator.isAST(S.Greater)) {
 
             plus = F.PlusAlloc(coefficientMap.size());
             for (Map.Entry<IExpr, IExpr> entry : coefficientMap.entrySet()) {
@@ -1858,6 +1868,8 @@ public class SeriesFunctions {
   }
 
   /**
+   *
+   *
    * <pre>
    * SeriesData(x, x0, {coeff0, coeff1, coeff2,...}, nMin, nMax, denominator})
    * </pre>
@@ -1883,7 +1895,7 @@ public class SeriesFunctions {
       int denominator = 1;
       if (ast.size() == 6 || ast.size() == 7) {
         if (ast.arg1().isNumber()) {
-          return F.Indeterminate;
+          return S.Indeterminate;
         }
         IExpr x = ast.arg1();
         IExpr x0 = ast.arg2();

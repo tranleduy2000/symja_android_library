@@ -11,6 +11,7 @@ import org.hipparchus.util.MathUtils;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.ArgumentTypeException;
+import org.matheclipse.core.form.DoubleToMMA;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
@@ -49,24 +50,30 @@ public class Num extends INumImpl implements INum {
    * @return a {@code Double} instance representing {@code d}.
    */
   public static Num valueOf(final double d) {
-    int i = (int) d;
-    if (i >= (-1) && i <= 1) {
-      switch (i) {
-        case -1:
-          if (d == (-1.0d)) {
-            return F.CND1;
+    if (d >= (-1.1) && d <= 1.1) {
+      try {
+        int i = DoubleMath.roundToInt(d, RoundingMode.UNNECESSARY);
+        if (i >= (-1) && i <= 1) {
+          switch (i) {
+            case -1:
+              if (d == (-1.0d)) {
+                return F.CND1;
+              }
+              break;
+            case 0:
+              if (d == 0.0d || d == -0.0d) {
+                return F.CD0;
+              }
+              break;
+            case 1:
+              if (d == 1.0d) {
+                return F.CD1;
+              }
+              break;
           }
-          break;
-        case 0:
-          if (d == 0.0d || d == -0.0d) {
-            return F.CD0;
-          }
-          break;
-        case 1:
-          if (d == 1.0d) {
-            return F.CD1;
-          }
-          break;
+        }
+      } catch (ArithmeticException ae) {
+        //
       }
     }
     return new Num(d);
@@ -205,11 +212,6 @@ public class Num extends INumImpl implements INum {
     return ComplexNum.valueOf(doubleValue(), 0.0);
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public int complexSign() {
-    return sign();
-  }
 
   @Override
   public IExpr copy() {
@@ -221,13 +223,13 @@ public class Num extends INumImpl implements INum {
     }
   }
 
-  /**
-   * @param that
-   * @return
-   */
-  public double divide(final double that) {
-    return fDouble / that;
-  }
+  //  /**
+  //   * @param that
+  //   * @return
+  //   */
+  //  public double divide(final double that) {
+  //    return fDouble / that;
+  //  }
 
   @Override
   public ISignedNumber divideBy(ISignedNumber that) {
@@ -270,12 +272,10 @@ public class Num extends INumImpl implements INum {
       if (Double.isNaN(c.fDouble)) {
         return Double.isNaN(fDouble);
       } else {
-        return MathUtils.equals(fDouble, c.fDouble);
+        return Double.doubleToLongBits(fDouble) //
+            == Double.doubleToLongBits(c.fDouble);
       }
     }
-    // if (other instanceof Num) {
-    // return fDouble == ((Num) other).fDouble;
-    // }
     return false;
   }
 
@@ -293,7 +293,7 @@ public class Num extends INumImpl implements INum {
       return F.CNInfinity;
     }
     if (Double.isNaN(fDouble)) {
-      return F.Indeterminate;
+      return S.Indeterminate;
     }
     if (engine.isNumericMode() && engine.isArbitraryMode()) {
       return ApfloatNum.valueOf(fDouble, engine.getNumericPrecision());
@@ -301,6 +301,7 @@ public class Num extends INumImpl implements INum {
     return F.NIL;
   }
 
+  @Override
   public INumber evaluatePrecision(EvalEngine engine) {
     return this;
   }
@@ -321,9 +322,6 @@ public class Num extends INumImpl implements INum {
     return this;
   }
 
-  public double exp() {
-    return Math.exp(fDouble);
-  }
 
   /** {@inheritDoc} */
   @Override
@@ -332,6 +330,26 @@ public class Num extends INumImpl implements INum {
   }
 
   /** {@inheritDoc} */
+  @Override
+  public String fullFormString() {
+    return fullFormString(fDouble);
+  }
+
+  public static String fullFormString(double d) {
+    String result = Double.toString(d);
+    if (!FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      int indx = result.indexOf("E");
+      if (indx > 0) {
+        result = result.replace("E", "`*^");
+      } else {
+        result = result + "`";
+      }
+    }
+    return result;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public IInteger integerPart() {
     return isNegative() ? ceilFraction() : floorFraction();
   }
@@ -390,7 +408,7 @@ public class Num extends INumImpl implements INum {
 
   @Override
   public ISymbol head() {
-    return F.Real;
+    return S.Real;
   }
 
   @Override
@@ -455,9 +473,7 @@ public class Num extends INumImpl implements INum {
     return fDouble > that.doubleValue();
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   public boolean isInfinite() {
     return Double.isInfinite(fDouble);
   }
@@ -545,13 +561,7 @@ public class Num extends INumImpl implements INum {
     return 2;
   }
 
-  public double log() {
-    return Math.log(fDouble);
-  }
-
-  /**
-   * @return
-   */
+  /** @return */
   public long longValue() {
     return (long) fDouble;
   }
@@ -572,9 +582,7 @@ public class Num extends INumImpl implements INum {
     return valueOf(fDouble * val.getRealPart());
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public ISignedNumber negate() {
     return valueOf(-fDouble);
@@ -585,9 +593,7 @@ public class Num extends INumImpl implements INum {
     return this;
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   @Override
   public ISignedNumber opposite() {
     return valueOf(-fDouble);
@@ -620,22 +626,6 @@ public class Num extends INumImpl implements INum {
     return super.plus(that);
   }
 
-  /**
-   * @param that
-   * @return
-   */
-  public double pow(final double that) {
-    return Math.pow(fDouble, that);
-  }
-
-  /**
-   * @param exp
-   * @return
-   */
-  public double pow(final int exp) {
-    return Math.pow(fDouble, exp);
-  }
-
   @Override
   public INum pow(final INum val) {
     return valueOf(Math.pow(fDouble, val.getRealPart()));
@@ -646,8 +636,8 @@ public class Num extends INumImpl implements INum {
     return 15L;
   }
 
-  @Override
-  public IInteger round() {
+  //@Override
+  public IInteger roundExpr() {
     return F.ZZ(DoubleMath.roundToBigInteger(fDouble, RoundingMode.HALF_EVEN));
   }
 
@@ -665,13 +655,11 @@ public class Num extends INumImpl implements INum {
   }
 
   @Override
-  public int sign() {
+  public int complexSign() {
     return (int) Math.signum(fDouble);
   }
 
-  /**
-   * @return
-   */
+  /** @return */
   // public double sqrt() {
   // return Math.sqrt(fDouble);
   // }
@@ -719,9 +707,7 @@ public class Num extends INumImpl implements INum {
     return super.times(that);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int toInt() throws ArithmeticException {
     return NumberUtil.toInt(fDouble);
@@ -737,9 +723,17 @@ public class Num extends INumImpl implements INum {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
+  //@Override
+  public long toLongDefault(long defaultValue) {
+    try {
+      return NumberUtil.toLong(fDouble);
+    } catch (ArithmeticException ae) {
+      return defaultValue;
+    }
+  }
+
+  /** {@inheritDoc} */
   @Override
   public long toLong() throws ArithmeticException {
     return NumberUtil.toLong(fDouble);
@@ -750,6 +744,73 @@ public class Num extends INumImpl implements INum {
    */
   @Override
   public String toString() {
-    return Double.toString(fDouble);
+    if (FEConfig.EXPLICIT_TIMES_OPERATOR) {
+      return Double.toString(fDouble);
+    }
+    StringBuilder buf = new StringBuilder();
+    DoubleToMMA.doubleToMMA(buf, fDouble, 5, 7);
+    return buf.toString();
+  }
+
+//  @Override
+  public IExpr ulp() {
+    return valueOf(Math.ulp(fDouble));
+  }
+
+//  @Override
+  public IExpr cos() {
+    return valueOf(Math.cos(fDouble));
+  }
+
+//  @Override
+  public IExpr cosh() {
+    return valueOf(Math.cosh(fDouble));
+  }
+
+//  @Override
+  public IExpr exp() {
+    return valueOf(Math.exp(fDouble));
+}
+//  @Override
+  public IExpr log() {
+    return valueOf(Math.log(fDouble));
+  }
+
+//  @Override
+  public IExpr pow(int n) {
+    return valueOf(Math.pow(fDouble, n));
+  }
+
+//  @Override
+  public IExpr rootN(int n) {
+    return valueOf(Math.pow(fDouble, 1.0 / n));
+  }
+
+  //@Override
+  public IExpr sign() {
+    if (isNaN() || isZero()) {
+      return this;
+    }
+    return valueOf(Math.abs(fDouble));
+  }
+
+//  @Override
+  public IExpr sin() {
+    return valueOf(Math.sin(fDouble));
+  }
+
+//  @Override
+  public IExpr sinh() {
+    return valueOf(Math.sinh(fDouble));
+  }
+
+//  @Override
+  public IExpr tan() {
+    return valueOf(Math.tan(fDouble));
+  }
+
+//  @Override
+  public IExpr tanh() {
+    return valueOf(Math.tanh(fDouble));
   }
 }

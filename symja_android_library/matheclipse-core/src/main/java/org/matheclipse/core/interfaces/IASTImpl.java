@@ -6,6 +6,7 @@ import com.duy.lambda.ObjIntConsumer;
 import com.duy.lambda.Predicate;
 
 import org.matheclipse.core.eval.exception.MemoryLimitExceeded;
+import org.matheclipse.core.eval.exception.RecursionLimitExceeded;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.generic.ObjIntPredicate;
 import org.matheclipse.core.visit.IVisitor;
@@ -49,11 +50,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
   }
 
   @Override
-  public IExpr getUnevaluated(int position) {
-    return get(position);
-  }
-
-  @Override
   public int argSize() {
     return size() - 1;
   }
@@ -79,6 +75,9 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
    */
   @Override
   public IExpr first() {
+    if (size() < 2) {
+      return F.NIL;
+    }
     return arg1();
   }
 
@@ -144,16 +143,22 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     return null;
   }
 
-  // @Override
-  // public abstract IAST clone() throws CloneNotSupportedException;
-
   @Override
   public IExpr acceptChecked(IVisitor visitor) {
     try {
       return accept(visitor);
     } catch (StackOverflowError soe) {
-      throw new MemoryLimitExceeded("StackOverflowError in visitor");
+      RecursionLimitExceeded.throwIt(Integer.MAX_VALUE, this);
     }
+    return F.NIL;
+  }
+
+  // @Override
+  // public abstract IAST clone() throws CloneNotSupportedException;
+
+  @Override
+  public IExpr getUnevaluated(int position) {
+    return get(position);
   }
 
   /**
@@ -264,16 +269,7 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
    */
   @Override
   public IASTAppendable extract(int fromIndex, int toIndex) {
-    if (0 < fromIndex && fromIndex <= size() && fromIndex < toIndex && toIndex <= size()) {
-      IASTAppendable ast = F.ast(head(), toIndex - fromIndex, false);
-      for (int i = fromIndex; i < toIndex; i++) {
-        ast.append(get(i));
-      }
-      return ast;
-    }
-    throw new IndexOutOfBoundsException(
-        "Index: " + Integer.valueOf(fromIndex) + ", Size: " + size());
-
+    return slice(fromIndex, toIndex);
   }
 
   /**
@@ -457,6 +453,18 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
   }
 
   @Override
+  public IAST most() {
+    switch (size()) {
+      case 0:
+        return this;
+      case 1:
+        return this;
+      default:
+        return splice(argSize());
+    }
+  }
+
+  @Override
   public IExpr oneIdentity0() {
     return oneIdentity(F.C0);
   }
@@ -464,6 +472,27 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
   @Override
   public IExpr oneIdentity1() {
     return oneIdentity(F.C1);
+  }
+
+  /**
+   * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code>
+   * inclusive to the end of this AST.
+   *
+   * @param fromPosition
+   * @return
+   */
+  public IAST removeFromEnd(int fromPosition) {
+    if (0 < fromPosition && fromPosition <= size()) {
+      if (fromPosition == size()) {
+        return this;
+      }
+      IASTAppendable ast = F.ast(head(), fromPosition, false);
+      ast.appendArgs(this, fromPosition);
+      return ast;
+    } else {
+      throw new IndexOutOfBoundsException(
+          "Index: " + Integer.valueOf(fromPosition) + ", Size: " + size());
+    }
   }
 
   @Override
@@ -488,27 +517,6 @@ public abstract class IASTImpl extends IExprImpl implements IAST {
     } else {
       throw new IndexOutOfBoundsException(
           "Index: " + Integer.valueOf(firstPosition) + ", Size: " + size());
-    }
-  }
-
-  /**
-   * Create a new <code>IAST</code> and remove all arguments from position <code>fromPosition</code>
-   * inclusive to the end of this AST.
-   *
-   * @param fromPosition
-   * @return
-   */
-  public IAST removeFromEnd(int fromPosition) {
-    if (0 < fromPosition && fromPosition <= size()) {
-      if (fromPosition == size()) {
-        return this;
-      }
-      IASTAppendable ast = F.ast(head(), fromPosition, false);
-      ast.appendArgs(this, fromPosition);
-      return ast;
-    } else {
-      throw new IndexOutOfBoundsException(
-          "Index: " + Integer.valueOf(fromPosition) + ", Size: " + size());
     }
   }
 

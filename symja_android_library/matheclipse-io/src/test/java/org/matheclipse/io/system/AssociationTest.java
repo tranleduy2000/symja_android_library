@@ -3,10 +3,6 @@ package org.matheclipse.io.system;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
 
-/**
- * Tests for the Java port of the <a href="http://www.apmaths.uwo.ca/~arich/">Rubi - rule-based
- * integrator</a>.
- */
 public class AssociationTest extends AbstractTestCase {
 
   public AssociationTest(String name) {
@@ -14,6 +10,13 @@ public class AssociationTest extends AbstractTestCase {
   }
 
   public void testAssociateTo() {
+    check(
+        "aa=42", //
+        "42");
+    // AssociateTo: aa is not a variable with a value, so its value cannot be changed.
+    check(
+        "AssociateTo(aa , c->17)", //
+        "AssociateTo(aa,c->17)");
     check(
         "assoc = <|\"A\" -> <|\"a\" -> 1, \"b\" -> 2, \"c\" -> 3|>|>", //
         "<|A-><|a->1,b->2,c->3|>|>");
@@ -43,9 +46,24 @@ public class AssociationTest extends AbstractTestCase {
     check(
         "AppendTo(assoc, assoc2)", //
         "<|a->1,b->2,c->3|>");
+    check(
+        "a = {Association({a -> 1, b -> 2}), Association({c -> 3, d -> 4})}", //
+        "{<|a->1,b->2|>,<|c->3,d->4|>}");
+    check(
+        "AssociateTo(a[[2]], c->17)", //
+        "{<|a->1,b->2|>,<|c->17,d->4|>}");
+    check(
+        "a", //
+        "{<|a->1,b->2|>,<|c->17,d->4|>}");
   }
 
   public void testAssociation() {
+    check(
+        " <|{}|>", //
+        "<||>");
+    check(
+        "PossibleZeroQ(RegularExpression(<|a->0,b:>1|>))", //
+        "False");
     check(
         "pinfo = <|\"firstName\" -> \"John\", \"lastName\" -> \"Doe\"|>", //
         "<|firstName->John,lastName->Doe|>");
@@ -258,9 +276,9 @@ public class AssociationTest extends AbstractTestCase {
   }
 
   public void testAssociationQ() {
-    check(
-        "AssociationQ(<|a, b|>)", //
-        "False");
+//    check(
+//        "AssociationQ(<|a, b|>)", //
+//        "False");
     check(
         "AssociationQ(<|a->x, b->y, c->z|>)", //
         "True");
@@ -293,14 +311,20 @@ public class AssociationTest extends AbstractTestCase {
 
   public void testKey() {
     check(
-        "<|a -> b, c -> d|>[[Key(a)]]", //
+        "<|1 -> a, 3 -> b|>[[Key(3)]]", //
         "b");
+    check(
+        "<|a -> b, c -> d|>[Key(a)]", //
+        "Missing(KeyAbsent,Key(a))");
     check(
         "Key(z)[<|a -> b, c -> d|>]", //
         "Missing(KeyAbsent,z)");
     check(
         "Key(a)[<|a -> b, c -> d|>]", //
         "b");
+    check(
+        "<|\"a\" -> b, \"c\" -> d|>[[\"c\"]]", //
+        "d");
   }
 
   public void testKeys01() {
@@ -424,6 +448,9 @@ public class AssociationTest extends AbstractTestCase {
 
   public void testGroupBy() {
 
+    check(
+        "GroupBy({7},{})", //
+        "{7}");
     check(
         "assoc=<|key1->2, key2->4, key3->4, key4->2, key5->7, key6->4|>", //
         "<|key1->2,key2->4,key3->4,key4->2,key5->7,key6->4|>");

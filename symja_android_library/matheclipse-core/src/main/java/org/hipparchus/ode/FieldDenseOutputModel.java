@@ -22,7 +22,7 @@
 
 package org.hipparchus.ode;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.exception.MathIllegalStateException;
@@ -42,10 +42,10 @@ import java.util.List;
  * view. It is called iteratively during the integration process and
  * stores a copy of all steps information in a sorted collection for
  * later use. Once the integration process is over, the user can use
- * the {@link #getInterpolatedState(RealFieldElement) getInterpolatedState}
+ * the {@link #getInterpolatedState(CalculusFieldElement) getInterpolatedState}
  * method to retrieve this information at any time. It is important to wait
  * for the integration to be over before attempting to call {@link
- * #getInterpolatedState(RealFieldElement)} because some internal
+ * #getInterpolatedState(CalculusFieldElement)} because some internal
  * variables are set only once the last step has been handled.</p>
  *
  * <p>This is useful for example if the main loop of the user
@@ -81,7 +81,7 @@ import java.util.List;
  * @see FieldODEStateInterpolator
  */
 
-public class FieldDenseOutputModel<T extends RealFieldElement<T>>
+public class FieldDenseOutputModel<T extends CalculusFieldElement<T>>
         implements FieldODEStepHandler<T> {
 
     /**

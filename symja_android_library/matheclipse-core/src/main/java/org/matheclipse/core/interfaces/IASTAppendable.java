@@ -5,6 +5,7 @@ import com.duy.lambda.IntFunction;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.matheclipse.core.expression.F;
 
 /**
  * Appendable (I)nterface for the (A)bstract (S)yntax (T)ree of a given function.
@@ -25,7 +26,7 @@ import java.util.Map;
  *       Times,...) at index <code>0</code> and
  *   <li>the <code>n</code> arguments of a function in the index <code>1 to n</code>
  * </ul>
- *
+ * <p>
  * See <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a>, <a
  * href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a>
  */
@@ -43,6 +44,71 @@ public interface IASTAppendable extends IASTMutable {
   public boolean append(IExpr expr);
 
   /**
+   * Adds the specified long value at the end of this {@code List}.
+   *
+   * @param value the long value which should be appended.
+   * @return always true.
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   */
+  /*default*/ boolean append(long value);/* {
+    return append(F.ZZ(value));
+  }*/
+
+  /**
+   * Adds the specified double value at the end of this {@code List}.
+   *
+   * @param value the double value which should be appended.
+   * @return always true.
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   */
+  /*default*/ boolean append(double value); /*{
+    return append(F.num(value));
+  }*/
+
+  /**
+   * Adds the specified string value at the end of this {@code List}.
+   *
+   * @param value the string value which should be appended.
+   * @return always true.
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   */
+  /*default*/ boolean append(String value); /*{
+    return append(F.stringx(value));
+  }*/
+
+  /**
+   * Adds the specified character value at the end of this {@code List}.
+   *
+   * @param value the character value which should be appended.
+   * @return always true.
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   */
+  /*default*/ boolean append(char value); /*{
+    return append(F.stringx(value));
+  }*/
+
+  /**
+   * Adds the specified boolean value at the end of this {@code List}.
+   *
+   * @param value the boolean value which should be appended.
+   * @return always true.
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   */
+  /*default*/ boolean append(boolean value);/*{
+    return append(F.bool(value));
+  }*/
+
+  /**
    * Inserts the specified object into this {@code List} at the specified location. The object is
    * inserted before the current element at the specified location. If the location is equal to the
    * size of this {@code List}, the object is added at the end. If the location is smaller than the
@@ -50,7 +116,7 @@ public interface IASTAppendable extends IASTMutable {
    * position towards the end of the {@code List}.
    *
    * @param location the index at which to insert.
-   * @param object the object to add.
+   * @param object   the object to add.
    * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
    * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
    * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
@@ -59,12 +125,30 @@ public interface IASTAppendable extends IASTMutable {
   public void append(int location, IExpr object);
 
   /**
+   * Inserts the specified long value into this {@code List} at the specified location. The object
+   * is inserted before the current element at the specified location. If the location is equal to
+   * the size of this {@code List}, the object is added at the end. If the location is smaller than
+   * the size of this {@code List}, then all elements beyond the specified location are moved by one
+   * position towards the end of the {@code List}.
+   *
+   * @param location the index at which to insert.
+   * @param value    the long value which should be added
+   * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
+   * @throws ClassCastException            if the class of the object is inappropriate for this {@code List}.
+   * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
+   * @throws IndexOutOfBoundsException     if {@code location < 0 || location > size()}
+   */
+  /*  default */void append(int location, long value);/* {
+    append(location, F.ZZ(value));
+  }*/
+
+  /**
    * Adds the objects in the specified collection to the end of this {@code List}. The objects are
    * added in the order in which they are returned from the collection's iterator.
    *
    * @param collection the collection of objects.
    * @return {@code true} if this {@code List} is modified, {@code false} otherwise (i.e. if the
-   *     passed collection was empty).
+   * passed collection was empty).
    * @throws UnsupportedOperationException if adding to this {@code List} is not supported.
    * @throws ClassCastException            if the class of an object is inappropriate for this {@code List}.
    * @throws IllegalArgumentException      if an object cannot be added to this {@code List}.
@@ -84,9 +168,9 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all elements from offset <code>startPosition</code> to <code>endPosition</code> in the
    * specified AST to the end of this AST.
    *
-   * @param ast AST containing elements to be added to this AST
+   * @param ast           AST containing elements to be added to this AST
    * @param startPosition the start position, inclusive.
-   * @param endPosition the ending position, exclusive.
+   * @param endPosition   the ending position, exclusive.
    * @return <tt>true</tt> if this AST changed as a result of the call
    */
   public boolean appendAll(IAST ast, int startPosition, int endPosition);
@@ -95,7 +179,7 @@ public interface IASTAppendable extends IASTMutable {
    * Inserts the objects in the specified collection at the specified location in this AST. The
    * objects are added in the order they are returned from the collection's iterator.
    *
-   * @param location the index at which to insert.
+   * @param location   the index at which to insert.
    * @param collection the collection of objects.
    * @return {@code true} if this {@code ArrayList} is modified, {@code false} otherwise.
    * @throws IndexOutOfBoundsException when {@code location < 0 || > size()}
@@ -106,9 +190,9 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all elements from offset <code>startPosition</code> to <code>endPosition</code> in the
    * specified list to the end of this AST.
    *
-   * @param list list containing elements to be added to this AST
+   * @param list          list containing elements to be added to this AST
    * @param startPosition the start position, inclusive.
-   * @param endPosition the ending position, exclusive.
+   * @param endPosition   the ending position, exclusive.
    * @return <tt>true</tt> if this AST changed as a result of the call
    */
   public boolean appendAll(List<? extends IExpr> list, int startPosition, int endPosition);
@@ -117,9 +201,9 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all elements from offset <code>startPosition</code> to <code>endPosition</code> in the
    * specified list to the end of this AST.
    *
-   * @param args array containing elements to be added to this AST
+   * @param args          array containing elements to be added to this AST
    * @param startPosition the start position, inclusive.
-   * @param endPosition the ending position, exclusive.
+   * @param endPosition   the ending position, exclusive.
    * @return <tt>true</tt> if this AST changed as a result of the call
    */
   public boolean appendAll(IExpr[] args, int startPosition, int endPosition);
@@ -137,9 +221,9 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all of the arguments (starting from offset <code>1</code>) in the specified AST up to
    * position <code>untilPosition</code> exclusive.
    *
-   * @param ast AST containing elements to be added to this AST
+   * @param ast           AST containing elements to be added to this AST
    * @param untilPosition append all argumments of ast up to position <code>untilPosition</code>
-   *     exclusive.
+   *                      exclusive.
    * @return <tt>true</tt> if this AST changed as a result of the call
    */
   public boolean appendArgs(IAST ast, int untilPosition);
@@ -148,8 +232,8 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all elements generated by the given function from index <code>start</code> inclusive to
    * <code>end</code> exclusive.
    *
-   * @param start start index (inclusive)
-   * @param end end index (exclusive)
+   * @param start    start index (inclusive)
+   * @param end      end index (exclusive)
    * @param function function which generates the elements which should be appended
    * @return <tt>this</tt>
    */
@@ -159,7 +243,7 @@ public interface IASTAppendable extends IASTMutable {
    * Appends all elements generated by the given function from index <code>1</code> inclusive to
    * <code>end</code> exclusive.
    *
-   * @param end end index (exclusive)
+   * @param end      end index (exclusive)
    * @param function function which generates the elements which should be appended
    * @return <tt>this</tt>
    */
@@ -177,7 +261,7 @@ public interface IASTAppendable extends IASTMutable {
   /**
    * Adds the specified rule at the end of this association.
    *
-   * @param rule the rule to add at the end of this association
+   * @param expr the rule to add at the end of this association
    * @return always true
    */
   void appendRule(IExpr expr); /*{
@@ -202,7 +286,7 @@ public interface IASTAppendable extends IASTMutable {
    * IASTAppendable</code> object, otherwise do nothing.
    *
    * @param consumer block to be executed if this expression unequals <code>F.NIL</code>
-   * @see java.util.Optional#ifPresent(Consumer)
+   * see java.util.Optional#ifPresent(Consumer)
    */
   public void ifAppendable(Consumer<? super IASTAppendable> consumer); /*{
     consumer.accept(this);
@@ -223,8 +307,8 @@ public interface IASTAppendable extends IASTMutable {
    * index.
    *
    * @param start the index at which to start removing.
-   * @param end the index one after the end of the range to remove. * @throws
-   *     UnsupportedOperationException if removing from this {@code IAST} is not supported.
+   * @param end   the index one after the end of the range to remove. * @throws
+   *              UnsupportedOperationException if removing from this {@code IAST} is not supported.
    * @throws IndexOutOfBoundsException when {@code start < 0, start > end} or {@code end > size()}
    */
   public void removeRange(int start, int end);

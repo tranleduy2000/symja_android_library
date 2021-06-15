@@ -26,13 +26,20 @@ public interface ISignedNumber extends INumber {
    * {@inheritDoc}
    */
   @Override
-  IExpr complexArg();
+  IExpr complexArg(); /* {
+    if (complexSign() < 0) {
+      return S.Pi;
+    }
+    return F.C0;
+  }*/
 
   /**
    * {@inheritDoc}
    */
   @Override
-  INumber conjugate();
+  INumber conjugate(); /* {
+    return this;
+  }*/
 
   /**
    * Divide <code>this</code> signed number by <code>that</code> signed number.
@@ -49,8 +56,10 @@ public interface ISignedNumber extends INumber {
    */
   public double doubleValue();
 
+  @Override
   public IInteger ceilFraction() throws ArithmeticException;
 
+  @Override
   public IInteger floorFraction() throws ArithmeticException;
 
   /**
@@ -58,6 +67,7 @@ public interface ISignedNumber extends INumber {
    *
    * @return
    */
+  @Override
   public ISignedNumber fractionalPart();
 
   /**
@@ -68,6 +78,7 @@ public interface ISignedNumber extends INumber {
    *
    * @return
    */
+  @Override
   public IInteger integerPart();
 
 
@@ -87,17 +98,21 @@ public interface ISignedNumber extends INumber {
    *
    * @return <code>this > that</code>
    */
-  boolean isGE(ISignedNumber that);
+  boolean isGE(ISignedNumber that); /*{
+    return !isLT(that);
+  }*/
 
   /**
    * @param that
    * @return
    * @deprecated use #isGT()
    */
-  boolean isGreaterThan(ISignedNumber that);
+  boolean isGreaterThan(ISignedNumber that); /*{
+    return isGT(that);
+  }*/
 
   /**
-   * Test if <code>this</code> signed number is less <code>than</code> that signed number..
+   * Test if <code>this</code> signed number is less than <code>that</code> signed number.
    *
    * @return <code>this < that</code>
    */
@@ -108,14 +123,18 @@ public interface ISignedNumber extends INumber {
    *
    * @return <code>this > that</code>
    */
-  boolean isLE(ISignedNumber that);
+  boolean isLE(ISignedNumber that); /*{
+    return !isGT(that);
+  }*/
 
   /**
    * @param that
    * @return
    * @deprecated use #isLT()
    */
-  boolean isLessThan(ISignedNumber that);
+  boolean isLessThan(ISignedNumber that); /*{
+    return isLT(that);
+  }*/
 
   /**
    * Test if this number is negative.
@@ -175,19 +194,22 @@ public interface ISignedNumber extends INumber {
 
   /**
    * Returns the closest <code>IInteger</code> to the argument. The result is rounded to an integer
-   * by adding 1/2 and taking the floor of the result. <br/> This method raises {@link
-   * ArithmeticException} if a numeric value cannot be represented by an <code>long</code> type.
+   * by adding 1/2 and taking the floor of the result. <br>
+   * This method raises {@link ArithmeticException} if a numeric value cannot be represented by an
+   * <code>long</code> type.
    *
    * @return the closest integer to the argument.
    */
-  IInteger round();
+  @Override
+  IInteger roundExpr();
 
   /**
-   * Round <code>this</code> number to the closest <code>ISignedNumber</code> multiple of the
-   * <code>factor</code>.
+   * Round <code>this</code> number to the closest <code>ISignedNumber</code> multiple of the <code>
+   * factor</code>.
    *
    * @param factor
    * @return the closest integer to the argument.
+   * @throws ArithmeticException
    */
   public ISignedNumber roundClosest(ISignedNumber factor);
 
@@ -195,10 +217,11 @@ public interface ISignedNumber extends INumber {
    * Returns the signum function of this number (i.e., -1, 0 or 1 as the value of this number is
    * negative, zero or positive).
    *
-   * @return -1 if this is a negative number;<br/> 0 if this is a zero;<br/> -1 if this is a
-   * negative number;
+   * @return 1 if this is a positive number;<br>
+   *     0 if this is a zero;<br>
+   *     -1 if this is a negative number;
    */
-  int sign();
+  int complexSign();
 
   /**
    * Subtract <code>that</code> signed number from <code>this</code> signed number
@@ -212,8 +235,8 @@ public interface ISignedNumber extends INumber {
    * Converts this number to <code>int</code>; unlike {@link #intValue} this method raises {@link
    * ArithmeticException} if this number cannot be represented by an <code>int</code> type.
    *
-   * @return the numeric value represented by this integer after conversion to type
-   * <code>int</code>.
+   * @return the numeric value represented by this integer after conversion to type <code>int</code>
+   *     .
    * @throws ArithmeticException if conversion to <code>int</code> is not possible.
    */
   int toInt() throws ArithmeticException;
@@ -278,5 +301,10 @@ public interface ISignedNumber extends INumber {
   IExpr upper();
 
   @Override
-  IAST toPolarCoordinates();
+  IAST toPolarCoordinates(); /* {
+    if (isNegative()) {
+      return F.list(this.negate(), S.Pi);
+    }
+    return F.list(this, F.C0);
+  }*/
 }

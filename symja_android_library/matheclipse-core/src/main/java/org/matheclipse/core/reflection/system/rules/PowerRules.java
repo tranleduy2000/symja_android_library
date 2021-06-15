@@ -79,10 +79,10 @@ public interface PowerRules {
 
     final public static IAST RULES = List(
             IInit(Power, SIZES),
-    // E^(1/2*I*Pi)=I
+    // E^(I*1/2*Pi)=I
     ISet(Exp(Times(CC(0L,1L,1L,2L),Pi)),
       CI),
-            // E^(3/2*I*Pi)=-I
+    // E^(I*3/2*Pi)=-I
             ISet(Exp(Times(CC(0L,1L,3L,2L),Pi)),
                     CNI),
     // E^(I*Pi*n_):=(-1)^n/;n∈Integers
@@ -91,13 +91,13 @@ public interface PowerRules {
             // E^(Pi*c_Complex):=Module({r=Re(c),j=Im(c)},If(EvenQ(j),1,-1)/;r==0&&IntegerQ(j))
             ISetDelayed(Exp(Times(Pi,$p(c,Complex))),
                     Module(List(Set(r,Re(c)),Set(j,Im(c))),Condition(If(EvenQ(j),C1,CN1),And(Equal(r,C0),IntegerQ(j))))),
-            // E^(x_+Pi*c_Complex):=Module({r=Re(c),j=Im(c)},If(EvenQ(j),E^x,-E^x)/;r==0&&IntegerQ(j))
+    // E^(Pi*c_Complex+x_):=Module({r=Re(c),j=Im(c)},If(EvenQ(j),E^x,-E^x)/;r==0&&IntegerQ(j))
             ISetDelayed(Exp(Plus(Times(Pi,$p(c,Complex)),x_)),
                     Module(List(Set(r,Re(c)),Set(j,Im(c))),Condition(If(EvenQ(j),Exp(x),Negate(Exp(x))),And(Equal(r,C0),IntegerQ(j))))),
-            // E^(I*Infinity)=Indeterminate
+    // E^I*Infinity=Indeterminate
             ISet(Exp(DirectedInfinity(CI)),
                     Indeterminate),
-            // E^(-I*Infinity)=Indeterminate
+    // E^-I*Infinity=Indeterminate
             ISet(Exp(DirectedInfinity(CNI)),
                     Indeterminate),
             // E^ComplexInfinity=Indeterminate
@@ -106,7 +106,7 @@ public interface PowerRules {
             // E^Log(x_):=x
             ISetDelayed(Exp(Log(x_)),
                     x),
-    // E^(a_*Log(x_)):=x^a/;FreeQ(a,x)
+    // E^(Log(x_)*a_):=x^a/;FreeQ(a,x)
     ISetDelayed(Exp(Times(Log(x_),a_)),
       Condition(Power(x,a),FreeQ(a,x))),
             // Tan(x_)^m_?(IntegerQ(#1)&&#1<0&):=Cot(x)^(-m)

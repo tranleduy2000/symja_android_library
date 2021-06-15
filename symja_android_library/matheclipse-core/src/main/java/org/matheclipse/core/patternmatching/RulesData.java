@@ -15,6 +15,7 @@ import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.util.OpenIntToIExprHashMap;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
 import org.matheclipse.core.interfaces.IExpr;
@@ -43,8 +44,8 @@ public final class RulesData implements Serializable {
   public static final int DEFAULT_VALUE_INDEX = Integer.MIN_VALUE;
 
   /**
-   * If this method returns <code>false</code>, the matching can try to match the <code>lha</code> with a hash value
-   * in a step before the &quot;real structural pattern matching&quot;.
+   * If this method returns <code>false</code>, the matching can try to match the <code>lha</code>
+   * with a hash value in a step before the &quot;real structural pattern matching&quot;.
    *
    * @param lhs the left-hand-side of pattern matching definition
    * @return
@@ -154,7 +155,6 @@ public final class RulesData implements Serializable {
     IExpr key;
     PatternMatcherEquals pmEquals;
     IAST ast;
-    IExpr condition;
     PatternMatcherAndEvaluator pmEvaluator;
     if (fEqualUpRules != null && fEqualUpRules.size() > 0) {
       iter = fEqualUpRules.keySet().iterator();
@@ -181,12 +181,6 @@ public final class RulesData implements Serializable {
             }
             if (pmEvaluator.getRHS().isASTOrAssociation()) {
               pmEvaluator.getRHS().accept(visitor);
-            }
-            condition = pmEvaluator.getCondition();
-            if (condition != null) {
-              if (condition.isASTOrAssociation()) {
-                condition.accept(visitor);
-              }
             }
           }
         }
@@ -266,6 +260,7 @@ public final class RulesData implements Serializable {
     clear();
     fMessages = null;
   }
+
   public List<IAST> definition() {
     ArrayList<IAST> definitionList = new ArrayList<IAST>();
     Iterator<IExpr> iter;
@@ -377,33 +372,36 @@ public final class RulesData implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (obj == null) { return false; }
-		if (getClass() != obj.getClass()) { return false; }
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
 
     RulesData other = (RulesData) obj;
 
     if (fEqualDownRules == null) {
-			if (other.fEqualDownRules != null) { return false; }
-    } else if (!fEqualDownRules.equals(other.fEqualDownRules)) { return false; }
+      if (other.fEqualDownRules != null) return false;
+    } else if (!fEqualDownRules.equals(other.fEqualDownRules)) return false;
     if (fEqualUpRules == null) {
-			if (other.fEqualUpRules != null) { return false; }
-    } else if (!fEqualUpRules.equals(other.fEqualUpRules)) { return false; }
+      if (other.fEqualUpRules != null) return false;
+    } else if (!fEqualUpRules.equals(other.fEqualUpRules)) return false;
 
     if (fPatternDownRules == null) {
-			if (other.fPatternDownRules != null) { return false; }
-    } else if (!fPatternDownRules.equals(other.fPatternDownRules)) { return false; }
+      if (other.fPatternDownRules != null) return false;
+    } else if (!fPatternDownRules.equals(other.fPatternDownRules)) return false;
 
     if (fSimplePatternUpRules == null) {
-			if (other.fSimplePatternUpRules != null) { return false; }
-    } else if (!fSimplePatternUpRules.equals(other.fSimplePatternUpRules)) { return false; }
+      if (other.fSimplePatternUpRules != null) return false;
+    } else if (!fSimplePatternUpRules.equals(other.fSimplePatternUpRules)) return false;
 
     return true;
   }
 
   /**
+   * Try matching the <code>expr</code> expression with this pattern-matching rules and if matched,
+   * return an evaluated right-hand-side expression, otherwise return {@link F#NIL}.
+   *
    * @param expr
-   * @return <code>F.NIL</code> if no evaluation was possible
+   * @return {@link F#NIL} if no evaluation was possible
    */
   public IExpr evalDownRule(final IExpr expr, EvalEngine engine) {
 
@@ -456,37 +454,40 @@ public final class RulesData implements Serializable {
             // assigning pmEvaluator = patternEvaluator cause unrecognized selector
             IPatternMatcher pmEvaluator = (IPatternMatcher) patternEvaluator.clone();
             //if (showSteps) {
-            //	if (isShowSteps(pmEvaluator)) {
-            //		IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
-            //		System.out.println(
-            //				" COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
-            //	}
+            //  if (isShowSteps(pmEvaluator)) {
+            //    IExpr rhs = pmEvaluator.getRHS().orElse(F.Null);
+            //    System.out.println(
+            //        " COMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
+            //  }
             //}
             // if (pmEvaluator.getLHSPriority() == 6656) {
             // System.out.println("Debug from this line");
             // }
             //if (FEConfig.SHOW_STACKTRACE) {
-            //	if (isShowPriority(pmEvaluator)) {
-            //		System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
-            //	}
-            //	// if (pmEvaluator.getLHSPriority() == 432) {
-            //	// System.out.println(pmEvaluator.toString());
-            //	// System.out.println(expr);
-            //	// System.out.println("Debug from this line");
-            //	// }
+            //  if (isShowPriority(pmEvaluator)) {
+            //    System.out.print("try: " + pmEvaluator.getLHSPriority() + " - ");
+            //  }
+            //  // if (pmEvaluator.getLHSPriority() == 432) {
+            //  // System.out.println(pmEvaluator.toString());
+            //  // System.out.println(expr);
+            //  // System.out.println("Debug from this line");
+            //  // }
             //}
             // System.out.println(pmEvaluator.toString());
             // System.out.println(">>"+expr);
 
             result = pmEvaluator.eval(expr, engine);
             if (result.isPresent()) {
-              // if (patternEvaluator.fLhsPatternExpr.isAST(F.Integrate)) {
-              // System.out.println(((IPatternMatcher) patternEvaluator).toString());
-              // // if (((IPatternMatcher) patternEvaluator).getLHSPriority() == 6686) {
-              // System.out.println("Rule number: "+((IPatternMatcher)
+              //              if (patternEvaluator.fLhsPatternExpr.isAST(S.Integrate)) {
+              //                System.out.println(((IPatternMatcher) patternEvaluator).toString());
+              //                // if (((IPatternMatcher) patternEvaluator).getLHSPriority() ==
+              // 6686) {
+              //                System.out.println(
+              //                    "Rule number: " + ((IPatternMatcher)
               // patternEvaluator).getLHSPriority());
-              // // }
-              // }
+              //                // }
+              //                System.out.println("Result: "+result.toString());
+              //              }
               if (FEConfig.SHOW_STACKTRACE) {
                 if (isShowPriority(pmEvaluator)) {
                   System.out.println(
@@ -497,7 +498,7 @@ public final class RulesData implements Serializable {
                 if (isShowSteps(pmEvaluator)) {
                   IExpr rhs = pmEvaluator.getRHS();
                   if (!rhs.isPresent()) {
-                    rhs = F.Null;
+                    rhs = S.Null;
                   }
                   System.out.println(
                       "\nCOMPLEX: " + pmEvaluator.getLHS().toString() + " := " + rhs.toString());
@@ -527,12 +528,12 @@ public final class RulesData implements Serializable {
     if (head.isSymbol() && ((ISymbol) head).isContext(Context.RUBI)) {
       return true;
     }
-    return head.equals(F.Integrate);
+    return head.equals(S.Integrate);
   }
 
   private boolean isShowPriority(IPatternMatcher pmEvaluator) {
     IExpr head = pmEvaluator.getLHS().head();
-    return head.equals(F.Integrate);
+    return head.equals(S.Integrate);
   }
 
   public IExpr evalUpRule(final IExpr expression, EvalEngine engine) {
@@ -619,9 +620,9 @@ public final class RulesData implements Serializable {
 
   public final IPatternMatcher putDownRule(final IExpr leftHandSide, final IExpr rightHandSide) {
     return putDownRule(
-    		IPatternMatcher.SET_DELAYED,
-				false, leftHandSide,
-				rightHandSide,
+        IPatternMatcher.SET_DELAYED,
+        false, leftHandSide,
+        rightHandSide,
         IPatternMapImpl.DEFAULT_RULE_PRIORITY);
   }
 
@@ -629,10 +630,10 @@ public final class RulesData implements Serializable {
       final IExpr leftHandSide,
       final IExpr rightHandSide) {
     return putDownRule(
-    		IPatternMatcher.SET_DELAYED,
-				false,
-				leftHandSide,
-				rightHandSide,
+        IPatternMatcher.SET_DELAYED,
+        false,
+        leftHandSide,
+        rightHandSide,
         IPatternMapImpl.DEFAULT_RULE_PRIORITY);
   }
 
@@ -650,11 +651,16 @@ public final class RulesData implements Serializable {
     final PatternMatcherAndEvaluator pmEvaluator;
     int patternHash = 0;
     if (!isComplicatedPatternRule(leftHandSide) && !leftHandSide.isCondition()) {
+      //            if (leftHandSide.isAST(S.Sum)) {
+      //              System.out.println(leftHandSide.toString());
+      //            }
       patternHash = ((IAST) leftHandSide).patternHashCode();
     }
-    if (leftHandSide.isAST(F.Integrate)) {
-      pmEvaluator = new PatternMatcherAndEvaluator(setSymbol, leftHandSide, rightHandSide, false,
-          patternHash);
+    if (leftHandSide.isAST(S.Integrate)) {
+
+      pmEvaluator =
+          new PatternMatcherAndEvaluator(
+              setSymbol, leftHandSide, rightHandSide, false, patternHash);
       // keep Integrate rules in order predefined by Rubi project
       pmEvaluator.setLHSPriority(priority);
 
@@ -747,14 +753,14 @@ public final class RulesData implements Serializable {
    * Test if the matchers are equivalent, comparing the LHS (and possibly RHS-condition), with named
    * patterns replaced by slot values <code>#1, #2, #3,...</code>.
    *
-   * @param matcher the existing pattern matcher in the RulesData structure
+   * @param matcher             the existing pattern matcher in the RulesData structure
    * @param newNumberOfPatterns the number of patterns which the new rule contains
-   * @param newSlotValuesLHS the left-hand-side of the new rule with patterns replaced by slot
-   *     values
-   * @param newSlotValuesRHS the right-hand-side of the new rule with pattern symbols replaced by
-   *     slot values
+   * @param newSlotValuesLHS    the left-hand-side of the new rule with patterns replaced by slot
+   *                            values
+   * @param newSlotValuesRHS    the right-hand-side of the new rule with pattern symbols replaced by
+   *                            slot values
    * @return <code>true</code> if the <code>matcher</code>'s LHS and RHS-condition are equivalent to
-   *     the new matcher parameters
+   * the new matcher parameters
    */
   private static boolean equivalentSlots(IPatternMatcher matcher, int newNumberOfPatterns,
       IExpr newSlotValuesLHS,

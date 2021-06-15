@@ -2,23 +2,41 @@ package org.matheclipse.core.patternmatching.hash;
 
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.patternmatching.RulesData;
 import org.matheclipse.core.visit.HashValueVisitor;
 
 public abstract class AbstractHashedPatternRules {
 
-  protected int hash1;
-  protected int hash2;
-  protected int hashSum;
-  protected RulesData fRulesData = null;
+  /**
+   * The first left-hand-side pattern which must match a single term in an {@link IAST} expression
+   * with attribute {@link ISymbol#ORDERLESS}.
+   */
   protected final IExpr fLHSPattern1;
+  /**
+   * The second left-hand-side pattern which must match a single term in an {@link IAST} expression
+   * with attribute {@link ISymbol#ORDERLESS}.
+   */
   protected final IExpr fLHSPattern2;
+
+  /** The corresponding hashcode for the first left-hand-side pattern. */
+  protected int hash1;
+  /** The corresponding hashcode for the second left-hand-side pattern. */
+  protected int hash2;
+  /** the combined hashcode from hash1 and hash2 */
+  protected int hashSum;
+  /**
+   * The pattern matching rules associated with a symbol. Contains DownValues and UpValues rules for
+   * pattern matching.
+   */
+  protected RulesData fRulesData = null;
 
   /**
    * @param lhsPattern1 first left-hand-side pattern
    * @param lhsPattern2 second left-hand-side pattern
-   * @param defaultHashCode if <code>false</code> use a <code>HashValueVisitor()</code> to determine the tw0 hash values for the
-   * lhs... arguments. if <code>true</code> use the default <code>Object.hashCode()</code> method.
+   * @param defaultHashCode if <code>false</code> use a <code>HashValueVisitor()</code> to determine
+   *     the two hash values for the <code>lhs...</code> arguments. if <code>true</code> use the
+   *     default <code> Object.hashCode()</code> method.
    */
   public AbstractHashedPatternRules(IExpr lhsPattern1, IExpr lhsPattern2, boolean defaultHashCode) {
     fLHSPattern1 = lhsPattern1;
@@ -27,8 +45,8 @@ public abstract class AbstractHashedPatternRules {
   }
 
   /**
-   * Calculate two hash values <code>hash1</code> for <code>lhsPattern1</code> and <code>hash2</code>for
-   * <code>lhsPattern2</code>
+   * Calculate two hash values <code>hash1</code> for <code>lhsPattern1</code> and <code>hash2
+   * </code>for <code>lhsPattern2</code>
    *
    * @param lhsPattern1
    * @param lhsPattern2
@@ -113,28 +131,37 @@ public abstract class AbstractHashedPatternRules {
     return hash2;
   }
 
-  /**
-   * Test if the first left-hand-side is a pattern object
-   */
+  /** Test if the first left-hand-side is a pattern object */
   public boolean isPattern1() {
     return fLHSPattern1.isPattern();
   }
 
-  /**
-   * Test if the second left-hand-side is a pattern object
-   */
+  /** Test if the second left-hand-side is a pattern object */
   public boolean isPattern2() {
     return fLHSPattern2.isPattern();
   }
 
   /**
-   * @param e1
+   * If the second left-hand-side expression must have a negative integer number return <code>
+   * true</code>.
+   *
+   * @return <code>true</code> if the second left-hand-side must have a negative integer number
+   */
+  public boolean isLHS2Negate() {
+    return false;
+  }
+
+  /**
+   * Try matching the <code>arg1, arg2</code> expressions as <code>F.List(arg1, arg2)</code> with this
+   * pattern-matching rules and if matched, return an evaluated right-hand-side expression,
+   * otherwise return {@link F#NIL}.
+   *
+   * @param arg1
    * @param num1
-   * @param e2
+   * @param arg2
    * @param num2
    * @param engine
-   * @return
+   * @return {@link F#NIL} if no match was found
    */
-  public abstract IExpr evalDownRule(IExpr e1, IExpr num1, IExpr e2, IExpr num2, EvalEngine engine);
-
+  public abstract IExpr evalDownRule(IExpr arg1, IExpr num1, IExpr arg2, IExpr num2, EvalEngine engine);
 }

@@ -60,7 +60,7 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
    */
   @Override
   public IExpr complexArg() {
-    if (sign() < 0) {
+    if (complexSign() < 0) {
       return F.Pi;
     }
     return F.C0;
@@ -113,9 +113,9 @@ public abstract class ISignedNumberImpl extends INumberImpl implements ISignedNu
   @Override
   public IAST toPolarCoordinates() {
     if (isNegative()) {
-      return F.pair(this.negate(), F.Pi);
+      return F.list(this.negate(), S.Pi);
     }
-    return F.pair(this, F.C0);
+    return F.list(this, F.C0);
   }
 
   /**

@@ -15,11 +15,7 @@
  */
 package org.matheclipse.parser.client.ast;
 
-/**
- * A node for a parsed pattern expression (i.e. <code>_</code> or
- * <code>x_</code>)
- * 
- */
+/** A node for a parsed pattern expression (i.e. <code>_</code> or <code>x_</code>) */
 public class PatternNode extends ASTNode {
 	
 	protected final SymbolNode fSymbol;
@@ -84,9 +80,7 @@ public class PatternNode extends ASTNode {
 		return fConstraint;
 	}
 
-	/**
-	 * @return the fOptional
-	 */
+  /** @return the fOptional */
 	public ASTNode getDefaultValue() {
 		return fDefaultValue;
 	}
@@ -103,9 +97,7 @@ public class PatternNode extends ASTNode {
 		return 11;
 	}
 
-	/**
-	 * @return the fOptional
-	 */
+  /** @return the fOptional */
 	public boolean isDefault() {
 		return fDefault;
 	}

@@ -34,7 +34,7 @@ public class OrderlessStepVisitor extends FlatOrderlessStepVisitor implements IS
   }
 
   @Override
-  protected boolean matchSinglePartition(int[][] result, @Nonnull StackMatcher stackMatcher) {
+  protected boolean matchSinglePartition(int[][] result, StackMatcher stackMatcher) {
     int lastStackSize = stackMatcher.size();
     IExpr[] patternValues = fPatternMap.copyPattern();
     boolean matched = true;

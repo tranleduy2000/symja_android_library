@@ -23,7 +23,7 @@ package org.hipparchus.analysis.solvers;
 
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.RealFieldUnivariateFunction;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -48,7 +48,7 @@ import org.hipparchus.util.MathUtils;
  *
  * @param <T> the type of the field elements
  */
-public class FieldBracketingNthOrderBrentSolver<T extends RealFieldElement<T>>
+public class FieldBracketingNthOrderBrentSolver<T extends CalculusFieldElement<T>>
         implements BracketedRealFieldUnivariateSolver<T> {
 
     /**

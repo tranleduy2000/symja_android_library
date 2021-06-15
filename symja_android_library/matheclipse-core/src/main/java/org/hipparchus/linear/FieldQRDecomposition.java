@@ -22,7 +22,7 @@
 
 package org.hipparchus.linear;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.hipparchus.util.FastMath;
@@ -46,7 +46,7 @@ import java.util.Arrays;
  * @see <a href="http://mathworld.wolfram.com/QRDecomposition.html">MathWorld</a>
  * @see <a href="http://en.wikipedia.org/wiki/QR_decomposition">Wikipedia</a>
  */
-public class FieldQRDecomposition<T extends RealFieldElement<T>> {
+public class FieldQRDecomposition<T extends CalculusFieldElement<T>> {
     /**
      * Singularity threshold.
      */
@@ -84,7 +84,7 @@ public class FieldQRDecomposition<T extends RealFieldElement<T>> {
      * The singularity threshold defaults to zero.
      *
      * @param matrix The matrix to decompose.
-     * @see #FieldQRDecomposition(FieldMatrix, RealFieldElement)
+     * @see #FieldQRDecomposition(FieldMatrix, CalculusFieldElement)
      */
     public FieldQRDecomposition(FieldMatrix<T> matrix) {
         this(matrix, matrix.getField().getZero());
@@ -310,7 +310,7 @@ public class FieldQRDecomposition<T extends RealFieldElement<T>> {
      * (i.e. a system with more equations than unknowns, which corresponds to a tall A
      * matrix with more rows than columns). In any case, if the matrix is singular
      * within the tolerance set at {@link #FieldQRDecomposition(FieldMatrix,
-     * RealFieldElement) construction}, an error will be triggered when
+     * CalculusFieldElement) construction}, an error will be triggered when
      * the {@link DecompositionSolver#solve(RealVector) solve} method will be called.
      * </p>
      *

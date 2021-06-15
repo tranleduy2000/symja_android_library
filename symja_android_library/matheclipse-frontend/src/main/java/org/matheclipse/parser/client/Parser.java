@@ -41,6 +41,7 @@ import java.util.List;
  * parser</a> for the idea, how to parse the operators depending on their precedence.
  */
 public class Parser extends Scanner {
+
   /** SymbolNode for <code>Derivative</code> corresponding to <code>F#Derivative</code> */
   public static final SymbolNode DERIVATIVE = new SymbolNode("Derivative");
 
@@ -77,7 +78,7 @@ public class Parser extends Scanner {
    *
    * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
    * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of
-   *     ASTNodes
+   *                      ASTNodes
    */
   public Parser(final boolean relaxedSyntax, boolean packageMode) {
     this(ASTNodeFactory.MMA_STYLE_FACTORY, relaxedSyntax, packageMode);
@@ -107,7 +108,7 @@ public class Parser extends Scanner {
    * @param factory       a parser factory
    * @param relaxedSyntax if <code>true</code>, use '('...')' as brackets for function arguments
    * @param packageMode   parse in &quot;package mode&quot; and initialize an internal list of
-   *     ASTNodes
+   *                      ASTNodes
    */
   public Parser(INodeParserFactory factory, final boolean relaxedSyntax, boolean packageMode) {
     super(packageMode, FEConfig.EXPLICIT_TIMES_OPERATOR);
@@ -629,10 +630,12 @@ public class Parser extends Scanner {
 
   }
 
+  @Override
   protected boolean isOperatorCharacters() {
     return fFactory.isOperatorChar(fCurrentChar);
   }
 
+  @Override
   protected boolean isOperatorCharacters(char ch) {
     return fFactory.isOperatorChar(ch);
   }
@@ -642,6 +645,7 @@ public class Parser extends Scanner {
    *
    * @return
    */
+  @Override
   protected final List<Operator> getOperator() {
     char lastChar;
     final int startPosition = fCurrentPosition - 1;
@@ -715,46 +719,87 @@ public class Parser extends Scanner {
    */
   private ASTNode getNumber(final boolean negative) throws SyntaxError {
     ASTNode temp = null;
-    String number = "";
+    String numberStr = "";
     try {
       final Object[] result = getNumberString();
-      number = (String) result[0];
+      numberStr = (String) result[0];
       final int numFormat = ((Integer) result[1]).intValue();
+      String exponentStr = (String) result[2];
       if (negative) {
-        number = '-' + number;
+        numberStr = '-' + numberStr;
       }
       if (numFormat < 0) {
         if (fCurrentChar == '`' && isValidPosition()) {
           fCurrentPosition++;
-          if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
+          if (isValidPosition() && fInputString[fCurrentPosition] == '*') {
+            fCurrentPosition++;
+            if (isValidPosition() && fInputString[fCurrentPosition] == '^') {
+              fCurrentPosition += 2;
+              long exponent = getJavaLong();
+              //              Double d = Double.valueOf(number + "E" + exponent);
+              return fFactory.createDouble(numberStr + "E" + exponent);
+            }
+          } else if (isValidPosition() && fInputString[fCurrentPosition] == '`') {
             fCurrentPosition += 2;
             long precision = getJavaLong();
             if (precision < FEConfig.MACHINE_PRECISION) {
               precision = FEConfig.MACHINE_PRECISION;
             }
-            return fFactory.createDouble(number);
-            // return F.num(new Apfloat(number, precision));
+            return fFactory.createDouble(numberStr);
           } else {
-            fCurrentPosition++;
-            long precision = FEConfig.MACHINE_PRECISION;
             if (isValidPosition() && Character.isDigit(fInputString[fCurrentPosition])) {
-              precision = getJavaLong();
+              fCurrentPosition++;
+              long precision = getJavaLong();
               if (precision < FEConfig.MACHINE_PRECISION) {
                 precision = FEConfig.MACHINE_PRECISION;
               }
-              return fFactory.createDouble(number);
+              return fFactory.createDouble(numberStr);
             } else {
               getNextToken();
-              return fFactory.createDouble(number);
+              return fFactory.createDouble(numberStr);
             }
           }
+          throwSyntaxError("Number format error: " + numberStr, numberStr.length());
         }
-        temp = fFactory.createDouble(number);
+        temp = fFactory.createDouble(numberStr);
       } else {
-        temp = fFactory.createInteger(number, numFormat);
+        if (exponentStr == null || exponentStr.equals("1")) {
+          temp = fFactory.createInteger(numberStr, numFormat);
+        } else {
+          if (numFormat == 10) {
+            try {
+              int exponent = Integer.parseInt(exponentStr, 10);
+              if (exponent < 0) {
+                exponent = -exponent;
+                StringBuilder buf = new StringBuilder(numberStr.length() + exponent);
+                buf.append(numberStr);
+                for (int i = 0; i < exponent; i++) {
+                  buf.append('0');
+                }
+                temp =
+                    fFactory.createFunction(
+                        new SymbolNode("Power"),
+                        fFactory.createInteger(buf.toString(), numFormat),
+                        IntegerNode.CN1);
+              } else {
+                StringBuilder buf = new StringBuilder(numberStr.length() + exponent);
+                buf.append(numberStr);
+                for (int i = 0; i < exponent; i++) {
+                  buf.append('0');
+                }
+                temp = fFactory.createInteger(buf.toString(), numFormat);
+              }
+            } catch (final NumberFormatException e) {
+              throwSyntaxError(
+                  "Number format error (not an int type): " + exponentStr, exponentStr.length());
+            }
+          } else {
+            throwSyntaxError("Number format error: " + numberStr, numberStr.length());
+          }
+        }
       }
     } catch (final SyntaxError e) {
-      throwSyntaxError("Number format error: " + number, number.length());
+      throwSyntaxError("Number format error: " + numberStr, numberStr.length());
     }
     getNextToken();
     return temp;
@@ -797,8 +842,8 @@ public class Parser extends Scanner {
                 getNextToken();
                 // fToken = TT_PARTCLOSE;
                 return function;
+              }
             }
-          }
             // scanner-step end
             // if (fInputString.length > fCurrentPosition && fInputString[fCurrentPosition] == ']')
             // {
@@ -1089,9 +1134,6 @@ public class Parser extends Scanner {
           if (postfixOperator != null && postfixOperator.getPrecedence() >= min_precedence) {
             lhs = parsePostfixOperator(lhs, postfixOperator);
             continue;
-            // } else {
-            // throwSyntaxError("Operator: " + fOperatorString + " is no infix or postfix
-            // operator.");
           }
         }
       }
@@ -1104,6 +1146,9 @@ public class Parser extends Scanner {
     getNextToken();
     lhs = postfixOperator.createFunction(fFactory, lhs);
     lhs = parseArguments(lhs);
+    if (fToken == TT_ARGUMENTS_OPEN) {
+      return getFunctionArguments(lhs);
+    }
     return lhs;
   }
 
@@ -1146,6 +1191,7 @@ public class Parser extends Scanner {
         rhs = parseLookaheadOperator(infixOperator.getPrecedence());
         ast.add(rhs);
       }
+      lhs = infixOperator.endFunction(fFactory, ast, this);
     } else {
       if (fToken == TT_OPERATOR && infixOperator.getGrouping() == InfixOperator.NONE
           && infixOperator.isOperator(fOperatorString)) {
@@ -1241,8 +1287,12 @@ public class Parser extends Scanner {
           PostfixOperator postfixOperator = determinePostfixOperator();
           if (postfixOperator != null) {
             if (postfixOperator.getPrecedence() >= min_precedence) {
-              getNextToken();
-              rhs = postfixOperator.createFunction(fFactory, rhs);
+              //              getNextToken();
+              rhs = parsePostfixOperator(rhs, postfixOperator);
+              //              rhs = postfixOperator.createFunction(fFactory, rhs);
+              //              if (fToken == TT_ARGUMENTS_OPEN) {
+              //                return getFunctionArguments(rhs);
+              //              }
               continue;
             }
           }
@@ -1275,7 +1325,11 @@ public class Parser extends Scanner {
    * @throws SyntaxError
    */
   public List<ASTNode> parsePackage(final String expression) throws SyntaxError {
-    initialize(expression);
+    String input = expression.trim();
+    initialize(input);
+    if (fToken == TT_EOF) {
+      return new ArrayList<ASTNode>(1);
+    }
     while (fToken == TT_NEWLINE) {
       getNextToken();
     }

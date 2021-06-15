@@ -26,7 +26,9 @@ import com.duy.lang.DDouble;
 
 import java.util.Arrays;
 
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
+import org.hipparchus.FieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.exception.Localizable;
 import org.hipparchus.exception.LocalizedCoreFormats;
 import org.hipparchus.exception.MathIllegalArgumentException;
@@ -47,6 +49,8 @@ public final class MathUtils {
     /** \(\pi^2\) */
     public static final double PI_SQUARED = FastMath.PI * FastMath.PI;
 
+    /** \(\pi/2\). */
+    public static final double SEMI_PI = 0.5 * FastMath.PI;
 
     /**
      * Class contains only static methods.
@@ -127,7 +131,7 @@ public final class MathUtils {
       * @param center center of the desired 2&pi; interval for the result
       * @return a-2k&pi; with integer k and center-&pi; &lt;= a-2k&pi; &lt;= center+&pi;
       */
-      public static <T extends RealFieldElement<T>> T normalizeAngle(T a, T center) {
+      public static <T extends CalculusFieldElement<T>> T normalizeAngle(T a, T center) {
           return a.subtract(FastMath.floor(a.add(FastMath.PI).subtract(center).divide(TWO_PI)).multiply(TWO_PI));
       }
 
@@ -137,7 +141,7 @@ public final class MathUtils {
       * @param e2 second element
       * @return max(a1, e2)
       */
-     public static <T extends RealFieldElement<T>> T max(final T e1, final T e2) {
+     public static <T extends CalculusFieldElement<T>> T max(final T e1, final T e2) {
          return e1.subtract(e2).getReal() >= 0 ? e1 : e2;
      }
 
@@ -147,7 +151,7 @@ public final class MathUtils {
       * @param e2 second element
       * @return min(a1, e2)
       */
-     public static <T extends RealFieldElement<T>> T min(final T e1, final T e2) {
+     public static <T extends CalculusFieldElement<T>> T min(final T e1, final T e2) {
          return e1.subtract(e2).getReal() >= 0 ? e2 : e1;
      }
 
@@ -370,4 +374,138 @@ public final class MathUtils {
         }
     }
 
+    /**
+     * Sums {@code a} and {@code b} using Møller's 2Sum algorithm.
+     * <p>
+     * References:
+     * <ul>
+     * <li>Møller, Ole. "Quasi double-precision in floating point addition." BIT
+     * 5, 37–50 (1965).</li>
+     * <li>Shewchuk, Richard J. "Adaptive Precision Floating-Point Arithmetic
+     * and Fast Robust Geometric Predicates." Discrete & Computational Geometry
+     * 18, 305–363 (1997).</li>
+     * <li><a href=
+     * "https://en.wikipedia.org/wiki/2Sum">https://en.wikipedia.org/wiki/2Sum</a></li>
+     * </ul>
+     * @param a first summand
+     * @param b second summand
+     * @return sum and residual error in the sum
+     */
+    public static SumAndResidual twoSum(final double a, final double b) {
+        final double s = a + b;
+        final double aPrime = s - b;
+        final double bPrime = s - aPrime;
+        final double deltaA = a - aPrime;
+        final double deltaB = b - bPrime;
+        final double t = deltaA + deltaB;
+        return new SumAndResidual(s, t);
+    }
+
+    /**
+     * Sums {@code a} and {@code b} using Møller's 2Sum algorithm.
+     * <p>
+     * References:
+     * <ul>
+     * <li>Møller, Ole. "Quasi double-precision in floating point addition." BIT
+     * 5, 37–50 (1965).</li>
+     * <li>Shewchuk, Richard J. "Adaptive Precision Floating-Point Arithmetic
+     * and Fast Robust Geometric Predicates." Discrete & Computational Geometry
+     * 18, 305–363 (1997).</li>
+     * <li><a href=
+     * "https://en.wikipedia.org/wiki/2Sum">https://en.wikipedia.org/wiki/2Sum</a></li>
+     * </ul>
+     * @param <T> field element type
+     * @param a first summand
+     * @param b second summand
+     * @return sum and residual error in the sum
+     */
+    public static <T extends FieldElement<T>> FieldSumAndResidual<T> twoSum(final T a, final T b) {
+        final T s = a.add(b);
+        final T aPrime = s.subtract(b);
+        final T bPrime = s.subtract(aPrime);
+        final T deltaA = a.subtract(aPrime);
+        final T deltaB = b.subtract(bPrime);
+        final T t = deltaA.add(deltaB);
+        return new FieldSumAndResidual<>(s, t);
+    }
+
+    /**
+     * Result class for {@link MathUtils#twoSum(double, double)} containing the
+     * sum and the residual error in the sum.
+     */
+    public static final class SumAndResidual {
+
+        /** Sum. */
+        private final double sum;
+        /** Residual error in the sum. */
+        private final double residual;
+
+        /**
+         * Constructs a {@link SumAndResidual} instance.
+         * @param sum sum
+         * @param residual residual error in the sum
+         */
+        private SumAndResidual(final double sum, final double residual) {
+            this.sum = sum;
+            this.residual = residual;
+        }
+
+        /**
+         * Returns the sum.
+         * @return sum
+         */
+        public double getSum() {
+            return sum;
+        }
+
+        /**
+         * Returns the residual error in the sum.
+         * @return residual error in the sum
+         */
+        public double getResidual() {
+            return residual;
+        }
+
+    }
+
+    /**
+     * Result class for
+     * {@link MathUtils#twoSum(FieldElement, FieldElement)} containing
+     * the sum and the residual error in the sum.
+     * @param <T> field element type
+     */
+    public static final class FieldSumAndResidual<T extends FieldElement<T>> {
+
+        /** Sum. */
+        private final T sum;
+        /** Residual error in the sum. */
+        private final T residual;
+
+        /**
+         * Constructs a {@link FieldSumAndResidual} instance.
+         * @param sum sum
+         * @param residual residual error in the sum
+         */
+        private FieldSumAndResidual(final T sum, final T residual) {
+            this.sum = sum;
+            this.residual = residual;
+        }
+
+        /**
+         * Returns the sum.
+         * @return sum
+         */
+        public T getSum() {
+            return sum;
+        }
+
+        /**
+         * Returns the residual error in the sum.
+         * @return residual error in the sum
+         */
+        public T getResidual() {
+            return residual;
+        }
+
+    }
 }

@@ -19,6 +19,7 @@ import org.matheclipse.core.visit.IVisitor;
 import org.matheclipse.core.visit.IVisitorBoolean;
 import org.matheclipse.core.visit.IVisitorInt;
 import org.matheclipse.core.visit.IVisitorLong;
+import org.matheclipse.parser.client.FEConfig;
 
 /** A concrete pattern sequence implementation (i.e. x__) */
 public class PatternSequence extends IPatternSequenceImpl implements IPatternSequence {
@@ -42,7 +43,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
       boolean zeroArgsAllowed) {
     PatternSequence p = new PatternSequence();
     p.fSymbol = symbol;
-    p.fCondition = check;
+    p.fHeadTest = check;
     p.fDefault = def;
     p.fZeroArgsAllowed = zeroArgsAllowed;
     return p;
@@ -54,14 +55,14 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
    * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
    * @param check a header check.Maybe <code>null</code>.
    * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
-   * args has to be >= 1.
+   *     args has to be >= 1.
    * @return
    */
   public static PatternSequence valueOf(final ISymbol symbol, final IExpr check,
       boolean zeroArgsAllowed) {
     PatternSequence p = new PatternSequence();
     p.fSymbol = symbol;
-    p.fCondition = check;
+    p.fHeadTest = check;
     p.fZeroArgsAllowed = zeroArgsAllowed;
     return p;
   }
@@ -71,7 +72,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
    *
    * @param symbol the associated symbol of the pattern sequence. Maybe <code>null</code>.
    * @param zeroArgsAllowed if <code>true</code>, 0 arguments are allowed, otherwise the number of
-   * args has to be >= 1.
+   *     args has to be >= 1.
    * @return
    */
   public static PatternSequence valueOf(final ISymbol symbol, boolean zeroArgsAllowed) {
@@ -79,7 +80,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
   }
 
   /** The expression which should check this pattern sequence */
-  protected IExpr fCondition;
+  protected IExpr fHeadTest;
 
   /** The associated symbol for this pattern sequence */
   protected ISymbol fSymbol;
@@ -99,7 +100,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     int[] result = new int[2];
     result[0] = IAST.CONTAINS_PATTERN_SEQUENCE;
     result[1] = 1;
-    if (fCondition != null) {
+    if (fHeadTest != null) {
       result[1] += 2;
     }
     return result;
@@ -115,20 +116,20 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
       if (fSymbol == null) {
         if (pattern.fSymbol == null) {
           if (fDefault == pattern.fDefault && fZeroArgsAllowed == pattern.fZeroArgsAllowed) {
-            if ((fCondition != null) && (pattern.fCondition != null)) {
-              return fCondition.equals(pattern.fCondition);
+            if ((fHeadTest != null) && (pattern.fHeadTest != null)) {
+              return fHeadTest.equals(pattern.fHeadTest);
             }
-            return fCondition == pattern.fCondition;
+            return fHeadTest == pattern.fHeadTest;
           }
         }
         return false;
       }
       if (fSymbol.equals(pattern.fSymbol) && fDefault == pattern.fDefault
           && fZeroArgsAllowed == pattern.fZeroArgsAllowed) {
-        if ((fCondition != null) && (pattern.fCondition != null)) {
-          return fCondition.equals(pattern.fCondition);
+        if ((fHeadTest != null) && (pattern.fHeadTest != null)) {
+          return fHeadTest.equals(pattern.fHeadTest);
         }
-        return fCondition == pattern.fCondition;
+        return fHeadTest == pattern.fHeadTest;
       }
     }
     return false;
@@ -136,8 +137,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
   /**
    * Check if the two left-hand-side pattern expressions are equivalent. (i.e. <code>f[x_,y_]</code>
-   * is equivalent to
-   * <code>f[a_,b_]</code> )
+   * is equivalent to <code>f[a_,b_]</code> )
    *
    * @param patternExpr2
    * @param pm1
@@ -193,7 +193,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
   @Override
   public IExpr getHeadTest() {
-    return fCondition;
+    return fHeadTest;
   }
 
   @Override
@@ -239,10 +239,10 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
       buffer.append(prefix + "$ps(");
       if (fSymbol == null) {
         buffer.append("(ISymbol)null");
-        if (fCondition != null) {
+        if (fHeadTest != null) {
           buffer.append(
               ","
-                  + fCondition.internalJavaString(
+                  + fHeadTest.internalJavaString(
                   symbolsAsFactoryMethod,
                   0,
                   useOperators,
@@ -251,17 +251,17 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
                   variables));
         }
         if (fDefault) {
-          if (fCondition == null) {
+          if (fHeadTest == null) {
             buffer.append(",null");
           }
           buffer.append(",true");
         }
       } else {
         buffer.append("\"" + fSymbol.toString() + "\"");
-        if (fCondition != null) {
+        if (fHeadTest != null) {
           buffer.append(
               ","
-                  + fCondition.internalJavaString(
+                  + fHeadTest.internalJavaString(
                   symbolsAsFactoryMethod,
                   0,
                   useOperators,
@@ -291,11 +291,11 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
       if (fDefault) {
         buffer.append('.');
       }
-      if (fCondition != null) {
-        buffer.append(fCondition.toString());
+      if (fHeadTest != null) {
+        buffer.append(fHeadTest.toString());
       }
     } else {
-      if (fCondition == null) {
+      if (fHeadTest == null) {
         buffer.append(fSymbol.toString());
         buffer.append("__");
         if (fZeroArgsAllowed) {
@@ -313,7 +313,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
         if (fDefault) {
           buffer.append('.');
         }
-        buffer.append(fCondition.toString());
+        buffer.append(fHeadTest.toString());
       }
     }
     return buffer.toString();
@@ -323,20 +323,27 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
   public String fullFormString() {
     StringBuilder buf = new StringBuilder();
     if (fSymbol == null) {
-      buf.append("BlankSequence[");
-      if (fCondition != null) {
-        buf.append(fCondition.fullFormString());
+      buf.append(fZeroArgsAllowed ? "BlankNullSequence" : "BlankSequence");
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? '(' : '[');
+      if (fHeadTest != null) {
+        buf.append(fHeadTest.fullFormString());
       }
-      buf.append(']');
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? ')' : ']');
     } else {
-      buf.append("PatternSequence[");
+      buf.append("PatternSequence");
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? '(' : '[');
       buf.append(fSymbol.toString());
       buf.append(", ");
-      buf.append("BlankSequence[");
-      if (fCondition != null) {
-        buf.append(fCondition.fullFormString());
+      buf.append(fZeroArgsAllowed ? "BlankNullSequence" : "BlankSequence");
+      if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
+        buf.append('(');
+      } else {
+        buf.append('[');
       }
-      buf.append("]]");
+      if (fHeadTest != null) {
+        buf.append(fHeadTest.fullFormString());
+      }
+      buf.append(FEConfig.PARSER_USE_LOWERCASE_SYMBOLS ? "))" : "]]");
     }
 
     return buf.toString();
@@ -363,15 +370,15 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
         }
       }
 
-      if (fCondition == null) {
-        if (((PatternSequence) expr).fCondition != null) {
+      if (fHeadTest == null) {
+        if (((PatternSequence) expr).fHeadTest != null) {
           return -1;
         }
       } else {
-        if (((PatternSequence) expr).fCondition == null) {
+        if (((PatternSequence) expr).fHeadTest == null) {
           return 1;
         } else {
-          return fCondition.compareTo(((PatternSequence) expr).fCondition);
+          return fHeadTest.compareTo(((PatternSequence) expr).fHeadTest);
         }
       }
       return 0;
@@ -391,7 +398,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
   @Override
   public ISymbol head() {
-    return F.Pattern;
+    return S.Pattern;
   }
 
   @Override
@@ -401,12 +408,12 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
 
   @Override
   public boolean isConditionMatchedSequence(final IAST sequence, IPatternMap patternMap) {
-    if (fCondition == null) {
+    if (fHeadTest == null) {
       return patternMap.setValue(this, sequence);
       // return true;
     }
     for (int i = 1; i < sequence.size(); i++) {
-      if (!sequence.get(i).head().equals(fCondition)) {
+      if (!sequence.get(i).head().equals(fHeadTest)) {
         return false;
 
       }
@@ -456,6 +463,7 @@ public class PatternSequence extends IPatternSequenceImpl implements IPatternSeq
     return fDefault;
   }
 
+  @Override
   public boolean isNullSequence() {
     return fZeroArgsAllowed;
   }

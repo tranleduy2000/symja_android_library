@@ -70,7 +70,7 @@ public class EvalAttributes {
   public static IExpr simpleEval(IASTMutable result) {
     IASTMutable temp = result;
     if (temp.isFlatAST()) {
-      IASTMutable t = EvalAttributes.flatten((IAST) temp);
+      IASTMutable t = EvalAttributes.flatten(temp);
       if (t.isPresent()) {
         temp = t;
       }
@@ -104,8 +104,9 @@ public class EvalAttributes {
   }
 
   /**
-   * Flatten only the first level in the list (i.e. typically the ASTs head has the attribute ISymbol.FLAT) example:
-   * suppose the head f should be flattened out: <code>f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,f[u,v],z]</code>
+   * Flatten only the first level in the list (i.e. typically the ASTs head has the attribute
+   * ISymbol.FLAT) example: suppose the head f should be flattened out: <code>
+   * f[a,b,f[x,y,f[u,v]],z] ==> f[a,b,x,y,f[u,v],z]</code>
    *
    * @param ast the <code>AST</code> whose elements should be flattened.
    * @return returns the flattened list or <code>F.NIL</code>
@@ -138,6 +139,7 @@ public class EvalAttributes {
    * @return the flattened ast expression if a sublist was flattened out, otherwise return <code>
    * F#NIL</code>..
    */
+  @ObjcMemoryIssue
   public static IASTAppendable flattenDeep(final ISymbol head, final IAST ast) {
     // swift changed: memory issue
     /*final*/
@@ -199,12 +201,8 @@ public class EvalAttributes {
     newSize/*[0]*/ = 0;
     /*final*/
     boolean/*[]*/ flattened = /*new boolean[]{*/false/*}*/;
-    // TODO: com.duy.annotations.ObjcMemoryIssue
     for (int i = 1; i < ast.size(); i++) {
-//    ast.forEach(
-//				new Consumer<IExpr>() {
-//					@Override
-//					public void accept(IExpr expr) {
+//    ast.forEach(expr -> {
       IExpr expr = ast.get(i);
       if (expr.isAST(head)) {
         flattened/*[0]*/ = true;
@@ -307,9 +305,7 @@ public class EvalAttributes {
     /*final*/
     int/*[]*/ newSize =/* new int[1]*/ 0;
     for (int i = 1; i < ast.size(); i++) {
-//    ast.forEach(new Consumer<IExpr>() {
-//      @Override
-//      public void accept(IExpr expr) {
+//    ast.forEach( expr -> {
       IExpr expr = ast.get(i);
       if (expr.isAST(head)) {
         newSize/*[0]*/ += flattenAlloc(head, (IAST) expr);
@@ -406,7 +402,7 @@ public class EvalAttributes {
         case 4:
           return sort3Args(ast, false);
         default:
-          if (sort(ast, Comparators.ExprComparator.CONS)) {
+          if (sort(ast, Comparators.CANONICAL_COMPARATOR)) {
             if (FEConfig.SHOW_STACKTRACE) {
               checkCachedHashcode(ast);
             }
@@ -418,10 +414,8 @@ public class EvalAttributes {
   }
 
   /**
-   * <p>
-   * Sort the <code>ast</code> in place using function <code>Order</code>.
-   * </p>
-   * <b>Example:</b> suppose the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
+   * Sort the <code>ast</code> in place using function <code>Order</code>. <b>Example:</b> suppose
+   * the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
    *
    * @param ast the AST will be sorted in place.
    * @return <code>true</code> if the sort algorithm was used; <code>false</code> otherwise
@@ -439,7 +433,7 @@ public class EvalAttributes {
         case 4:
           return sort3Args(ast, true);
         default:
-          if (sort(ast, Comparators.ExprComparator.CONS)) {
+          if (sort(ast, Comparators.CANONICAL_COMPARATOR)) {
             ast.addEvalFlags(IAST.IS_SORTED);
             if (FEConfig.SHOW_STACKTRACE) {
               checkCachedHashcode(ast);
@@ -464,8 +458,8 @@ public class EvalAttributes {
   }
 
   /**
-   * Check if the arguments of <code>ast</code> starting from <code>fromPosition</code> are sorted for the used
-   * <code>comparator</code>.
+   * Check if the arguments of <code>ast</code> starting from <code>fromPosition</code> are sorted
+   * for the used <code>comparator</code>.
    *
    * @param ast
    * @param fromPosition start comparing the arguments from this position
@@ -489,7 +483,6 @@ public class EvalAttributes {
   }
 
   /**
-   * <p>
    * Sort the <code>ast</code> in place using function <code>comparator#compare(a, b)</code>.
    * </p>
    * <b>Example:</b> suppose the Symbol f has the attribute ISymbol.ORDERLESS <code>f(z,d,a,b) ==> f(a,b,d,z)</code>
@@ -599,8 +592,8 @@ public class EvalAttributes {
   }
 
   /**
-   * Thread through all (sub-)lists in the arguments of the IAST (i.e. typically the ASTs head has the attribute
-   * ISymbol.LISTABLE) example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
+   * Thread through all (sub-)lists in the arguments of the IAST (i.e. typically the ASTs head has
+   * the attribute ISymbol.LISTABLE) example: <code>Sin[{2,x,Pi}] ==> {Sin[2],Sin[x],Sin[Pi]}</code>
    *
    * @param ast
    * @param listHead the lists head (typically <code>F.List</code>)

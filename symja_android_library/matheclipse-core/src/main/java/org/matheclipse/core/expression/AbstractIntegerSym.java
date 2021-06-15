@@ -1,5 +1,7 @@
 package org.matheclipse.core.expression;
 
+import com.gx.common.math.BigIntegerMath;
+import java.math.RoundingMode;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.hipparchus.exception.MathRuntimeException;
@@ -32,10 +34,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import edu.jas.arith.PrimeInteger;
@@ -86,8 +86,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   /**
    * Bottom-up divisors construction algorithm. Slightly faster than top-down.
    *
-   * @param factors
-   * @return the set of divisors of the number thats prime factorization is given
+   * @return the set of divisors of the number thats prime factorization is calculated
    */
   private SortedSet<IInteger> divisorsSet() {
     IAST factors = factorInteger();
@@ -125,7 +124,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
         int power = powers.get(i);
         if (power > 0) {
           // multiply entry to divisor
-          divisor = divisor.multiply(primes.get(i).pow(power));
+          divisor = divisor.multiply(primes.get(i).powerRational(power));
         }
       }
       if (divisors.add(divisor)) {
@@ -250,7 +249,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
    * @param radix         the radix to be used while parsing.
    * @return the corresponding large integer.
    * @throws NumberFormatException if the specified character sequence does not contain a parsable
-   *                               large integer.
+   *     large integer.
    */
   public static IInteger valueOf(final String integerString, final int radix) {
     if (integerString.length() >= 1 && radix == 10) {
@@ -379,6 +378,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
     return AbstractIntegerSym.valueOf(Primality.charmichaelLambda(toBigNumerator()));
   }
 
+  @Override
   public int compareTo(final IExpr expr) {
     if (expr.isNumber()) {
       int c = this.compareTo(((INumber) expr).re());
@@ -413,8 +413,8 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   /**
    * IntegerSym extended greatest common divisor.
    *
-   * @param that if that is of type IntegerSym calculate the extended GCD otherwise call
-   *             <code>super#egcd(IExpr)</code>
+   * @param that if that is of type IntegerSym calculate the extended GCD otherwise call <code>
+   *     super#egcd(IExpr)</code>
    * @return [ gcd(this,S), a, b ] with a*this + b*S = gcd(this,S).
    */
   @Override
@@ -520,69 +520,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
    */
   public IAST factorize() {
 
-    IInteger b = this;
-    if (b.isZero()) {
-      return F.CListC0;
-    } else if (b.isOne()) {
-      return F.CListC1;
-    } else if (b.isMinusOne()) {
-      return F.CListCN1;
-    }
-    if (sign() < 0) {
-      b = b.negate();
-    }
-
-    // ObjC changed: memory issues
-    if (b instanceof IntegerSym) {
-//      long longValue = b.longValue();
-//			return factorizeLong(longValue);
-    }
-//		BigInteger big = b.toBigNumerator();
-//		try {
-    // Android changed: BigInteger#longValueExact doesn't exist
-//			long longValue = new java.math.BigDecimal(big).longValueExact();
-//			if (longValue < PrimeInteger.BETA) {
-//				return factorizeLong(longValue);
-//			}
-//		} catch (ArithmeticException aex) {
-    // go on with big integers
-//		}
-    Int2IntMap map = new Int2IntRBTreeMap();
-    // SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-    BigInteger rest = Primality.countPrimes32749(b.toBigNumerator(), map);
-
-    IASTAppendable result = F.ListAlloc(map.size() + 10);
-    if (sign() < 0) {
-      result.append(F.CN1);
-    }
-    for (Int2IntMap.Entry entry : map.int2IntEntrySet()) {
-      int key = entry.getIntKey();
-      IInteger is = valueOf(key);
-      for (int i = 0; i < entry.getIntValue(); i++) {
-        result.append(is);
-      }
-    }
-    if (rest.equals(BigInteger.ONE)) {
-      return result;
-    }
-    if (rest.isProbablePrime(PRIME_CERTAINTY)) {
-      result.append(valueOf(rest));
-      return result;
-    }
-    b = valueOf(rest);
-
-    SortedMap<BigInteger, Integer> bigMap = new TreeMap<BigInteger, Integer>();
-    Primality.factorInteger(rest, bigMap);
-
-    for (Map.Entry<BigInteger, Integer> entry : bigMap.entrySet()) {
-      BigInteger key = entry.getKey();
-      IInteger is = valueOf(key);
-      for (int i = 0; i < entry.getValue(); i++) {
-        result.append(is);
-      }
-    }
-
-    return result;
+    return Config.PRIME_FACTORS.factorIInteger(this);
   }
 
   /** {@inheritDoc} */
@@ -592,12 +530,12 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
     Int2IntMap map = new Int2IntRBTreeMap();
     IInteger b = this;
     boolean isNegative = false;
-    if (sign() < 0) {
+    if (complexSign() < 0) {
       b = b.negate();
       isNegative = true;
     }
     if (numerator != 1) {
-      b = b.pow(numerator);
+      b = b.powerRational(numerator);
     }
     if (b.isLT(F.C8)) {
       return F.NIL;
@@ -637,6 +575,17 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
         result.append(F.Power(F.Power(valueOf(key), valueOf(value)), F.QQ(1, denominator)));
       }
     }
+    if (denominator == 2
+        && numerator == 1
+        && rest.compareTo(BigInteger.valueOf(Short.MAX_VALUE - 20)) > 0) {
+      // exponent 1/2 ==> special case - try to get exact square root of rest
+      IInteger[] sr = F.ZZ(rest).sqrtAndRemainder();
+      if (sr != null && sr[1].isZero()) {
+        result.append(sr[0]);
+        rest = BigInteger.ONE;
+        evaled = true;
+      }
+    }
     if (evaled) {
       if (!rest.equals(BigInteger.ONE)) {
         result.append(F.Power(valueOf(rest), F.QQ(1, denominator)));
@@ -661,7 +610,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   // prime = TDIV31.findSingleFactor(intValue);
   // intValue /= prime;
   // if (prime != 1) {
-  // result.append(F.ZZ(prime));
+  // result.append(prime);
   // } else {
   // break;
   // }
@@ -678,14 +627,19 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   // }
   // return result;
   // }
-  private IAST factorizeLong(long longValue) {
-    Map<Long, Integer> map = PrimeInteger.factors(longValue);
-    int resultSize = sign() < 0 ? 1 : 0;
-    for (Map.Entry<Long, Integer> entry : map.entrySet()) {
-      resultSize += entry.getValue();
+  public static IAST factorizeLong(long value) {
+    int allocSize = 0;
+    long longValue = value;
+    if (longValue < 0) {
+      allocSize = 1;
+      longValue = -longValue;
     }
-    IASTAppendable result = F.ListAlloc(resultSize);
-    if (sign() < 0) {
+    Map<Long, Integer> map = PrimeInteger.factors(longValue);
+    for (Map.Entry<Long, Integer> entry : map.entrySet()) {
+      allocSize += entry.getValue();
+    }
+    IASTAppendable result = F.ListAlloc(allocSize);
+    if (value < 0) {
       result.append(F.CN1);
     }
     for (Map.Entry<Long, Integer> entry : map.entrySet()) {
@@ -705,6 +659,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   }
 
   /** {@inheritDoc} */
+  @Override
   public IInteger integerPart() {
     return this;
   }
@@ -778,8 +733,20 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
       // Android changed: use DOUBLE_TOLERANCE to avoid infinity loop in some functions
       multiple = F.fraction(multiple.doubleValue(), Config.DOUBLE_TOLERANCE);
     }
-    IInteger ii = this.divideBy((IRational) multiple).round();
+    IInteger ii = this.divideBy((IRational) multiple).roundExpr();
     return ii.multiply((IRational) multiple);
+  }
+
+  /** {@inheritDoc} */
+  // @Override
+  public IInteger[] sqrtAndRemainder() {
+    if (complexSign() > 0) {
+      BigInteger bignum = toBigNumerator();
+      BigInteger s = BigIntegerMath.sqrt(bignum, RoundingMode.FLOOR);
+      BigInteger r = bignum.subtract(s.multiply(s));
+      return new IInteger[] {valueOf(s), valueOf(r)};
+    }
+    return null;
   }
 
   @Override
@@ -927,11 +894,11 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
   @Override
   public IInteger[] nthRootSplit(int n) throws ArithmeticException {
     IInteger[] result = new IInteger[2];
-    if (sign() == 0) {
+    if (complexSign() == 0) {
       result[0] = F.C0;
       result[1] = F.C1;
       return result;
-    } else if (sign() < 0) {
+    } else if (complexSign() < 0) {
       if (n % 2 == 0) {
         // even exponent n
         throw new ArithmeticException();
@@ -974,7 +941,7 @@ public abstract class AbstractIntegerSym extends IRationalImpl implements IInteg
 
   /** {@inheritDoc} */
   @Override
-  public final IInteger pow(final long exponent) throws ArithmeticException {
+  public final IInteger powerRational(final long exponent) throws ArithmeticException {
     if (exponent < 0L) {
       throw new ArithmeticException("Negative exponent");
     }

@@ -53,7 +53,7 @@ public abstract class IFractionImpl extends IRationalImpl implements IFraction {
      * @throws ArithmeticException if {@code 0^0} is given.
      */
     @Override
-    public abstract IFraction pow(final long exp) throws ArithmeticException;
+    public abstract IFraction powerRational(final long exp) throws ArithmeticException;
 
     public abstract IFraction sub(IFraction parm1);
 }

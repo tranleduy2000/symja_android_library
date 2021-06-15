@@ -1,8 +1,8 @@
 package org.matheclipse.core.interfaces;
 
 import com.duy.lambda.DoubleFunction;
-
 import org.matheclipse.core.basic.Config;
+import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.expression.Context;
 import org.matheclipse.core.expression.F;
 import org.matheclipse.core.expression.ID;
@@ -12,37 +12,6 @@ import org.matheclipse.core.expression.ID;
  */
 
 public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
-
-  /**
-   * Does the attributes flag set contains the <code>ISymbol.Flat</code> bit set?
-   *
-   * @return <code>true</code> if this attribute set contains the <code>ISymbol.Flat</code>
-   * attribute.
-   */
-  public static boolean hasFlatAttribute(int attributes) {
-    return (attributes & FLAT) == FLAT;
-  }
-
-  /**
-   * Does the attributes flag set contains the <code>ISymbol.Flat</code> and <code>ISymbol.Orderless
-   * </code> bits set?
-   *
-   * @return <code>true</code> if this attribute set contains the <code>ISymbol.Flat</code> and
-   * <code>ISymbol.Orderless</code> attribute.
-   */
-  public static boolean hasOrderlessAttributeFlat(int attributes) {
-    return (attributes & FLATORDERLESS) == FLATORDERLESS;
-  }
-
-  /**
-   * Does this symbols attribute set contains the <code>Orderless</code> attribute?
-   *
-   * @return <code>true</code> if this symbols attribute set contains the <code>Orderless</code>
-   * attribute.
-   */
-  public static boolean hasOrderlessAttribute(int attributes) {
-    return (attributes & ORDERLESS) == ORDERLESS;
-  }
 
   @Override
   public boolean isBooleanFormula() {
@@ -75,6 +44,11 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
   @Override
   public IExpr get() {
     return assignedValue();
+  }
+
+  @Override
+  public boolean isNumericFunction(boolean allowList) {
+    return isConstantAttribute();
   }
 
   /**
@@ -128,10 +102,28 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
   }
 
   @Override
+  public IExpr of(String... args) {
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = F.stringx(args[i]);
+    }
+    return of(array);
+  }
+
+  @Override
   public IExpr of(boolean... args) {
     IExpr[] array = new IExpr[args.length];
     for (int i = 0; i < array.length; i++) {
       array[i] = args[i] ? F.True : F.False;
+    }
+    return of(array);
+  }
+
+  @Override
+  public IExpr ofObject(Object... args) {
+    IExpr[] array = new IExpr[args.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = Object2Expr.convert(args[i], true, false);
     }
     return of(array);
   }
@@ -159,6 +151,7 @@ public abstract class ISymbolImpl extends IExprImpl implements ISymbol {
     return new IExpr[]{this, F.C0};
   }
 
+  @Override
   public IExpr[] linearPower(IExpr variable) {
     if (this.equals(variable)) {
       return new IExpr[]{F.C0, F.C1, F.C1};

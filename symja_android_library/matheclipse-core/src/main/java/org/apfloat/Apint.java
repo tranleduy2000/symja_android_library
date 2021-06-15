@@ -1,5 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2002-2021 Mikko Tommila
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.apfloat;
 
+import java.io.PushbackReader;
 import org.apfloat.spi.ApfloatImpl;
 
 import java.io.IOException;
@@ -21,7 +45,7 @@ import static java.util.FormattableFlags.ALTERNATE;
  *
  * @see ApintMath
  *
- * @version 1.8.0
+ * @version 1.10.0
  * @author Mikko Tommila
  */
 
@@ -105,6 +129,36 @@ public class Apint
     }
 
     /**
+     * Reads an apint from a stream using the default radix.
+     *
+     * @param in The stream to read from
+     *
+     * @exception java.io.IOException If an I/O error occurs accessing the stream.
+     * @exception java.lang.NumberFormatException If the number is not valid.
+     */
+
+    public Apint(PushbackReader in)
+        throws IOException, NumberFormatException, ApfloatRuntimeException
+    {
+        this.value = new Apfloat(ApfloatHelper.createApfloat(in, INFINITE, true));
+    }
+
+    /**
+     * Reads an apint from a stream using the specified radix.
+     *
+     * @param in The stream to read from
+     * @param radix The radix of the number.
+     *
+     * @exception java.io.IOException If an I/O error occurs accessing the stream.
+     * @exception java.lang.NumberFormatException If the number is not valid.
+     */
+
+    public Apint(PushbackReader in, int radix)
+        throws IOException, NumberFormatException, ApfloatRuntimeException
+    {
+        this.value = new Apfloat(ApfloatHelper.createApfloat(in, INFINITE, radix, true));
+    }
+    /**
      * Constructs an apint from a <code>BigInteger</code>. The default radix is used.
      *
      * @param value The value of the number.
@@ -119,11 +173,26 @@ public class Apint
     }
 
     /**
+     * Constructs an apint from a <code>BigInteger</code> using the specified radix.
+     *
+     * @param value The value of the number.
+     * @param radix The radix of the number.
+     *
+     * @exception java.lang.NumberFormatException If the radix is not valid.
+     */
+
+    public Apint(BigInteger value, int radix)
+        throws NumberFormatException, ApfloatRuntimeException
+    {
+        this.value = new Apfloat(value, INFINITE, radix);
+    }
+    /**
      * Numerator of this aprational.
      *
      * @return <code>this</code>.
      */
 
+    @Override
     public Apint numerator()
     {
         return this;
@@ -135,6 +204,7 @@ public class Apint
      * @return {@link #ONE}.
      */
 
+    @Override
     public Apint denominator()
     {
         return ONES[radix()];
@@ -146,6 +216,7 @@ public class Apint
      * @return Radix of this apint.
      */
 
+    @Override
     public int radix()
     {
         return this.value.radix();
@@ -161,6 +232,7 @@ public class Apint
      * @see Apfloat#scale()
      */
 
+    @Override
     public long scale()
         throws ApfloatRuntimeException
     {
@@ -180,6 +252,7 @@ public class Apint
      * @since 1.6
      */
 
+    @Override
     public long size()
         throws ApfloatRuntimeException
     {
@@ -192,6 +265,7 @@ public class Apint
      * @return -1, 0 or 1 as the value of this apint is negative, zero or positive.
      */
 
+    @Override
     public int signum()
     {
         return this.value.signum();
@@ -205,6 +279,7 @@ public class Apint
      * @see Apfloat#isShort()
      */
 
+    @Override
     public boolean isShort()
         throws ApfloatRuntimeException
     {
@@ -236,6 +311,7 @@ public class Apint
      * @since 1.1
      */
 
+    @Override
     public Apint negate()
         throws ApfloatRuntimeException
     {
@@ -372,6 +448,7 @@ public class Apint
      * @return This apint.
      */
 
+    @Override
     public Apint floor()
     {
         return this;
@@ -384,6 +461,7 @@ public class Apint
      * @return This apint.
      */
 
+    @Override
     public Apint ceil()
     {
         return this;
@@ -395,6 +473,7 @@ public class Apint
      * @return This apint.
      */
 
+    @Override
     public Apint truncate()
     {
         return this;
@@ -408,6 +487,7 @@ public class Apint
      * @since 1.7.0
      */
 
+    @Override
     public Apint frac()
         throws ApfloatRuntimeException
     {
@@ -447,6 +527,7 @@ public class Apint
      * @since 1.2
      */
 
+    @Override
     public Apint toRadix(int radix)
         throws NumberFormatException, ApfloatRuntimeException
     {
@@ -474,6 +555,7 @@ public class Apint
      * @return -1, 0 or 1 as this apint is numerically less than, equal to, or greater than <code>x</code>.
      */
 
+    @Override
     public int compareTo(Aprational x)
     {
         if (x instanceof Apint)
@@ -494,6 +576,7 @@ public class Apint
      * @return -1, 0 or 1 as this apint is numerically less than, equal to, or greater than <code>x</code>.
      */
 
+    @Override
     public int compareTo(Apfloat x)
     {
         if (x instanceof Aprational)
@@ -518,6 +601,7 @@ public class Apint
      * @return <code>true</code> if the objects are the same; <code>false</code> otherwise.
      */
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -541,11 +625,56 @@ public class Apint
     }
 
     /**
+     * Tests two apint numbers for equality.
+     * Returns <code>false</code> if the numbers are definitely known to be not equal.
+     * If <code>true</code> is returned, equality is unknown and should be verified by
+     * calling {@link #equals(Object)}.
+     * This method is usually significantly faster than calling <code>equals(Object)</code>.
+     *
+     * @param x The number to test against.
+     *
+     * @return <code>false</code> if the numbers are definitely not equal, <code>true</code> if unknown.
+     *
+     * @since 1.10.0
+     */
+
+    public boolean test(Apint x)
+    {
+        return this.value.test(x.value);
+    }
+
+    @Override
+    public boolean test(Aprational x)
+    {
+        if (x instanceof Apint)
+        {
+            return test((Apint) x);
+        }
+        else
+        {
+            return super.test(x);
+        }
+    }
+
+    @Override
+    public boolean test(Apfloat x)
+    {
+        if (x instanceof Aprational)
+        {
+            return test((Aprational) x);
+        }
+        else
+        {
+            return this.value.test(x);
+        }
+    }
+    /**
      * Returns a hash code for this apint.
      *
      * @return The hash code value for this object.
      */
 
+    @Override
     public int hashCode()
     {
         return this.value.hashCode();
@@ -559,6 +688,7 @@ public class Apint
      * @return A string representing this object.
      */
 
+    @Override
     public String toString(boolean pretty)
         throws ApfloatRuntimeException
     {
@@ -574,12 +704,14 @@ public class Apint
      * @exception java.io.IOException In case of I/O error writing to the stream.
      */
 
+    @Override
     public void writeTo(Writer out, boolean pretty)
         throws IOException, ApfloatRuntimeException
     {
         this.value.writeTo(out, pretty);
     }
 
+    @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision)
     {
         if ((flags & ALTERNATE) == ALTERNATE)
@@ -601,17 +733,20 @@ public class Apint
      * @return An <code>ApfloatImpl</code> representing this object to the requested precision.
      */
 
+    @Override
     protected ApfloatImpl getImpl(long precision)
         throws ApfloatRuntimeException
     {
         return this.value.getImpl(precision);
     }
 
+    @Override
     Apint roundAway()
     {
         return this;
     }
 
+    @Override
     Apint abs()
     {
         return ApintMath.abs(this);

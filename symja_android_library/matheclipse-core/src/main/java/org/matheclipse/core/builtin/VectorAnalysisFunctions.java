@@ -13,17 +13,16 @@ import org.matheclipse.core.interfaces.IExpr;
 
 public class VectorAnalysisFunctions {
 	/**
-	 *
-	 * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation in static
-	 * initializer</a>
+   * See <a href="https://pangin.pro/posts/computation-in-static-initializer">Beware of computation
+   * in static initializer</a>
 	 */
 	private static class Initializer {
 
 		private static void init() {
-			F.Curl.setEvaluator(new Curl());
-			F.Div.setEvaluator(new Div());
-			F.Grad.setEvaluator(new Grad());
-			F.RotationMatrix.setEvaluator(new RotationMatrix());
+      S.Curl.setEvaluator(new Curl());
+      S.Div.setEvaluator(new Div());
+      S.Grad.setEvaluator(new Grad());
+      S.RotationMatrix.setEvaluator(new RotationMatrix());
 		}
 	}
 
@@ -208,7 +207,8 @@ public class VectorAnalysisFunctions {
 				}
 				if (x.isZero() && y.isZero()) {
 					return
-					// [$ {{Cos(theta),-((z*Sin(theta))/Abs(z)),0},{(Conjugate(z)*Sin(theta))/Abs(z),(z*Conjugate(z)*
+          // [$
+          // {{Cos(theta),-((z*Sin(theta))/Abs(z)),0},{(Conjugate(z)*Sin(theta))/Abs(z),(z*Conjugate(z)*
 					// Cos(theta))/Abs(z)^2,0},{0,0,(z*Conjugate(z))/Abs(z)^2}} $]
 					F.List(F.List(F.Cos(theta), F.Times(F.CN1, z, F.Power(F.Abs(z), F.CN1), F.Sin(theta)), F.C0),
 							F.List(F.Times(F.Power(F.Abs(z), F.CN1), F.Conjugate(z), F.Sin(theta)),

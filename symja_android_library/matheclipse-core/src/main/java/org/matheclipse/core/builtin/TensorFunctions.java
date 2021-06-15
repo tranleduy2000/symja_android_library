@@ -2,15 +2,20 @@ package org.matheclipse.core.builtin;
 
 import com.duy.lambda.IntFunction;
 
+import java.util.Map;
 import org.hipparchus.exception.MathIllegalArgumentException;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.exception.Validate;
 import org.matheclipse.core.eval.interfaces.AbstractEvaluator;
 import org.matheclipse.core.eval.interfaces.AbstractNonOrderlessArgMultiple;
+import org.matheclipse.core.eval.util.IAssumptions;
+import org.matheclipse.core.eval.util.OptionArgs;
 import org.matheclipse.core.expression.F;
+import org.matheclipse.core.expression.S;
 import org.matheclipse.core.generic.Predicates;
 import org.matheclipse.core.interfaces.IAST;
 import org.matheclipse.core.interfaces.IASTAppendable;
+import org.matheclipse.core.interfaces.IASTMutable;
 import org.matheclipse.core.interfaces.IExpr;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
@@ -29,14 +34,14 @@ public class TensorFunctions {
   private static class Initializer {
 
     private static void init() {
-      F.ArrayReshape.setEvaluator(new ArrayReshape());
-      F.Ordering.setEvaluator(new Ordering());
-      F.ListConvolve.setEvaluator(new ListConvolve());
-      F.ListCorrelate.setEvaluator(new ListCorrelate());
-      F.TensorDimensions.setEvaluator(new TensorDimensions());
-      F.TensorProduct.setEvaluator(new TensorProduct());
-      F.TensorRank.setEvaluator(new TensorRank());
-      F.TensorSymmetry.setEvaluator(new TensorSymmetry());
+      S.ArrayReshape.setEvaluator(new ArrayReshape());
+      S.Ordering.setEvaluator(new Ordering());
+      S.ListConvolve.setEvaluator(new ListConvolve());
+      S.ListCorrelate.setEvaluator(new ListCorrelate());
+      S.TensorDimensions.setEvaluator(new TensorDimensions());
+      S.TensorProduct.setEvaluator(new TensorProduct());
+      S.TensorRank.setEvaluator(new TensorRank());
+      S.TensorSymmetry.setEvaluator(new TensorSymmetry());
     }
   }
 
@@ -46,10 +51,10 @@ public class TensorFunctions {
    * </pre>
    *
    * <blockquote>
-   * <p>
-   * returns the <code>list-of-values</code> elements reshaped as nested list with dimensions according to the
-   * <code>list-of-dimension</code>.
-   * </p>
+   *
+   * <p>returns the <code>list-of-values</code> elements reshaped as nested list with dimensions
+   * according to the <code>list-of-dimension</code>.
+   *
    * </blockquote>
    *
    * <pre>
@@ -397,7 +402,7 @@ public class TensorFunctions {
         int n = indexes.length;
         if (ast.size() >= 3) {
           IExpr arg2 = ast.arg2();
-          if (arg2.equals(F.All)) {
+          if (arg2.equals(S.All)) {
           } else if (arg2.isReal()) {
             ISignedNumber sn = (ISignedNumber) arg2;
             n = sn.toIntDefault(Integer.MIN_VALUE);
@@ -426,19 +431,94 @@ public class TensorFunctions {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      if (ast.arg1().isList()) {
+      IExpr arg1 = ast.arg1();
+      if (arg1.isList()) {
         // same as Dimensions for List structures
-        return F.Dimensions(ast.arg1());
+        return F.Dimensions(arg1);
+      }
+      IAssumptions oldAssumptions = engine.getAssumptions();
+      OptionArgs options = null;
+      if (ast.size() > 2) {
+        options = new OptionArgs(ast.topHead(), ast, ast.argSize(), engine);
+      }
+      IExpr assumptionExpr = OptionArgs.determineAssumptions(ast, 2, options);
+      try {
+        Map<IExpr, IAST> tensorProperties = tensorProperties(oldAssumptions, assumptionExpr);
+        if (tensorProperties != null) {
+
+          if (arg1.isASTSizeGE(S.Dot, 3)) {
+            return dotDimensions(ast, tensorProperties, engine);
+          }
+
+          IAST tensorArg1 = tensorProperties.get(arg1);
+          if (tensorArg1 != null) {
+            if (tensorArg1.isAST(S.Vectors)) {
+              return F.List(tensorArg1.arg1());
+            }
+            return tensorArg1.arg1();
+          }
+        }
+      } finally {
+        engine.setAssumptions(oldAssumptions);
       }
       return F.NIL;
     }
 
+    /**
+     * Determine the dimensions of <code>TensorDimensions(Dot(...))</code> if possible.
+     *
+     * @param tensorDimensions is of the form <code>TensorDimensions(Dot(...))</code>
+     * @param tensorAssumptions
+     * @param engine
+     * @return
+     */
+    private static IExpr dotDimensions(
+        final IAST tensorDimensions, Map<IExpr, IAST> tensorAssumptions, EvalEngine engine) {
+      IAST dotAST = (IAST) tensorDimensions.arg1();
+      IExpr lastArg = dotAST.arg1();
+
+      IAST property1 = tensorAssumptions.get(lastArg);
+      if (property1 != null) {
+        if (property1.isAST(S.Matrices)) {
+          IASTMutable dims =
+              F.binaryAST2(S.List, property1.arg1().first(), property1.arg1().second());
+          for (int i = 2; i < dotAST.size(); i++) {
+            IExpr tempArg = dotAST.get(i);
+            IAST property = tensorAssumptions.get(tempArg);
+            if (property == null) {
+              return F.NIL;
+            }
+            if (property.isAST(S.Matrices)) {
+              IAST iDims = (IAST) property.arg1();
+              if (!dims.second().equals(iDims.first())) {
+                // Dot contraction of `1` and `2` is invalid because dimensions `3` and `4`
+                // are incompatible.
+                return IOFunctions.printMessage(
+                    tensorDimensions.topHead(),
+                    "dotdim",
+                    F.List(lastArg, tempArg, dims.second(), iDims.first()),
+                    engine);
+              }
+              dims.set(2, iDims.second());
+              lastArg = tempArg;
+            } else {
+              return F.NIL;
+            }
+          }
+          return dims;
+        }
+      }
+      return F.NIL;
+    }
+
+    @Override
     public int[] expectedArgSize(IAST ast) {
       return ARGS_1_1;
     }
 
     @Override
     public void setUp(final ISymbol newSymbol) {
+      setOptions(newSymbol, F.List(F.Rule(S.Assumptions, S.$Assumptions)));
     }
 
   }
@@ -447,11 +527,21 @@ public class TensorFunctions {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      IAssumptions oldAssumptions = engine.getAssumptions();
+      OptionArgs options = null;
+      IExpr sameTest = S.SameQ;
+      if (ast.size() > 2) {
+        options = new OptionArgs(ast.topHead(), ast, ast.argSize(), engine);
+        IExpr option = options.getOption(S.SameTest);
+        if (option.isPresent()) {
+          sameTest = option;
+        }
+      }
+      IExpr assumptionExpr = OptionArgs.determineAssumptions(ast, 2, options);
       IExpr arg1 = ast.arg1().normal(false);
       if (arg1.isAST()) {
         IAST tensor = (IAST) arg1;
-        ArrayList<Integer> dims =
-            LinearAlgebra.dimensions(tensor, tensor.head(), Integer.MAX_VALUE);
+        ArrayList<Integer> dims = LinearAlgebra.dimensions(tensor, tensor.head());
         if (dims.size() > 0) {
           if (dims.size() == 2 && dims.get(0).equals(dims.get(1))) {
             // square matrix
@@ -462,9 +552,34 @@ public class TensorFunctions {
               }
               return F.Symmetric(F.List(F.C1, F.C2));
             }
-            return tensorSymmetrySquareMatrix(tensor, rowColumnSize, engine);
+            return tensorSymmetrySquareMatrix(tensor, rowColumnSize, sameTest, engine);
           }
         }
+      }
+
+      try {
+
+        Map<IExpr, IAST> tensorProperties = tensorProperties(oldAssumptions, assumptionExpr);
+        if (tensorProperties != null) {
+          IAST tensorArg1 = tensorProperties.get(arg1);
+          if (tensorArg1 != null) {
+            if (tensorArg1.isAST(S.Vectors)) {
+              return F.CEmptyList;
+          }
+            if (tensorArg1.isAST(S.Arrays, 3) | tensorArg1.isAST(S.Matrices, 3)) {
+              if (tensorArg1.last().isAST()) {
+                IAST arg3 = (IAST) tensorArg1.last();
+                if (arg3.isAST(S.Symmetric, 2) //
+                    || arg3.isAST(S.AntiSymmetric, 2)
+                    || arg3.isAST(S.ZeroSymmetric, 2)) {
+                  return arg3;
+                }
+              }
+            }
+        }
+      }
+      } finally {
+        engine.setAssumptions(oldAssumptions);
       }
       return F.NIL;
     }
@@ -480,8 +595,8 @@ public class TensorFunctions {
      * @param engine the evaluation engine
      * @return
      */
-    private static IExpr tensorSymmetrySquareMatrix(IAST squareMatrix, int rowColumnSize,
-        EvalEngine engine) {
+    private static IExpr tensorSymmetrySquareMatrix(
+        IAST squareMatrix, int rowColumnSize, IExpr sameTest, EvalEngine engine) {
       IExpr temp = isZeroSymmetricSquareMatrix(squareMatrix, rowColumnSize);
       if (temp.isPresent()) {
         return temp;
@@ -490,27 +605,54 @@ public class TensorFunctions {
       boolean isSymmetric = true;
       for (int i = 1; i < rowColumnSize; i++) {
         if (isSymmetric) {
+          if (sameTest == S.SameQ) {
           for (int j = i + 1; j < rowColumnSize; j++) {
             if (!squareMatrix.getPart(i, j).equals(squareMatrix.getPart(j, i))) {
               isSymmetric = false;
               break;
+              }
+            }
+          } else {
+
+            for (int j = i + 1; j < rowColumnSize; j++) {
+              if (!engine.evalTrue(
+                  F.binaryAST2(
+                      sameTest, //
+                      squareMatrix.getPart(i, j), //
+                      squareMatrix.getPart(j, i)))) {
+                isSymmetric = false;
+                break;
+              }
             }
           }
         }
         if (isSymmetric) {
           isAntiSymmetric = false;
         } else if (isAntiSymmetric) {
+          if (sameTest == S.SameQ) {
           for (int j = i + 1; j < rowColumnSize; j++) {
             temp = squareMatrix.getPart(j, i).negate();
             if (!squareMatrix.getPart(i, j).equals(temp)) {
               isAntiSymmetric = false;
               break;
+              }
+            }
+          } else
+            for (int j = i + 1; j < rowColumnSize; j++) {
+              temp = squareMatrix.getPart(j, i).negate();
+              if (!engine.evalTrue(
+                  F.binaryAST2(
+                      sameTest, //
+                      squareMatrix.getPart(i, j), //
+                      temp))) {
+                isAntiSymmetric = false;
+                break;
             }
           }
         }
 
         if (!isAntiSymmetric && !isSymmetric) {
-          return F.NIL;
+          return F.CEmptyList;
         }
       }
       if (isSymmetric) {
@@ -548,35 +690,85 @@ public class TensorFunctions {
 
     @Override
     public void setUp(final ISymbol newSymbol) {
+      setOptions(
+          newSymbol,
+          F.List(
+              F.Rule(S.Assumptions, S.$Assumptions), //
+              F.Rule(S.SameTest, S.Automatic)));
     }
 
   }
 
-  private static class TensorProduct extends AbstractNonOrderlessArgMultiple {
+  private static class TensorProduct extends AbstractEvaluator {
 
-    public IExpr evaluateAST1(final IAST ast, EvalEngine engine) {
+    @Override
+    public IExpr evaluate(final IAST ast, EvalEngine engine) {
+      int argSize = ast.argSize();
+      if (argSize == 0) {
+        return F.C0;
+      } else if (argSize == 1) {
       return ast.arg1();
     }
 
-    @Override
-    public IExpr e2ObjArg(IAST ast, final IExpr arg1, final IExpr arg2) {
-      if (arg1.isList() && arg2.isList()) {
-        // TODO
-        // IAST tensor1 = (IAST) o0;
-        // IAST tensor2 = (IAST) o0;
-        // return tensor1.mapList(tensor2::times, 1);
+      if (ast.arg1().isList() && ast.arg2().isList()) {
+        IAST tensor1 = (IAST) ast.arg1();
+        ArrayList<Integer> dim1 = LinearAlgebra.dimensions(tensor1, S.List);
+        if (dim1.size() > 0) {
+          for (int i = 2; i < ast.size(); i++) {
+            IAST tensor2 = (IAST) ast.get(i);
+            ArrayList<Integer> dim2 = LinearAlgebra.dimensions(tensor2, S.List);
+            if (dim2.size() > 0) {
+              IExpr temp = tensorProduct(tensor1, tensor2, dim1.size(), engine);
+              if (temp.isPresent()) {
+                if (temp.isList()) {
+                  tensor1 = (IAST) temp;
+                  dim1 = LinearAlgebra.dimensions(tensor1, S.List);
+                  if (dim1.size() > 0) {
+                    if (i < argSize) {
+                      if (ast.get(i + 1).isList()) {
+                        continue;
+                      }
+                    } else {
+                      return tensor1;
       }
 
+                  }
+                }
+                IASTAppendable result = F.ast(S.TensorProduct);
+                result.append(temp);
+                result.appendAll(ast, i + 1, ast.size());
+                return result;
+              }
+            }
+            if (i == 2) {
       return F.NIL;
     }
 
-    private IExpr numericalDot(final IExpr o0, final IExpr o1) throws MathIllegalArgumentException {
+            IASTAppendable result = F.ast(S.TensorProduct);
+            result.append(tensor1);
+            result.appendAll(ast, i, ast.size());
+            return result;
+          }
+          return tensor1;
+        }
+      }
       return F.NIL;
     }
 
-    @Override
-    public IExpr numericEval(final IAST ast, EvalEngine engine) {
-      return evaluate(ast, engine);
+    /**
+     * Evaluate expression: <code>Map((#1 * tensor2)&, tensor1, {tensor1Depth}) </code>, to get the
+     * tensor product.
+     *
+     * @param tensor1 the first tensor
+     * @param tensor2 the second tensor
+     * @param tensor1Depth depth of the first tensor
+     * @param engine
+     * @return
+     */
+    private static IExpr tensorProduct(
+        final IAST tensor1, final IAST tensor2, int tensor1Depth, EvalEngine engine) {
+      return engine.evaluate(
+          F.Map(F.Function(F.Times(F.Slot1, tensor2)), tensor1, F.List(tensor1Depth)));
     }
 
     @Override
@@ -590,24 +782,72 @@ public class TensorFunctions {
 
     @Override
     public IExpr evaluate(final IAST ast, EvalEngine engine) {
-      if (ast.arg1().isList()) {
-        IAST list = (IAST) ast.arg1();
-        List<Integer> intList = LinearAlgebra
-            .dimensions((IAST) ast.arg1(), list.head(), Integer.MAX_VALUE);
+      IExpr arg1 = ast.arg1();
+      if (arg1.isList()) {
+        IAST list = (IAST) arg1;
+        List<Integer> intList = LinearAlgebra.dimensions((IAST) arg1, list.head());
         return F.ZZ(intList.size());
+      }
+      IAssumptions oldAssumptions = engine.getAssumptions();
+      OptionArgs options = null;
+      if (ast.size() > 2) {
+        options = new OptionArgs(ast.topHead(), ast, ast.argSize(), engine);
+      }
+      IExpr assumptionExpr = OptionArgs.determineAssumptions(ast, 2, options);
+      try {
+
+        Map<IExpr, IAST> tensorProperties = tensorProperties(oldAssumptions, assumptionExpr);
+        if (tensorProperties != null) {
+          IAST tensorArg1 = tensorProperties.get(arg1);
+          if (tensorArg1 != null) {
+            if (tensorArg1.isAST(S.Vectors)) {
+              return F.C1;
+            }
+            if (tensorArg1.isAST(S.Matrices)) {
+              return F.C2;
+            }
+            if (tensorArg1.isAST(S.Arrays)) {
+              int size = tensorArg1.arg1().argSize();
+              return F.ZZ(size);
+            }
+          }
+        }
+
+      } finally {
+        engine.setAssumptions(oldAssumptions);
       }
       return F.NIL;
     }
 
+    @Override
     public int[] expectedArgSize(IAST ast) {
-      return ARGS_1_1;
+      return ARGS_1_2;
     }
 
     @Override
-    public void setUp(final ISymbol newSymbol) {}
+    public void setUp(final ISymbol newSymbol) {
+      setOptions(
+          newSymbol, //
+          F.List(F.Rule(S.Assumptions, S.$Assumptions)));
+    }
     }
 
 
+  private static Map<IExpr, IAST> tensorProperties(
+      IAssumptions oldAssumptions, IExpr assumptionExpr) {
+    if (assumptionExpr.isPresent() && assumptionExpr.isAST()) {
+      IAssumptions assumptions =
+          org.matheclipse.core.eval.util.Assumptions.getInstance(assumptionExpr);
+      if (assumptions != null) {
+        return assumptions.getTensorsMap();
+      }
+    } else {
+      if (oldAssumptions != null) {
+        return oldAssumptions.getTensorsMap();
+      }
+    }
+    return null;
+  }
 
   public static void initialize() {
     Initializer.init();

@@ -14,9 +14,10 @@ public class WolframFormFactory extends OutputFormFactory {
       int exponentFigures,
       int significantFigures) {
     super(relaxedSyntax, reversed, exponentFigures, significantFigures);
-    this.fQuotes = true;
+    this.fInputForm = true;
   }
 
+  @Override
   public void convertSymbol(final Appendable buf, final ISymbol symbol) throws IOException {
     Context context = symbol.getContext();
     if (context == Context.DUMMY) {

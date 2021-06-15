@@ -9,9 +9,7 @@ import org.matheclipse.core.interfaces.INumber;
 import org.matheclipse.parser.client.FEConfig;
 
 public final class NumStr extends Num {
-	/**
-	 * 
-	 */
+  /** */
 	private static final long serialVersionUID = -6378124858265275437L;
 
 	private String fFloatStr;
@@ -86,6 +84,7 @@ public final class NumStr extends Num {
 		return super.evaluate(engine);
 	}
 
+  @Override
 	public INumber evaluatePrecision(EvalEngine engine) {
 		if (engine.isArbitraryMode()) {
 			long precision = fPrecision < engine.getNumericPrecision() ? engine.getNumericPrecision() : fPrecision;
@@ -161,6 +160,7 @@ public final class NumStr extends Num {
 		return fFloatStr;
 	}
 
+  @Override
 	public long precision() {
 		return fPrecision;
 	}

@@ -12,6 +12,9 @@ import com.duy.lambda.Supplier;
 import com.gx.common.cache.Cache;
 import com.gx.common.cache.CacheBuilder;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import org.hipparchus.complex.Complex;
 import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.hipparchus.linear.RealMatrix;
@@ -20,8 +23,11 @@ import org.jgrapht.graph.DefaultGraphType;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.builtin.BooleanFunctions;
 import org.matheclipse.core.builtin.IOFunctions;
+import org.matheclipse.core.builtin.PredicateQ;
+import org.matheclipse.core.builtin.StructureFunctions;
 import org.matheclipse.core.builtin.StructureFunctions.LeafCount;
 import org.matheclipse.core.convert.AST2Expr;
+import org.matheclipse.core.convert.Object2Expr;
 import org.matheclipse.core.convert.VariablesSet;
 import org.matheclipse.core.eval.EvalEngine;
 import org.matheclipse.core.eval.Predicates;
@@ -48,6 +54,7 @@ import org.matheclipse.core.interfaces.IDiscreteDistribution;
 import org.matheclipse.core.interfaces.IDistribution;
 import org.matheclipse.core.interfaces.IEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
+import org.matheclipse.core.interfaces.IExpr_COMPARE_TERNARY;
 import org.matheclipse.core.interfaces.IInteger;
 import org.matheclipse.core.interfaces.INum;
 import org.matheclipse.core.interfaces.INumber;
@@ -56,6 +63,7 @@ import org.matheclipse.core.interfaces.IPatternSequence;
 import org.matheclipse.core.interfaces.ISignedNumber;
 import org.matheclipse.core.interfaces.ISymbol;
 import org.matheclipse.core.interfaces.ISymbolImpl;
+import org.matheclipse.core.interfaces.ISymbolStatic;
 import org.matheclipse.core.interfaces.IUnaryIndexFunction;
 import org.matheclipse.core.patternmatching.IPatternMatcher;
 import org.matheclipse.core.patternmatching.PatternMatcher;
@@ -195,9 +203,45 @@ public abstract class AbstractAST extends IASTMutableImpl {
     }
 
     @Override
+    public boolean append(long value) {
+      ArgumentTypeException.throwNIL();
+      return false;
+    }
+
+    @Override
+    public boolean append(double value) {
+      ArgumentTypeException.throwNIL();
+      return false;
+    }
+
+    @Override
+    public boolean append(String value) {
+      ArgumentTypeException.throwNIL();
+      return false;
+    }
+
+    @Override
+    public boolean append(char value) {
+      ArgumentTypeException.throwNIL();
+      return false;
+    }
+
+    @Override
+    public boolean append(boolean value) {
+      ArgumentTypeException.throwNIL();
+      return false;
+    }
+
+    @Override
     public void append(int location, IExpr object) {
       ArgumentTypeException.throwNIL();
       // throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void append(int location, long value) {
+      ArgumentTypeException.throwNIL();
+
     }
 
     @Override
@@ -324,6 +368,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     }
 
     /** {@inheritDoc} */
+    @Override
     public int argSize() {
       return -1;
     }
@@ -580,10 +625,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
       return false;
     }
 
+    @Override
     public final boolean isInterval() {
       return false;
     }
 
+    @Override
     public final boolean isInterval1() {
       return false;
     }
@@ -632,13 +679,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
     /** {@inheritDoc} */
     @Override
-    public final boolean isListOfRules(boolean ignoreEmptyList) {
+    public final boolean isListOfRules(boolean ignoreEmptySublists) {
       return false;
     }
 
     /** {@inheritDoc} */
     @Override
-    public final boolean isListOfRulesOrAssociation(boolean ignoreEmptyList) {
+    public final boolean isListOfRulesOrAssociation(boolean ignoreEmptySublists) {
       return false;
     }
 
@@ -680,6 +727,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
     /** {@inheritDoc} */
     @Override
+    public final boolean isNumericFunction(IExpr expr) {
+      return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public final boolean isNumericMode() {
       return false;
     }
@@ -704,6 +757,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
     @Override
     public boolean isPlusTimesPower() {
+      return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isPossibleZero(boolean fastTest) {
       return false;
     }
 
@@ -942,6 +1001,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
       return null;
     }
 
+    @Override
     public IExpr getValue(int position) {
       ArgumentTypeException.throwNIL();
       return null;
@@ -1295,6 +1355,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     IExpr arg = get(position);
     return arg.isUnevaluated() ? arg.first() : arg;
   }
+
   @Override
   public Set<IExpr> asSet() {
     return null;
@@ -1354,6 +1415,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
    * @param predicate the binary predicate
    * @return
    */
+  @Override
   public boolean compareAdjacent(BiPredicate<IExpr, IExpr> predicate) {
     if (size() < 2) {
       return false;
@@ -1426,8 +1488,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
                 // O-3
                 return compareToASTDecreasing(this, rhs);
               }
-            } else if (!rhsExpr.isSameHeadSizeGE(F.Plus, 1) && !rhsExpr
-                .isSameHeadSizeGE(F.Times, 1)) {
+            } else if (!rhsExpr.isSameHeadSizeGE(S.Plus, 1)
+                && !rhsExpr.isSameHeadSizeGE(S.Times, 1)) {
               // O-10
               return compareToASTDecreasingArg1(this, rhsExpr, F.C0);
             }
@@ -1452,8 +1514,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
               }
               // O-9
               return compareToASTIncreasingArg1(this, rhsExpr, F.C1);
-            } else if (!rhsExpr.isSameHeadSizeGE(F.Times, 1) && !rhsExpr
-                .isSameHeadSizeGE(F.Plus, 1)) {
+            } else if (!rhsExpr.isSameHeadSizeGE(S.Times, 1)
+                && !rhsExpr.isSameHeadSizeGE(S.Plus, 1)) {
               // O-9
               return compareToASTIncreasingArg1(this, rhsExpr, F.C1);
             }
@@ -1564,11 +1626,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
     }
     return ++maxDepth;
   }
+
   /** {@inheritDoc} */
   @Override
   public long determinePrecision() {
     long precision = -1;
-    if (isAST(F.N, 3)) {
+    if (isAST(S.N, 3)) {
       long determinedPrecision = arg1().determinePrecision();
       if (determinedPrecision > 0) {
         return determinedPrecision;
@@ -1658,6 +1721,57 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return true;
   }
 
+  @Override
+  public IExpr_COMPARE_TERNARY equalTernary(IExpr that, EvalEngine engine) {
+    if (that.isIndeterminate()) {
+      return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+    }
+    if (this == that) {
+      return IExpr_COMPARE_TERNARY.TRUE;
+    }
+
+    if (that.isAST()) {
+      IAST list2 = (IAST) that;
+      if (isList() && list2.isList()) {
+        int size1 = size();
+        if (size1 != list2.size()) {
+          return IExpr_COMPARE_TERNARY.FALSE;
+        }
+        IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.TRUE;
+        for (int i = 1; i < size1; i++) {
+          b = get(i).equalTernary(list2.get(i), engine);
+          if (b == IExpr_COMPARE_TERNARY.FALSE) {
+
+            return IExpr_COMPARE_TERNARY.FALSE;
+          }
+          if (b != IExpr_COMPARE_TERNARY.TRUE) {
+            return IExpr_COMPARE_TERNARY.UNDECIDABLE;
+          }
+        }
+        return IExpr_COMPARE_TERNARY.TRUE;
+      } else {
+        int size1 = size();
+        if (size1 == list2.size() //
+            && size1 > 0
+            && head().equals(list2.head())) {
+          boolean unequal = false;
+          IExpr_COMPARE_TERNARY b = IExpr_COMPARE_TERNARY.TRUE;
+          for (int i = 1; i < size1; i++) {
+            b = get(i).equalTernary(list2.get(i), engine);
+            if (b != IExpr_COMPARE_TERNARY.TRUE) {
+              unequal = true;
+              break;
+            }
+          }
+          if (!unequal) {
+            return IExpr_COMPARE_TERNARY.TRUE;
+          }
+        }
+      }
+    }
+
+    return super.equalTernary(that, engine);
+  }
   /** {@inheritDoc} */
   @Override
   public final Complex evalComplex() {
@@ -1697,19 +1811,25 @@ public abstract class AbstractAST extends IASTMutableImpl {
    * Evaluate arguments with the head <code>F.Evaluate</code>, i.e. <code>
    * f(a, ... , Evaluate(x), ...)</code>
    *
-   * @param ast
+   * @param engine the evaluation engine
    * @return
    */
   public IExpr evalEvaluate(final EvalEngine engine) {
     final IASTMutable[] rlist = new IASTMutable[]{F.NIL};
-    forEach(1, size(), new ObjIntConsumer<IExpr>() {
-      @Override
-      public void accept(IExpr x, int i) {
-        if (x.isAST(F.Evaluate)) {
-          engine.evalArg(rlist, AbstractAST.this, x, i, false);
-        }
-      }
-    });
+    if (!isHoldAllCompleteAST()) {
+      forEach(
+          1,
+          size(),
+          new ObjIntConsumer<IExpr>() {
+            @Override
+            public void accept(IExpr x, int i) {
+              if (x.isAST(S.Evaluate)) {
+                IExpr temp = engine.evalLoop(x);
+                engine.evalArg(rlist, AbstractAST.this, temp, x, i, false);
+              }
+            }
+          });
+    }
     return rlist[0];
   }
 
@@ -1721,19 +1841,77 @@ public abstract class AbstractAST extends IASTMutableImpl {
     }
     final IExpr head = head();
     final int argSize = argSize();
-    if (head instanceof IBuiltInSymbol) {
-      final IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
-      if (evaluator instanceof ICoreFunctionEvaluator) {
-        try {
-          ICoreFunctionEvaluator functionEvaluator = (ICoreFunctionEvaluator) evaluator;
-          IAST ast = EvalEngine.checkBuiltinArguments(this, functionEvaluator, engine);
-          if (!ast.isPresent()) {
-            return F.NIL;
+    if (head instanceof ISymbol) {
+      ISymbol headSymbol = (ISymbol) head;
+      Class<?> clazz = headSymbol.getContext().getJavaClass();
+      if (clazz != null) {
+        String staticMethodName = headSymbol.getSymbolName();
+        //        try {
+        //          Method method = clazz.getMethod(staticMethodName);
+        //          if (Modifier.isStatic(method.getModifiers())) {
+        //            Parameter[] parameters = method.getParameters();
+        //            if (parameters.length == argSize()) {
+        //              Object[] params = JavaFunctions.determineParameters(this, parameters, 1);
+        //              if (params != null) {
+        //                Object result;
+        //                try {
+        //                  result = method.invoke(null, params);
+        //                  if (result instanceof String) {
+        //                    return F.stringx((String) result);
+        //                  }
+        //                  return Object2Expr.convert(result);
+        //                } catch (IllegalAccessException
+        //                    | IllegalArgumentException
+        //                    | InvocationTargetException e) {
+        //                  // fall through?
+        //                }
+        //              }
+        //            }
+        //          }
+        //
+        //        } catch (IllegalArgumentException | NoSuchMethodException | SecurityException e) {
+        //          // fall through?
+        //        }
+       /* Method[] methods = clazz.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+          if (Modifier.isStatic(methods[i].getModifiers())) {
+            if (staticMethodName.equals(methods[i].getName())) {
+              Parameter[] parameters = methods[i].getParameters();
+              if (parameters.length == argSize()) {
+                Object[] params = JavaFunctions.determineParameters(this, parameters, 1);
+                if (params != null) {
+                  Object result;
+                  try {
+                    result = methods[i].invoke(null, params);
+
+                    if (result instanceof String) {
+                      return F.stringx((String) result);
+                    }
+                    return Object2Expr.convert(result, false, true);
+                  } catch (IllegalAccessException
+                      | IllegalArgumentException
+                      | InvocationTargetException e) {
+                    // fall through?
+                  }
+                }
+              }
+            }
+          }
+        }*/
+      }
+      if (head instanceof IBuiltInSymbol) {
+        final IEvaluator evaluator = ((IBuiltInSymbol) head).getEvaluator();
+        if (evaluator instanceof ICoreFunctionEvaluator) {
+          try {
+            ICoreFunctionEvaluator functionEvaluator = (ICoreFunctionEvaluator) evaluator;
+            IAST ast = EvalEngine.checkBuiltinArguments(this, functionEvaluator, engine);
+            if (!ast.isPresent()) {
+              return F.NIL;
             }
             IBuiltInSymbol header = ((IBuiltInSymbol) head);
             if ((header.getAttributes() & ISymbol.SEQUENCEHOLD) != ISymbol.SEQUENCEHOLD) {
               IExpr temp;
-              if ((temp = engine.flattenSequences(this)).isPresent()) {
+              if ((temp = F.flattenSequence(this)).isPresent()) {
                 return temp;
               }
             }
@@ -1747,18 +1925,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
             if (evaluateTemp.isPresent()) {
               return evaluateTemp;
             }
-          return functionEvaluator.evaluate(ast, engine);
+            return functionEvaluator.evaluate(ast, engine);
 
-        } catch (FlowControlException fce) {
-          throw fce;
-        } catch (SymjaMathException ve) {
-          if (ve instanceof LimitException) {
-            throw ve;
+          } catch (FlowControlException fce) {
+            throw fce;
+          } catch (SymjaMathException ve) {
+            if (ve instanceof LimitException) {
+              throw ve;
+            }
+            if (FEConfig.SHOW_STACKTRACE) {
+              ve.printStackTrace();
+            }
+            return engine.printMessage(topHead(), ve);
           }
-          if (FEConfig.SHOW_STACKTRACE) {
-            ve.printStackTrace();
-          }
-          return engine.printMessage(topHead(), ve);
         }
       }
     }
@@ -1875,6 +2054,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return filterAST;
   }
 
+  @Override
   public IAST select(Predicate<? super IExpr> predicate) {
     int[] items = new int[size()];
     int length = 0;
@@ -1889,7 +2069,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return getItems(items, length);
   }
 
-  ;
+  @Override
 
   public IAST select(Predicate<? super IExpr> predicate, int maxMatches) {
     maxMatches = size() > maxMatches ? maxMatches : size();
@@ -1909,7 +2089,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return getItems(items, length);
   }
 
-  ;
 
   /** {@inheritDoc} */
   @Override
@@ -1935,8 +2114,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
       result.appendRule(arg);
     }
     if (evaled) {
-    return result;
-  }
+      return result;
+    }
     return this;
   }
 
@@ -1947,11 +2126,11 @@ public abstract class AbstractAST extends IASTMutableImpl {
    * <code>restAST</code>.
    *
    * @param filterAST the non <code>F.NIL</code> elements which were returned by the <code>
-   *     function#apply()</code> method
-   * @param restAST the arguments in this <code>AST</code> for which the <code>function#apply()
-   *     </code> method returned <code>F.NIL</code>
+   *                  function#apply()</code> method
+   * @param restAST   the arguments in this <code>AST</code> for which the <code>function#apply()
+   *                  </code> method returned <code>F.NIL</code>
    * @param function  the function which filters each argument by returning a value which unequals
-   *     <code>F.NIL</code>
+   *                  <code>F.NIL</code>
    * @return the given <code>filterAST</code>
    */
   protected IAST filterFunction(final IASTAppendable filterAST, final IASTAppendable restAST,
@@ -1971,42 +2150,32 @@ public abstract class AbstractAST extends IASTMutableImpl {
   }
 
 
-  /**
-   * Apply the functor to the elements of the range from left to right and return the final result.
-   * Results do accumulate from one invocation to the next: each time this method is called, the
-   * accumulation starts over with value from the previous function call.
-   *
-   * @param function   a binary function that accumulate the elements
-   * @param startValue
-   * @return the accumulated elements
-   */
-  public IExpr foldLeft(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue,
-      int start) {
-    final IExpr[] value = {startValue};
-    forEach(start, size(), new Consumer<IExpr>() {
-      @Override
-      public void accept(IExpr x) {
-        value[0] = function.apply(value[0], x);
+  /** {@inheritDoc} */
+  @Override
+  public IExpr foldLeft(
+      final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
+    IExpr value = startValue;
+    for (int i = start; i < size(); i++) {
+      value = function.apply(value, get(i));
+      if (!value.isPresent()) {
+        return F.NIL;
       }
-    });
-    return value[0];
+    }
+
+    return value;
   }
 
-  /**
-   * Apply the functor to the elements of the range from right to left and return the final result.
-   * Results do accumulate from one invocation to the next: each time this method is called, the
-   * accumulation starts over with value from the previous function call.
-   *
-   * @param function   a binary function that accumulate the elements
-   * @param startValue
-   * @return the accumulated elements
-   */
-  public IExpr foldRight(final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue,
-      int start) {
+  /** {@inheritDoc} */
+  @Override
+  public IExpr foldRight(
+      final BiFunction<IExpr, IExpr, ? extends IExpr> function, IExpr startValue, int start) {
     IExpr value = startValue;
     int end = argSize();
     for (int i = end; i >= start; i--) {
       value = function.apply(value, get(i));
+      if (!value.isPresent()) {
+        return F.NIL;
+      }
     }
     return value;
   }
@@ -2204,7 +2373,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public IExpr getOptionalValue() {
-    if (isAST(F.Optional, 3)) {
+    if (isAST(S.Optional, 3)) {
       return arg2();
     }
     return null;// fOptionalValue;
@@ -2389,12 +2558,12 @@ public abstract class AbstractAST extends IASTMutableImpl {
     if (this.equals(F.Slot2)) {
       return prefix + "Slot2";
     }
-    if (temp.equals(F.Inequality) && size() >= 4) {
+    if (temp.equals(S.Inequality) && size() >= 4) {
       return BooleanFunctions.inequality2And(this)
           .internalJavaString(
               symbolsAsFactoryMethod, depth, useOperators, usePrefix, noSymbolPrefix, variables);
     }
-    if (temp.equals(F.Rational) && size() == 3) {
+    if (temp.equals(S.Rational) && size() == 3) {
       if (arg1().isInteger() && arg2().isInteger()) {
         return F.QQ((IInteger) arg1(), (IInteger) arg2())
             .internalJavaString(
@@ -2418,17 +2587,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
           return prefix + "CN1D4";
         }
       }
-      if (equalsAt(1, F.E)) {
+      if (equalsAt(1, S.E)) {
         return prefix
             + "Exp("
             + arg2()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ")";
       }
       if (equalsAt(2, F.C1D2)) {
@@ -2452,26 +2621,26 @@ public abstract class AbstractAST extends IASTMutableImpl {
         return prefix
             + "Sqrt("
             + arg1()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ")";
       }
       if (equalsAt(2, F.C2)) {
         return prefix
             + "Sqr("
             + arg1()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ")";
       }
       if (equalsAt(2, F.CN1D2) && arg1().isInteger()) {
@@ -2544,7 +2713,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
       return text.toString();
     }
 
-    if (isAST(F.Times, 3)) {
+    if (isAST(S.Times, 3)) {
       if (equals(F.CNPi)) {
         return prefix + "CNPi";
       } else if (equals(F.CN2Pi)) {
@@ -2570,37 +2739,37 @@ public abstract class AbstractAST extends IASTMutableImpl {
         return prefix
             + "Negate("
             + arg2()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ")";
       }
-    } else if (isAST(F.Plus, 3)) {
-      if (arg2().isAST(F.Times, 3) && arg2().first().isMinusOne()) {
+    } else if (isAST(S.Plus, 3)) {
+      if (arg2().isAST(S.Times, 3) && arg2().first().isMinusOne()) {
         return prefix
             + "Subtract("
             + arg1()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ","
             + arg2()
-                .second()
-                .internalJavaString(
-                    symbolsAsFactoryMethod,
-                    depth + 1,
-                    useOperators,
-                    usePrefix,
-                    noSymbolPrefix,
-                    variables)
+            .second()
+            .internalJavaString(
+                symbolsAsFactoryMethod,
+                depth + 1,
+                useOperators,
+                usePrefix,
+                noSymbolPrefix,
+                variables)
             + ")";
       }
     }
@@ -2661,9 +2830,6 @@ public abstract class AbstractAST extends IASTMutableImpl {
           usePrefix,
           noSymbolPrefix,
           variables);
-      if (depth == 0 && isList()) {
-        text.append('\n');
-      }
     } else {
       if (depth == 0 && isList()) {
         text.append('\n');
@@ -2685,9 +2851,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
           }
         }
       }
-      if (depth == 0 && isList()) {
-        text.append('\n');
-      }
+    }
+    if (depth == 0 && isList()) {
+      text.append('\n');
     }
     text.append(')');
     return text.toString();
@@ -2727,7 +2893,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isAbs() {
-    return isSameHead(F.Abs, 2);
+    return isSameHead(S.Abs, 2);
   }
 
   /** {@inheritDoc} */
@@ -2742,49 +2908,49 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isAlternatives() {
-    return isSameHeadSizeGE(F.Alternatives, 1);
+    return isSameHeadSizeGE(S.Alternatives, 1);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isAnd() {
-    return isSameHeadSizeGE(F.And, 3);
+    return isSameHeadSizeGE(S.And, 3);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcCos() {
-    return isSameHead(F.ArcCos, 2);
+    return isSameHead(S.ArcCos, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcCosh() {
-    return isSameHead(F.ArcCosh, 2);
+    return isSameHead(S.ArcCosh, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcSin() {
-    return isSameHead(F.ArcSin, 2);
+    return isSameHead(S.ArcSin, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcSinh() {
-    return isSameHead(F.ArcSinh, 2);
+    return isSameHead(S.ArcSinh, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcTan() {
-    return isSameHead(F.ArcTan, 2);
+    return isSameHead(S.ArcTan, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isArcTanh() {
-    return isSameHead(F.ArcTanh, 2);
+    return isSameHead(S.ArcTanh, 2);
   }
 
   /** {@inheritDoc} */
@@ -2821,14 +2987,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
   /** {@inheritDoc} */
   @Override
-  public final boolean isAST(IExpr head, int minLength, int maxLength) {
+  public boolean isAST(IExpr head, int minLength, int maxLength) {
     int size = size();
     return head().equals(head) && minLength <= size && maxLength >= size;
   }
 
   /** {@inheritDoc} */
   @Override
-  public final boolean isAST(final String symbol) {
+  public boolean isAST(final String symbol) {
     if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
       String name = symbol;
       if (name.length() > 0) {
@@ -2845,7 +3011,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
   /** {@inheritDoc} */
   @Override
-  public final boolean isAST(final String symbol, final int length) {
+  public boolean isAST(final String symbol, final int length) {
     if (FEConfig.PARSER_USE_LOWERCASE_SYMBOLS) {
       String name = symbol;
       if (name.length() > 0) {
@@ -2920,19 +3086,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isCos() {
-    return isSameHead(F.Cos, 2);
+    return isSameHead(S.Cos, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isCosh() {
-    return isSameHead(F.Cosh, 2);
+    return isSameHead(S.Cosh, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isDefer() {
-    return isSameHead(F.Defer, 2);
+    return isSameHead(S.Defer, 2);
   }
 
   /** {@inheritDoc} */
@@ -2940,14 +3106,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
   public final IAST[] isDerivative() {
     if (head().isAST()) {
       IAST headAST = (IAST) head();
-      if (headAST.isSameHeadSizeGE(F.Derivative, 2)) {
+      if (headAST.isSameHeadSizeGE(S.Derivative, 2)) {
         IAST[] result = new IAST[3];
         result[0] = headAST;
         result[1] = this;
         return result;
       }
 
-      if (headAST.head().isSameHeadSizeGE(F.Derivative, 2)) {
+      if (headAST.head().isSameHeadSizeGE(S.Derivative, 2)) {
         if (this.size() != ((IAST) headAST.head()).size()) {
           return null;
         }
@@ -2966,14 +3132,14 @@ public abstract class AbstractAST extends IASTMutableImpl {
   public final IAST[] isDerivativeAST1() {
     if (head().isAST()) {
       IAST headAST = (IAST) head();
-      if (headAST.isAST(F.Derivative, 2)) {
+      if (headAST.isAST(S.Derivative, 2)) {
         IAST[] result = new IAST[3];
         result[0] = headAST;
         result[1] = this;
         return result;
       }
 
-      if (headAST.head().isAST(F.Derivative, 2)) {
+      if (headAST.head().isAST(S.Derivative, 2)) {
         if (this.size() != ((IAST) headAST.head()).size()) {
           return null;
         }
@@ -2990,15 +3156,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isDirectedInfinity() {
-    return isSameHead(F.DirectedInfinity, 1, 2);
+    return isSameHead(S.DirectedInfinity, 1, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isDirectedInfinity(IExpr x) {
-    return isSameHead(F.DirectedInfinity, 2) && arg1().equals(x);
+    return isSameHead(S.DirectedInfinity, 2) && arg1().equals(x);
   }
 
+  @Override
   public boolean isContinuousDistribution() {
     if (head().isBuiltInSymbol()) {
       IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -3007,6 +3174,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return false;
   }
 
+  @Override
   public boolean isDiscreteDistribution() {
     if (head().isBuiltInSymbol()) {
       IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -3015,6 +3183,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return false;
   }
 
+  @Override
   public boolean isDistribution() {
     if (head().isBuiltInSymbol()) {
       IEvaluator evaluator = ((IBuiltInSymbol) head()).getEvaluator();
@@ -3031,7 +3200,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isEqual() {
-    return isSameHead(F.Equal, 3);
+    return isSameHead(S.Equal, 3);
   }
 
   /** {@inheritDoc} */
@@ -3082,8 +3251,23 @@ public abstract class AbstractAST extends IASTMutableImpl {
         }
       }, heads);
     }
-    final IPatternMatcher matcher = new PatternMatcherEvalEngine(pattern, EvalEngine.get());
+    final IPatternMatcher matcher;
+    if (pattern.isOrderlessAST() && pattern.isFreeOfPatterns()) {
+      // append a BlankNullSequence[] to match the parts of an Orderless expression
+      IPatternSequence blankNullRest = F.$ps(null, true);
+      IASTAppendable newPattern = ((IAST) pattern).copyAppendable();
+      newPattern.append(blankNullRest);
+      matcher = new PatternMatcher(newPattern);
+    } else {
+      matcher = new PatternMatcher(pattern);
+    }
     return !has(matcher, heads);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isFree(IPatternMatcher predicate, boolean heads) {
+    return !has(predicate, heads);
   }
 
   /** {@inheritDoc} */
@@ -3189,7 +3373,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isHoldPatternOrLiteral() {
-    return isSameHead(F.HoldPattern, 2) || isSameHead(F.Literal, 2);
+    return isSameHead(S.HoldPattern, 2) || isSameHead(S.Literal, 2);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isHoldAllCompleteAST() {
+    return topHead().hasHoldAllCompleteAttribute();
   }
 
   /** {@inheritDoc} */
@@ -3229,7 +3419,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   @Override
   public boolean isIntegerResult() {
     ISymbol symbol = topHead();
-    if (symbol.equals(F.Floor) || symbol.equals(F.Ceiling) || symbol.equals(F.IntegerPart)) {
+    if (symbol.equals(S.Floor) || symbol.equals(S.Ceiling) || symbol.equals(S.IntegerPart)) {
       return true;
     }
     if (isPower() && exponent().isInteger() && base().isPositive()) {
@@ -3238,7 +3428,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
       }
       return false;
     }
-    if (isPlus() || isTimes() || symbol.equals(F.Binomial) || symbol.equals(F.Factorial)) {
+    if (isPlus() || isTimes() || symbol.equals(S.Binomial) || symbol.equals(S.Factorial)) {
       // TODO add more integer functions
       // check if all arguments are &quot;integer functions&quot;
       for (int i = 1; i < size(); i++) {
@@ -3255,7 +3445,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isInterval() {
-    if (isSameHeadSizeGE(F.Interval, 2)) {
+    if (isSameHeadSizeGE(S.Interval, 2)) {
       for (int i = 1; i < size(); i++) {
         if (!(get(i).isVector() == 2)) {
           return false;
@@ -3269,7 +3459,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isInterval1() {
-    return isSameHead(F.Interval, 2) && arg1().isAST(F.List, 3);
+    return isSameHead(S.Interval, 2) && arg1().isAST(S.List, 3);
   }
 
   /** {@inheritDoc} */
@@ -3287,13 +3477,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isList() {
-    return isSameHeadSizeGE(F.List, 1);
+    return isSameHeadSizeGE(S.List, 1);
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isList(Predicate<IExpr> pred) {
-    if (isList()) {
+    if (isList() && size() > 1) {
       for (int i = 1; i < size(); i++) {
         if (!pred.test(get(i))) {
           // the row is no list
@@ -3338,16 +3528,16 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public GraphType isListOfEdges() {
-    if (head().equals(F.List)) {
+    if (head().equals(S.List)) {
       boolean directed = true;
       for (int i = 1; i < size(); i++) {
         IExpr temp = get(i);
         if (temp.isAST2() && temp.head().isBuiltInSymbol()) {
           IBuiltInSymbol symbol = (IBuiltInSymbol) temp.head();
-          if (symbol == F.DirectedEdge || symbol == F.Rule) {
+          if (symbol == S.DirectedEdge || symbol == S.Rule) {
             continue;
           }
-          if (!(symbol == F.UndirectedEdge || symbol == F.TwoWayRule)) {
+          if (!(symbol == S.UndirectedEdge || symbol == S.TwoWayRule)) {
             // the row is no list of edges
             return null;
           }
@@ -3370,19 +3560,21 @@ public abstract class AbstractAST extends IASTMutableImpl {
   public boolean isEdge() {
     if (isAST2() && head().isBuiltInSymbol()) {
       IBuiltInSymbol symbol = (IBuiltInSymbol) head();
-      return (symbol == F.DirectedEdge || symbol == F.UndirectedEdge || symbol == F.Rule
-          || symbol == F.TwoWayRule);
+      return (symbol == S.DirectedEdge
+          || symbol == S.UndirectedEdge
+          || symbol == S.Rule
+          || symbol == S.TwoWayRule);
     }
     return false;
   }
 
   /** {@inheritDoc} */
   @Override
-  public boolean isListOfRules(boolean ignoreEmptyList) {
-    if (head().equals(F.List)) {
+  public boolean isListOfRules(boolean ignoreEmptySublists) {
+    if (head().equals(S.List)) {
       for (int i = 1; i < size(); i++) {
         if (!get(i).isRuleAST()) {
-          if (ignoreEmptyList && get(i).isEmptyList()) {
+          if (ignoreEmptySublists && get(i).isEmptyList()) {
             continue;
           }
           // the row is no list
@@ -3396,23 +3588,37 @@ public abstract class AbstractAST extends IASTMutableImpl {
 
   /** {@inheritDoc} */
   @Override
-  public boolean isListOfRulesOrAssociation(boolean ignoreEmptyList) {
+  public boolean isListOfRulesOrAssociation(boolean ignoreEmptySublists) {
     if (isAssociation()) {
       return true;
     }
-    if (head().equals(F.List)) {
+    if (head().equals(S.List)) {
       for (int i = 1; i < size(); i++) {
         if (!get(i).isRuleAST()) {
           if (get(i).isAssociation()) {
-            if (!ignoreEmptyList && get(i).size() <= 1) {
+            if (!ignoreEmptySublists && get(i).size() <= 1) {
               return false;
             }
             continue;
           }
-          if (ignoreEmptyList && get(i).isEmptyList()) {
+          if (ignoreEmptySublists && get(i).isEmptyList()) {
             continue;
           }
           // the row is no list
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  // @Override
+  public boolean isListOfStrings() {
+    if (isList() && size() > 1) {
+      for (int i = 1; i < size(); i++) {
+        if (!get(i).isString()) {
           return false;
         }
       }
@@ -3424,7 +3630,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isLog() {
-    return isSameHead(F.Log, 2);
+    return isSameHead(S.Log, 2);
   }
 
   /** {@inheritDoc} */
@@ -3451,7 +3657,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
               return null;
             }
             IAST rowList = (IAST) get(i);
-            if (dim[1] != ((IAST) rowList).argSize()) {
+            if (dim[1] != rowList.argSize()) {
               // this row has another dimension
               return null;
             }
@@ -3512,6 +3718,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return null;
   }
 
+  @Override
   public boolean isMember(final IExpr pattern, boolean heads, IVisitorBoolean visitor) {
     if (visitor != null) {
       return super.isMember(pattern, heads, visitor);
@@ -3540,9 +3747,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isModuleOrWithCondition() {
-    return size() == 3
-        && (head().equals(F.With) || head().equals(F.Module))
-        && (get(2).isCondition() || get(2).isModuleOrWithCondition());
+    if ((head() == S.With && size() >= 3) || (head() == S.Module && size() == 3)) {
+      return (last().isCondition() || last().isModuleOrWithCondition());
+    }
+    return false;
   }
 
   /** {@inheritDoc} */
@@ -3660,10 +3868,28 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return false;
   }
 
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isNumericFunction(final IExpr expr) {
+    if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
+      // check if all arguments are &quot;numeric&quot;
+      return forAll(new Predicate<IExpr>() {
+        @Override
+        public boolean test(IExpr x) {
+          return x.isNumericFunction(expr);
+        }
+      });
+    }
+    return false;
+  }
+
   /** {@inheritDoc} */
   @Override
   public boolean isNumericFunction(final Function<IExpr, String> list) {
-    if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute() || isList()) {
+    if (head().isSymbol() && ((ISymbol) head()).isNumericFunctionAttribute()
+        || isList()
+        || list.apply(this) != null) {
       // check if all arguments are &quot;numeric&quot;
       return forAll(new Predicate<IExpr>() {
         @Override
@@ -3672,7 +3898,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
         }
       });
     }
-    return false;
+    return /*IASTMutable.*/super.isNumericFunction(list);
   }
 
   /** {@inheritDoc} */
@@ -3699,7 +3925,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isOptional() {
-    return isAST(F.Optional, 2, 3);
+    return isAST(S.Optional, 2, 3);
   }
 
   /** {@inheritDoc} */
@@ -3729,13 +3955,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isPatternTest() {
-    return isAST(F.PatternTest, 3);
+    return isAST(S.PatternTest, 3);
   }
 
   /** {@inheritDoc} */
   @Override
   public int[] isPiecewise() {
-    if (isSameHead(F.Piecewise, 2, 3) && arg1().isList()) {
+    if (isSameHead(S.Piecewise, 2, 3) && arg1().isList()) {
       int[] result = arg1().isMatrix(false);
       if (result != null && (result[0] <= 0 || result[1] != 2)) {
         return null;
@@ -3769,10 +3995,10 @@ public abstract class AbstractAST extends IASTMutableImpl {
     final IExpr h = head();
     if (h instanceof IBuiltInSymbol) {
       if (4 <= size()) {
-        return h == F.Plus || h == F.Times;
+        return h == S.Plus || h == S.Times;
       }
       if (3 == size()) {
-        return h == F.Plus || h == F.Times || h == F.Power;
+        return h == S.Plus || h == S.Times || h == S.Power;
       }
     }
     return false;
@@ -3824,7 +4050,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isPolynomialOfMaxDegree(ISymbol variable, long maxDegree) {
-    return isPolynomialOfMaxDegree(F.List(variable), maxDegree);
+    return isPolynomialOfMaxDegree(S.List(variable), maxDegree);
   }
 
   /** {@inheritDoc} */
@@ -3854,20 +4080,20 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isPower() {
-    return isSameHead(F.Power, 3);
+    return isSameHead(S.Power, 3);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isPureFunction() {
-    return size() == 2 && head().equals(F.Function);
+    return size() == 2 && head().equals(S.Function);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isRationalResult() {
     ISymbol symbol = topHead();
-    if (symbol.equals(F.Floor) || symbol.equals(F.Ceiling) || symbol.equals(F.IntegerPart)) {
+    if (symbol.equals(S.Floor) || symbol.equals(S.Ceiling) || symbol.equals(S.IntegerPart)) {
       return true;
     }
     if (isPower() && arg2().isInteger() && arg2().isPositive()) {
@@ -3876,7 +4102,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
       }
       return false;
     }
-    if (isPlus() || isTimes() || symbol.equals(F.Binomial) || symbol.equals(F.Factorial)) {
+    if (isPlus() || isTimes() || symbol.equals(S.Binomial) || symbol.equals(S.Factorial)) {
       // TODO add more functions
       // check if all arguments are &quot;rational functions&quot;
       for (int i = 1; i < size(); i++) {
@@ -3953,7 +4179,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   @Override
   public boolean isRealResult() {
     IExpr head = head();
-    if (size() == 2 && F.Cos.equals(head) && F.Sin.equals(head)) {
+    if (size() == 2 && S.Cos.equals(head) && S.Sin.equals(head)) {
       // TODO add more functions
       return arg1().isRealResult();
     }
@@ -4014,20 +4240,20 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public boolean isRule() {
-    return head().equals(F.Rule) && size() == 3;
+    return head().equals(S.Rule) && size() == 3;
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isRuleAST() {
-    return (head().equals(F.Rule) || head().equals(F.RuleDelayed)) && size() == 3;
+    return (head().equals(S.Rule) || head().equals(S.RuleDelayed)) && size() == 3;
   }
 
 
   /** {@inheritDoc} */
   @Override
   public boolean isRuleDelayed() {
-    return head().equals(F.RuleDelayed) && size() == 3;
+    return head().equals(S.RuleDelayed) && size() == 3;
   }
 
   /** {@inheritDoc} */
@@ -4102,28 +4328,29 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isSlot() {
-    return isSameHead(F.Slot, 2) && //
+    return isSameHead(S.Slot, 2)
+        && //
         (arg1().isInteger() || arg1().isString());
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isSlotSequence() {
-    return isSameHead(F.SlotSequence, 2) && arg1().isInteger();
+    return isSameHead(S.SlotSequence, 2) && arg1().isInteger();
   }
 
   /** {@inheritDoc} */
   @Override
   public final int[] isSpan(int size) {
     int[] result = null;
-    if (isSameHead(F.Span, 3, 4)) {
+    if (isSameHead(S.Span, 3, 4)) {
       int step = 1;
       if (isAST3()) {
         step = Validate.checkIntType(this, 3, Integer.MIN_VALUE);
       }
       int index1 = Validate.checkIntType(this, 1, Integer.MIN_VALUE);
       int index2;
-      if (arg2().equals(F.All)) {
+      if (arg2().equals(S.All)) {
         index2 = size - 1;
         if (step < 0) {
           int tempIndx = index1;
@@ -4154,18 +4381,19 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isSubscript() {
-    return isSameHead(F.Subscript, 3) && arg1().isVariable();
+    return isSameHead(S.Subscript, 3) && arg1().isVariable();
   }
+
   /** {@inheritDoc} */
   @Override
   public final boolean isTan() {
-    return isSameHead(F.Tan, 2);
+    return isSameHead(S.Tan, 2);
   }
 
   /** {@inheritDoc} */
   @Override
   public final boolean isTanh() {
-    return isSameHead(F.Tanh, 2);
+    return isSameHead(S.Tanh, 2);
   }
 
   /** {@inheritDoc} */
@@ -4338,7 +4566,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final boolean isWith() {
-    return head() == F.With && size() == 3;
+    return head() == S.With && size() >= 3;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isPossibleZero(boolean fastTest) {
+    return PredicateQ.isPossibleZeroQ(this, fastTest, EvalEngine.get());
   }
 
   /**
@@ -4360,6 +4594,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public IExpr last() {
+    if (size() < 2) {
+      return F.NIL;
+    }
     return get(argSize());
   }
 
@@ -4377,7 +4614,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /** {@inheritDoc} */
   @Override
   public final long leafCount() {
-    return accept(new LeafCount.LeafCountVisitor(0));
+    return accept(StructureFunctions.leafCountVisitor());
   }
 
   /**
@@ -4571,7 +4808,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
         i++;
       }
     }
-    return (IAST) result.orElse(this);
+    return result.orElse(this);
   }
 
 
@@ -4594,6 +4831,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
    * @param function
    * @return
    */
+  @Override
   public IASTAppendable map(IASTAppendable astResult, IUnaryIndexFunction<IExpr, IExpr> function) {
     for (int i = 1; i < size(); i++) {
       astResult.append(function.apply(i, get(i)));
@@ -4621,18 +4859,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return map(setAtCopy(0, head), function);
   }
 
-  /**
-   * Append the mapped ranges elements directly to the given <code>list</code>
-   *
-   * @param list
-   * @param binaryFunction binary function
-   * @param leftArg        left argument of the binary functions <code>apply()</code> method.
-   * @return
-   */
-  public IAST mapLeft(IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction,
-      IExpr leftArg) {
+  /** {@inheritDoc} */
+  @Override
+  public IAST mapLeft(
+      IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction, IExpr leftArg) {
     for (int i = 1; i < size(); i++) {
-      list.append(binaryFunction.apply(leftArg, get(i)));
+      IExpr functionResult = binaryFunction.apply(leftArg, get(i));
+      if (functionResult.isPresent()) {
+        list.append(functionResult);
+      } else {
+        return F.NIL;
+      }
     }
     return list;
   }
@@ -4653,19 +4890,17 @@ public abstract class AbstractAST extends IASTMutableImpl {
     return result;
   }
 
-  /**
-   * Append the mapped ranges elements directly to the given <code>list</code>
-   *
-   * @param list
-   * @param binaryFunction a binary function
-   * @param rightArg       right argument of the binary functions <code>apply()</code> method.
-   * @return the given list
-   */
-  public Collection<IExpr> mapRight(Collection<IExpr> list,
-      BiFunction<IExpr, IExpr, IExpr> binaryFunction,
-      IExpr rightArg) {
+  /** {@inheritDoc} */
+  @Override
+  public IAST mapRight(
+      IASTAppendable list, BiFunction<IExpr, IExpr, IExpr> binaryFunction, IExpr rightArg) {
     for (int i = 1; i < size(); i++) {
-      list.add(binaryFunction.apply(get(i), rightArg));
+      IExpr functionResult = binaryFunction.apply(get(i), rightArg);
+      if (functionResult.isPresent()) {
+        list.append(functionResult);
+      } else {
+        return F.NIL;
+      }
     }
     return list;
   }
@@ -4802,11 +5037,20 @@ public abstract class AbstractAST extends IASTMutableImpl {
         }, 1);
       }
     }
-    return F.Times(F.CN1, this);
-    // return F.eval(F.Times(F.CN1, this));
+    return S.Times(F.CN1, this);
+    // return F.eval(S.Times(F.CN1, this));
   }
 
+  @Override
+  public IExpr optional() {
+    short id = S.GLOBAL_IDS_MAP.getShort(this);
+    if (id >= 0) {
+      return new ExprID(id);
+    }
+    return this;
+  }
 
+  @Override
   public IAST orElse(final IAST other) {
     return this;
   }
@@ -4859,13 +5103,13 @@ public abstract class AbstractAST extends IASTMutableImpl {
   @Override
   public final IAST partitionPlus(Predicate<? super IExpr> predicate, IExpr initYes, IExpr initNo,
       ISymbol action) {
-    return partition(F.Plus, predicate, initYes, initNo, F.Plus, F.List);
+    return partition(S.Plus, predicate, initYes, initNo, S.Plus, S.List);
   }
 
   @Override
   public final IAST partitionTimes(Predicate<? super IExpr> predicate, IExpr initYes, IExpr initNo,
       ISymbol action) {
-    return partition(F.Times, predicate, initYes, initNo, F.Times, F.List);
+    return partition(S.Times, predicate, initYes, initNo, S.Times, S.List);
   }
 
   /** Calculate a special hash value to find a matching rule in a hash table */
@@ -4874,9 +5118,9 @@ public abstract class AbstractAST extends IASTMutableImpl {
     if (size() > 1) {
       final int attr = topHead().getAttributes() & ISymbol.FLATORDERLESS;
       if (attr != ISymbol.NOATTRIBUTE) {
-        if (ISymbolImpl.hasOrderlessAttributeFlat(attr)) {
+        if (ISymbolStatic.hasOrderlessFlatAttribute(attr)) {
           return 17 * head().hashCode();
-        } else if (ISymbolImpl.hasFlatAttribute(attr)) {
+        } else if (ISymbolStatic.hasFlatAttribute(attr)) {
           if (arg1() instanceof IAST) {
             return 31 * head().hashCode() + ((IAST) arg1()).head().hashCode();
           }
@@ -4886,7 +5130,8 @@ public abstract class AbstractAST extends IASTMutableImpl {
       }
       if (arg1().isPresent()) {
         if (arg1() instanceof IAST) {
-          return 31 * head().hashCode() + ((IAST) arg1()).head().hashCode() + size();
+          IAST ast1 = (IAST) arg1();
+          return 31 * head().hashCode() + ast1.head().hashCode() + size();
         }
         return 37 * head().hashCode() + arg1().hashCode() + size();
       }
@@ -5012,16 +5257,18 @@ public abstract class AbstractAST extends IASTMutableImpl {
   /**
    * Append the elements in reversed order to the given <code>list</code>
    *
-   * @param list
+   * @param resultList
    * @return
    */
-  public IASTAppendable reverse(IASTAppendable list) {
+  @Override
+  public IASTAppendable reverse(IASTAppendable resultList) {
     for (int i = argSize(); i >= 1; i--) {
-      list.append(get(i));
+      resultList.append(get(i));
     }
-    return list;
+    return resultList;
   }
 
+  @Override
   public IExpr rewrite(int functionID) {
     int headID = headID();
     if (headID > 0) {
@@ -5037,42 +5284,44 @@ public abstract class AbstractAST extends IASTMutableImpl {
    * Rotate the ranges elements to the left by n places and append the resulting elements to the
    * <code>list</code>
    *
-   * @param list
+   * @param resultList
    * @param n
    * @return the given list
    */
-  public IAST rotateLeft(IASTAppendable list, final int n) {
+  @Override
+  public IAST rotateLeft(IASTAppendable resultList, final int n) {
     int size = size();
     int n1 = n + 1;
     for (int i = n1; i < size; i++) {
-      list.append(get(i));
+      resultList.append(get(i));
     }
     if (n <= size) {
       for (int i = 1; i < n1; i++) {
-        list.append(get(i));
+        resultList.append(get(i));
       }
     }
-    return list;
+    return resultList;
   }
 
   /**
    * Rotate the ranges elements to the right by n places and append the resulting elements to the
    * <code>list</code>
    *
-   * @param list
+   * @param resultList
    * @param n
    * @return the given list
    */
-  public IAST rotateRight(IASTAppendable list, final int n) {
+  @Override
+  public IAST rotateRight(IASTAppendable resultList, final int n) {
     if (n <= size()) {
       for (int i = size() - n; i < size(); i++) {
-        list.append(get(i));
+        resultList.append(get(i));
       }
       for (int i = 1; i < size() - n; i++) {
-        list.append(get(i));
+        resultList.append(get(i));
       }
     }
-    return list;
+    return resultList;
   }
 
   /** {@inheritDoc} */
@@ -5149,7 +5398,7 @@ public abstract class AbstractAST extends IASTMutableImpl {
       }, 1);
       return F.eval(plus);
     }
-    return F.eval(F.Times(this, that));
+    return F.eval(S.Times(this, that));
   }
 
   /** {@inheritDoc} */

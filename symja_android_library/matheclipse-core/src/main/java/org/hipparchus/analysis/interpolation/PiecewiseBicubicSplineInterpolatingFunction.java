@@ -22,7 +22,7 @@
 package org.hipparchus.analysis.interpolation;
 
 import org.hipparchus.Field;
-import org.hipparchus.RealFieldElement;
+import org.hipparchus.CalculusFieldElement;
 import org.hipparchus.analysis.BivariateFunction;
 import org.hipparchus.analysis.FieldBivariateFunction;
 import org.hipparchus.analysis.RealFieldBivariateFunction;
@@ -160,7 +160,7 @@ public class PiecewiseBicubicSplineInterpolatingFunction
     }
 
     @Override
-    public <T extends RealFieldElement<T>> RealFieldBivariateFunction<T> toRealFieldBivariateFunction(Field<T> field) {
+    public <T extends CalculusFieldElement<T>> RealFieldBivariateFunction<T> toRealFieldBivariateFunction(Field<T> field) {
         return new RealFieldBivariateFunction<T>() {
             @Override
             public T value(T x, T y) {
@@ -175,7 +175,7 @@ public class PiecewiseBicubicSplineInterpolatingFunction
      * @since 1.5
      */
     @Override
-    public <T extends RealFieldElement<T>> T value(final T x, final T y)
+    public <T extends CalculusFieldElement<T>> T value(final T x, final T y)
             throws MathIllegalArgumentException {
         final AkimaSplineInterpolator interpolator = new AkimaSplineInterpolator();
         final int offset = 2;
