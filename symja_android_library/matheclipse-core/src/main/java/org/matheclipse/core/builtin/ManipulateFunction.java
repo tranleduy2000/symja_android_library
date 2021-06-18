@@ -1,6 +1,5 @@
 package org.matheclipse.core.builtin;
 
-import android.text.Layout;
 import com.duy.lang.DDouble;
 import java.io.IOException;
 import java.io.StringWriter;
