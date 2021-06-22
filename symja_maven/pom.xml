@@ -115,4 +115,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--https://stackoverflow.com/questions/52357496/add-gitlab-private-repository-as-maven-dependency-->
+    <distributionManagement>
+        <repository>
+            <id>gittlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/27461192/packages/maven</url>
+        </repository>
+        <snapshotRepository>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/27461192/packages/maven</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
