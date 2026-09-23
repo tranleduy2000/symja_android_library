@@ -1,10 +1,16 @@
 package org.matheclipse.core.system;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import java.math.RoundingMode;
-import java.time.Duration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.matheclipse.core.basic.Config;
 import org.matheclipse.core.eval.EvalEngine;
@@ -94,16 +100,25 @@ public class LinearSolveSubresultantGCDTest {
    * above the one and three times below the other: a machine several times slower than this one
    * still passes, and the unguarded engine still fails.
    */
-  private static final Duration BUDGET = Duration.ofSeconds(5);
+  private static final long BUDGET_SECONDS = 5;
+
+  /**
+   * Symja's static initialisation has nothing to do with what this test bounds, and it is not
+   * small: 0.7 s in this module, 5.1 s in the Android build of the same sources. It happens once,
+   * before any budget starts, so a budget measures the solve rather than the start-up.
+   */
+  @BeforeAll
+  public static void awaitEngineInitialisation() throws InterruptedException {
+    F.await();
+  }
 
   @Test
   public void testExactLinearSolveFinishesWithinBudget() {
-    double[] roots = assertTimeoutPreemptively(BUDGET, //
-        () -> solveAndApproximate(EXACT_MATRIX, EXACT_VECTOR), //
-        () -> "LinearSolve over exact trigonometric entries did not finish within " + BUDGET
-            + ". It is in the subresultant GCD of AlgebraUtil.cancelGCD, which is quadratic in the"
-            + " term counts and re-enters the evaluator for every coefficient multiplication - and"
-            + " which cannot be interrupted once it is running.");
+    double[] roots = solveWithin(BUDGET_SECONDS, EXACT_MATRIX, EXACT_VECTOR,
+        "LinearSolve over exact trigonometric entries did not finish within " + BUDGET_SECONDS
+            + " s. It is in the subresultant GCD of AlgebraUtil.cancelGCD, which is quadratic in"
+            + " the term counts and re-enters the evaluator for every coefficient multiplication -"
+            + " and which cannot be interrupted once it is running.");
 
     // The tolerance is wide on purpose: the symbolic roots are a 4000 character sum of products of
     // cosines and radicals, and evaluating that in double arithmetic loses about eight digits to
@@ -120,8 +135,7 @@ public class LinearSolveSubresultantGCDTest {
    */
   @Test
   public void testNumericLinearSolveIsCheap() {
-    double[] roots = assertTimeoutPreemptively(Duration.ofSeconds(10), //
-        () -> solveAndApproximate("N(" + EXACT_MATRIX + ")", "N(" + EXACT_VECTOR + ")"), //
+    double[] roots = solveWithin(10, "N(" + EXACT_MATRIX + ")", "N(" + EXACT_VECTOR + ")",
         "The numeric solve of the same system did not finish either - the cost is not the"
             + " coefficient ring after all, and the analysis above is wrong.");
 
@@ -131,11 +145,46 @@ public class LinearSolveSubresultantGCDTest {
   }
 
   /**
+   * Runs the solve on a thread of its own and fails with <code>message</code> if it has not
+   * finished within <code>budgetSeconds</code>.
+   *
+   * <p>
+   * A plain {@link Future#get(long, TimeUnit)} rather than
+   * <code>Assertions.assertTimeoutPreemptively</code>, which needs <code>java.time</code> - not
+   * available in every module this test is compiled for.
+   *
+   * <p>
+   * The thread is a daemon because the calculation being bounded here <b>cannot be interrupted</b>:
+   * JAS only tests the interrupt flag when it constructs a polynomial, so a runaway GCD outlives
+   * the failure and would otherwise hold the JVM open.
+   *
+   * @return the three roots as doubles
+   */
+  private static double[] solveWithin(long budgetSeconds, String matrix, String vector,
+      String message) {
+    ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
+      Thread thread = new Thread(runnable, "LinearSolveSubresultantGCDTest");
+      thread.setDaemon(true);
+      return thread;
+    });
+    try {
+      Future<double[]> solved = executor.submit(() -> solveAndApproximate(matrix, vector));
+      return solved.get(budgetSeconds, TimeUnit.SECONDS);
+    } catch (TimeoutException timedOut) {
+      return fail(message);
+    } catch (InterruptedException | ExecutionException failed) {
+      throw new AssertionError(failed);
+    } finally {
+      executor.shutdownNow();
+    }
+  }
+
+  /**
    * Solves on the calling thread and approximates the three roots.
    *
    * <p>
    * The engine is built here rather than in a field because {@link EvalEngine} is held per thread
-   * and {@code assertTimeoutPreemptively} runs this on one of its own.
+   * and {@link #solveWithin} runs this on one of its own.
    *
    * @return the three roots as doubles
    */
