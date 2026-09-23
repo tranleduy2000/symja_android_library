@@ -1081,6 +1081,19 @@ public class AlgebraUtil {
         GenPolynomial<IExpr> p1 = jas.expr2IExprJAS(pol1);
         GenPolynomial<IExpr> p2 = jas.expr2IExprJAS(pol2);
 
+        // The subresultant PRS below does about p1.length() * p2.length() pseudo-remainder steps
+        // and each one multiplies every coefficient. With numeric coefficients that is bignum
+        // arithmetic and stays fast; when a coefficient is an unevaluated algebraic expression a
+        // single coefficient multiplication is a whole EvalEngine.evaluate whose result grows
+        // again at every step, and the loop cannot be interrupted once it is running.
+        // MAX_CANCEL_GCD_LEAFCOUNT does not bound that - see MAX_CANCEL_GCD_TERM_PRODUCT for the
+        // measurement. Declining is what Optional.empty() already means to every caller.
+        if (!p1.leadingBaseCoefficient().isNumber() || !p2.leadingBaseCoefficient().isNumber()) {
+          if ((long) p1.length() * (long) p2.length() > Config.MAX_CANCEL_GCD_TERM_PRODUCT) {
+            return Optional.empty();
+          }
+        }
+
         GreatestCommonDivisor<IExpr> engine;
         engine = GCDFactory.getImplementation(ExprRingFactory.CONST);
         GenPolynomial<IExpr> gcd = engine.gcd(p1, p2);

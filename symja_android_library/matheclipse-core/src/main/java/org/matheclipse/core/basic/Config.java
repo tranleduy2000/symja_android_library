@@ -137,6 +137,34 @@ public class Config {
   public static final int MAX_CANCEL_GCD_LEAFCOUNT = 4000;
 
   /**
+   * Maximum number of <code>p1.length() * p2.length()</code> - the product of the two polynomials'
+   * term counts - for which the subresultant GCD of {@link AlgebraUtil#cancelGCD(IExpr, IExpr)} is
+   * attempted <b>when a coefficient is not a number</b>. Has to be an int value greater 0.
+   *
+   * <p>
+   * {@link #MAX_CANCEL_GCD_LEAFCOUNT} bounds the same algorithm by the size of the input
+   * expression, which does not measure the work: the PRS does about one pseudo-remainder step per
+   * pair of terms, so the cost is in the term counts. A 3x3 exact <code>LinearSolve</code> over
+   * entries such as <code>Cos(7/36*Pi)</code> and <code>Sqrt(2)</code> reaches this GCD with 28
+   * terms over 23 - a term product of 644 at a leaf count of 1281, a third of the limit above - and
+   * that one call takes seconds. See
+   * {@link org.matheclipse.core.system.LinearSolveSubresultantGCDTest}.
+   *
+   * <p>
+   * The condition on the coefficients is what makes the difference. With numeric coefficients the
+   * same PRS is bignum arithmetic and stays fast, whatever the term counts:
+   * <code>Cancel(Expand((x+y+z)^4*(x-y))/Expand((x+y+z)^4))</code> is 30 terms over 15 and cancels
+   * in milliseconds. It is when a coefficient is an unevaluated algebraic expression that a single
+   * coefficient multiplication becomes a whole {@link EvalEngine#evaluate(IExpr)} whose result
+   * grows again at every step.
+   *
+   * <p>
+   * Above this limit the GCD is skipped and the expression is left uncancelled, which is a correct
+   * (only less reduced) result, exactly as for {@link #MAX_CANCEL_GCD_LEAFCOUNT}.
+   */
+  public static final int MAX_CANCEL_GCD_TERM_PRODUCT = 256;
+
+  /**
    * Maximum number for the leaf count of an expression so that {@link S#PossibleZeroQ} > will try a
    * factoring. Has to be an int value greater 0.
    */
